@@ -1,17 +1,38 @@
-import React from 'react';
-import ReactDOM from 'react-dom/client';
-import './index.css';
-import App from './App';
-import reportWebVitals from './reportWebVitals';
+import React, { useState } from "react";
+import ReactDOM from "react-dom/client";
+import { BrowserRouter, Route, Routes, Navigate } from "react-router-dom";
+import { SettingsProvider } from "./context/SettingsContext";
 
-const root = ReactDOM.createRoot(document.getElementById('root'));
-root.render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>
-);
+import Login from "./views/Login";
+import Dashboard from "./views/Dashboard";
+import Settings from "./views/Settings"; // Importa la vista de Settings
 
-// If you want to start measuring performance in your app, pass a function
-// to log results (for example: reportWebVitals(console.log))
-// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
-reportWebVitals();
+import "./App.css";
+
+const App = () => {
+  const [isAuthenticated, setIsAuthenticated] = useState(!!localStorage.getItem("token"));
+
+  return (
+    <SettingsProvider> {/* Envuelve la app con el proveedor */}
+      <BrowserRouter>
+        {isAuthenticated ? (
+          <Routes>
+            {/* Ruta para Dashboard que actúa como contenedor base */}
+            <Route path="/dashboard" element={<Dashboard setIsAuthenticated={setIsAuthenticated} />}>
+              {/* Rutas hijas dentro del dashboard que cambian el content */}
+              <Route path="settings" element={<Settings />} />
+              {/* Redireccionamiento predeterminado a Settings */}
+              <Route path="*" element={<Navigate to="/dashboard/settings" />} />
+            </Route>
+            {/* Otras rutas que pueden estar fuera del dashboard */}
+          </Routes>
+        ) : (
+          <Login setIsAuthenticated={setIsAuthenticated} />
+        )}
+      </BrowserRouter>
+    </SettingsProvider>
+  );
+};
+
+const root = ReactDOM.createRoot(document.getElementById("root"));
+root.render(<App />);
