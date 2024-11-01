@@ -1,52 +1,35 @@
 import React from "react";
 import { Form, Input, Select, Upload, message } from "antd";
 import { UploadOutlined } from "@ant-design/icons";
+import useFetch from "../../hooks/useFetch"; // Importa el hook useFetch
 
 const { Option } = Select;
 
 const DynamicInput = ({ label, name, type, options, form, rules, onImageUpload }) => {
+    const { request } = useFetch(); // Usa el hook useFetch para manejar las peticiones
+
     const handleRemoveImage = async (file) => {
         try {
-            const response = await fetch(`http://localhost:3000/api/images/delete`, {
-                method: 'DELETE',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ imageUrl: file.url || file.response.url }),
-            });
-
-            const data = await response.json();
-            if (response.ok) {
-                message.success('Image removed successfully');
-                form.setFieldsValue({ [name]: null });
-                if (onImageUpload) onImageUpload(null); // Limpia la URL en el componente padre
-            } else {
-                throw new Error(data.message || 'Failed to remove image');
-            }
+            const data = await request(`images/delete`, "DELETE", { imageUrl: file.url || file.response.url });
+            message.success("Image removed successfully");
+            form.setFieldsValue({ [name]: null });
+            if (onImageUpload) onImageUpload(null); // Limpia la URL en el componente padre
         } catch (error) {
-            message.error('Failed to remove image');
+            message.error("Failed to remove image");
         }
     };
 
     const customRequest = async ({ file, onSuccess, onError }) => {
         const formData = new FormData();
-        formData.append('logo', file);
-        try {
-            const response = await fetch('http://localhost:3000/api/images/upload', {
-                method: 'POST',
-                body: formData,
-            });
+        formData.append("logo", file);
 
-            const data = await response.json();
-            if (response.ok) {
-                form.setFieldsValue({ [name]: data.url });
-                if (onImageUpload) onImageUpload(data.url); // Pasa la URL al componente padre
-                onSuccess(data);
-            } else {
-                throw new Error(data.message || 'Upload failed');
-            }
+        try {
+            const data = await request("images/upload", "POST", formData);
+            form.setFieldsValue({ [name]: data.url });
+            if (onImageUpload) onImageUpload(data.url); // Pasa la URL al componente padre
+            onSuccess(data);
         } catch (error) {
-            console.error('Error uploading image:', error);
+            message.error("Failed to upload image");
             onError(error);
         }
     };
@@ -84,7 +67,7 @@ const DynamicInput = ({ label, name, type, options, form, rules, onImageUpload }
                         );
                     }}
                 >
-                    <button style={{ border: 0, background: 'none' }} type="button">
+                    <button style={{ border: 0, background: "none" }} type="button">
                         <UploadOutlined />
                         <div style={{ marginTop: 8 }}>Upload</div>
                     </button>

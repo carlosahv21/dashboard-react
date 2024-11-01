@@ -1,52 +1,53 @@
 import React, { useState, useEffect, useContext } from "react";
 import { SettingsContext } from "../context/SettingsContext";
 import { Form, Button, Row, Col, Card, message } from "antd";
-import DynamicInput from "../components/DynamicInput";
+import DynamicInput from "../components/Subcomponents/DynamicInput";
+import useFetch from "../hooks/useFetch";
 
 const Settings = () => {
     const [form] = Form.useForm();
-    const [loading, setLoading] = useState(false);
-    const [uploadKey, setUploadKey] = useState(Date.now()); // Clave para resetear el input
-
+    const [uploadKey, setUploadKey] = useState(Date.now());
     const { settings, setSettings } = useContext(SettingsContext);
     const [imageUrl, setImageUrl] = useState(settings?.logo_url || "");
-
     const baseBackend = process.env.REACT_APP_BACKEND;
+    const logo = `${baseBackend}/${settings?.logo_url || ""}`;
+    const { request, loading, error } = useFetch();
 
-    const logo = baseBackend +'/'+ settings.logo_url;
+    const mapLocalStorageToForm = (data) => ({
+        academyName: data.academy_name,
+        logo: data.logo_url,
+        currency: data.currency,
+        dateFormat: data.date_format,
+        theme: data.theme,
+        language: data.language,
+        contactEmail: data.contact_email,
+        phoneNumber: data.phone_number,
+    });
 
-    const mapLocalStorageToForm = (data) => {
-        return {
-            academyName: data.academy_name,
-            logo: data.logo_url,
-            currency: data.currency,
-            dateFormat: data.date_format,
-            theme: data.theme,
-            language: data.language,
-            contactEmail: data.contact_email,
-            phoneNumber: data.phone_number,
-        };
-    };
-
-    const mapFormToLocalStorage = (values) => {
-        return {
-            academy_name: values.academyName,
-            logo_url: values.logo_url,
-            currency: values.currency,
-            date_format: values.dateFormat,
-            theme: values.theme,
-            language: values.language,
-            contact_email: values.contactEmail,
-            phone_number: values.phoneNumber,
-        };
-    };
+    const mapFormToLocalStorage = (values) => ({
+        academy_name: values.academyName,
+        logo_url: values.logo_url,
+        currency: values.currency,
+        date_format: values.dateFormat,
+        theme: values.theme,
+        language: values.language,
+        contact_email: values.contactEmail,
+        phone_number: values.phoneNumber,
+    });
 
     useEffect(() => {
-        if (settings) {
-            const mappedSettings = mapLocalStorageToForm(settings);
-            form.setFieldsValue(mappedSettings);
-        }
-    }, [form, settings]);
+        const loadSettings = async () => {
+            try {
+                const fetchedSettings = await request("settings", "GET");
+                setSettings(fetchedSettings);
+                form.setFieldsValue(mapLocalStorageToForm(fetchedSettings));
+            } catch {
+                message.error(error || "Failed to fetch settings.");
+            }
+        };
+
+        loadSettings();
+    }, [request, form, setSettings, error]);
 
     const handleImageUpload = (url) => {
         setImageUrl(url);
@@ -54,36 +55,19 @@ const Settings = () => {
 
     const handleSubmit = async (values) => {
         try {
-            setLoading(true);
             const mappedValues = mapFormToLocalStorage({
                 ...values,
-                logo_url: imageUrl
+                logo_url: imageUrl,
             });
 
-            const response = await fetch("http://localhost:3000/api/settings", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify(mappedValues),
-            });
-
-            const data = await response.json();
-            if (response.ok) {
-                setSettings(data);
-                message.success("Settings updated successfully!");
-
-                // Resetear solo el campo de imagen después de guardar
-                setImageUrl("");  // Limpiar el estado de imageUrl
-                setUploadKey(Date.now()); // Cambia la clave del input tipo file para resetearlo
-            } else {
-                alert(`Error: ${data.error || "Failed to update settings"}`);
-            }
-        } catch (error) {
-            console.error("Error updating settings:", error);
-            alert("Failed to update settings.");
+            const updatedSettings = await request("settings", "POST", mappedValues);
+            setSettings(updatedSettings);
+            message.success("Settings updated successfully!");
+            setImageUrl("");
+            setUploadKey(Date.now());
+        } catch {
+            message.error(error || "Failed to update settings.");
         }
-        setLoading(false);
     };
 
     return (
@@ -126,12 +110,12 @@ const Settings = () => {
                     }}
                 >
                     <DynamicInput
-                        key={uploadKey}  // Clave dinámica para forzar el reinicio
+                        key={uploadKey}
                         label="Logo"
                         name="logo_url"
                         type="image"
                         form={form}
-                        rules={[{ required: true, message: "Logo is required" }]}
+                        rules={[{ required: !imageUrl, message: "Logo is required" }]}
                         accept="image/*"
                         multiple={false}
                         onImageUpload={handleImageUpload}
