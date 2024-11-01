@@ -1,35 +1,33 @@
-import React, { useState } from "react";
-import { Layout } from "antd";
-import Footer from "../components/Footer";
-import Sidebar from "../components/Sidebar";
-import HeaderComponent from "../components/Header";
-import { Outlet } from "react-router-dom"; // Outlet para renderizar las rutas hijas
+import React from "react";
+import { Card, Typography, Row, Col } from "antd";
 
-const { Content } = Layout;
+const { Title, Paragraph } = Typography;
 
-const Dashboard = ({ setIsAuthenticated }) => {
-    const [collapsed, setCollapsed] = useState(false);
-
+const DashboardHome = () => {
     return (
-        <Layout style={{ minHeight: "100vh" }}>
-            <Sidebar collapsed={collapsed} />
-            <Layout>
-                <HeaderComponent collapsed={collapsed} setCollapsed={setCollapsed} setIsAuthenticated={setIsAuthenticated} />
-                <Content
-                    style={{
-                        margin: "20px 16px",
-                        padding: 24,
-                        minHeight: 280,
-                        borderRadius: 8,
-                    }}
-                >
-                    {/* Aquí se renderizan las rutas hijas */}
-                    <Outlet />
-                </Content>
-                <Footer />
-            </Layout>
-        </Layout>
+        <div>
+            <Title level={2}>Welcome to the Dashboard</Title>
+            <Paragraph>This is the main overview of your application.</Paragraph>
+
+            <Row gutter={[16, 16]}>
+                <Col span={8}>
+                    <Card title="Statistics" bordered={false}>
+                        <p>Overview of statistics</p>
+                    </Card>
+                </Col>
+                <Col span={8}>
+                    <Card title="Recent Activities" bordered={false}>
+                        <p>List of recent activities</p>
+                    </Card>
+                </Col>
+                <Col span={8}>
+                    <Card title="Quick Actions" bordered={false}>
+                        <p>Shortcut links to common actions</p>
+                    </Card>
+                </Col>
+            </Row>
+        </div>
     );
 };
 
-export default Dashboard;
+export default DashboardHome;

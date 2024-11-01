@@ -1,44 +1,50 @@
-import React from "react";
-import { Button, Layout, Dropdown, Menu } from "antd";
-import UserOutlined from "@ant-design/icons/lib/icons/UserOutlined";
-import {
-    MenuFoldOutlined,
-    MenuUnfoldOutlined,
-    SettingOutlined,
-    LogoutOutlined,
-} from "@ant-design/icons";
-import { useNavigate } from "react-router-dom"; // Importar useNavigate
+// components/HeaderComponent.js
+import React, { useContext } from "react";
+import { Button, Layout, Dropdown } from "antd";
+import { MenuFoldOutlined, MenuUnfoldOutlined, SettingFilled } from "@ant-design/icons";
+import DynamicMenu from "./Subcomponents/DynamicMenu";
+import { RoutesContext } from "../context/RoutesContext";
+import { useNavigate } from "react-router-dom";
 
 const { Header } = Layout;
 
 const HeaderComponent = ({ collapsed, setCollapsed, setIsAuthenticated }) => {
-    const navigate = useNavigate(); // Hook para redireccionar
+    const { routes } = useContext(RoutesContext);
+    const navigate = useNavigate();
 
-    // Función de logout
-    const handleLogout = () => {
-        localStorage.removeItem("token"); // Quitar el token del localStorage
-        setIsAuthenticated(false); // Cambiar el estado de autenticación a 'false'
-        navigate("/login"); // Redireccionar al login
+    const headerRoutes = routes.filter(route => route.location === "HEADER");
+
+    const handleMenuClick = (route) => {
+        if (route.on_click_action === "navigate") {
+            navigate(route.path);
+        }
     };
 
-    const menu = (
-        <Menu>
-            <Menu.Item key="1" icon={<SettingOutlined />} onClick={() => navigate("/dashboard/settings")}>
-                Settings
-            </Menu.Item>
-            <Menu.Item key="2" icon={<LogoutOutlined />} onClick={handleLogout}>
-                Logout
-            </Menu.Item>
-        </Menu>
+    const handleLogout = () => {
+        localStorage.removeItem("token");
+        setIsAuthenticated(false);
+        navigate("/login");
+    };
+
+    const userMenu = (
+        <DynamicMenu routes={[...headerRoutes, { id: "logout", name: "Logout", icon: "Logout", on_click_action: "logout" }]} theme="light" onMenuClick={(route) => {
+            if (route.on_click_action === "logout") {
+                handleLogout();
+            } else {
+                handleMenuClick(route);
+            }
+        }} />
     );
 
     return (
         <Header
             style={{
                 padding: 0,
-                background: "#fff",
+                backgroundColor: "#fff",
                 display: "flex",
+                alignItems: "center",
                 justifyContent: "space-between",
+                boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
             }}
         >
             <Button
@@ -46,20 +52,20 @@ const HeaderComponent = ({ collapsed, setCollapsed, setIsAuthenticated }) => {
                 icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
                 onClick={() => setCollapsed(!collapsed)}
                 style={{
-                    fontSize: "16px",
+                    fontSize: "18px",
                     width: 64,
                     height: 64,
                 }}
             />
-            <Dropdown overlay={menu} placement="bottomRight" trigger={["click"]}>
+            <Dropdown overlay={userMenu} placement="bottomRight" trigger={["click"]}>
                 <Button
                     type="text"
-                    icon={<UserOutlined />}
+                    icon={<SettingFilled />}
                     style={{
-                        fontSize: "16px",
+                        fontSize: "18px",
                         width: 64,
                         height: 64,
-                        marginRight: 15,
+                        marginRight: 20,
                     }}
                 />
             </Dropdown>

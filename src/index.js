@@ -2,10 +2,12 @@ import React, { useState } from "react";
 import ReactDOM from "react-dom/client";
 import { BrowserRouter, Route, Routes, Navigate } from "react-router-dom";
 import { SettingsProvider } from "./context/SettingsContext";
+import { RoutesProvider } from "./context/RoutesContext";
 
 import Login from "./views/Login";
-import Dashboard from "./views/Dashboard";
-import Settings from "./views/Settings"; // Importa la vista de Settings
+import Layout from "./views/Layout"; 
+import Dashboard from "./views/Dashboard"; 
+import Settings from "./views/Settings";
 
 import "./App.css";
 
@@ -13,23 +15,23 @@ const App = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(!!localStorage.getItem("token"));
 
   return (
-    <SettingsProvider> {/* Envuelve la app con el proveedor */}
-      <BrowserRouter>
-        {isAuthenticated ? (
-          <Routes>
-            {/* Ruta para Dashboard que actúa como contenedor base */}
-            <Route path="/dashboard" element={<Dashboard setIsAuthenticated={setIsAuthenticated} />}>
-              {/* Rutas hijas dentro del dashboard que cambian el content */}
-              <Route path="settings" element={<Settings />} />
-              {/* Redireccionamiento predeterminado a Settings */}
-              <Route path="*" element={<Navigate to="/dashboard/settings" />} />
-            </Route>
-            {/* Otras rutas que pueden estar fuera del dashboard */}
-          </Routes>
-        ) : (
-          <Login setIsAuthenticated={setIsAuthenticated} />
-        )}
-      </BrowserRouter>
+    <SettingsProvider>
+      <RoutesProvider>
+        <BrowserRouter>
+          {isAuthenticated ? (
+            <Routes>
+              {/* Define Dashboard como el layout base */}
+              <Route element={<Layout setIsAuthenticated={setIsAuthenticated} />}>
+                <Route path="/" element={<Dashboard />} /> {/* Vista principal de Dashboard */}
+                <Route path="settings" element={<Settings />} />
+                <Route path="*" element={<Navigate to="/" />} />
+              </Route>
+            </Routes>
+          ) : (
+            <Login setIsAuthenticated={setIsAuthenticated} />
+          )}
+        </BrowserRouter>
+      </RoutesProvider>
     </SettingsProvider>
   );
 };
