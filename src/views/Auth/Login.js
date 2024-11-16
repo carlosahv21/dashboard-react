@@ -1,8 +1,8 @@
 import React, { useContext, useState } from "react";
 import { Form, Input, Button, Alert } from "antd";
 import { useNavigate } from "react-router-dom";
-import { SettingsContext } from "../context/SettingsContext";
-import useFetch from "../hooks/useFetch";
+import { SettingsContext } from "../../context/SettingsContext";
+import useFetch from "../../hooks/useFetch";
 
 const Login = ({ setIsAuthenticated }) => {
     const [error, setError] = useState("");

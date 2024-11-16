@@ -1,7 +1,7 @@
 import React from "react";
 import { Routes, Route } from "react-router-dom";
-import Dashboard from "../views/Layout";
-import Login from "../views/Login";
+import Dashboard from "../views/Layout/Layout";
+import Login from "../views/Auth/Login";
 
 // Asegúrate de que el usuario esté autenticado antes de mostrar el dashboard
 const isAuthenticated = () => {

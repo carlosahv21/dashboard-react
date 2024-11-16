@@ -4,10 +4,12 @@ import { BrowserRouter, Route, Routes, Navigate } from "react-router-dom";
 import { SettingsProvider } from "./context/SettingsContext";
 import { RoutesProvider } from "./context/RoutesContext";
 
-import Login from "./views/Login";
-import Layout from "./views/Layout"; 
-import Dashboard from "./views/Dashboard"; 
-import Settings from "./views/Settings";
+import Login from "./views/Auth/Login";
+import Layout from "./views/Layout/Layout";
+import Dashboard from "./views/Dashboard/Dashboard";
+import Settings from "./views/Settings/Settings";
+import Classes from "./views/Classes/Classes";
+import CreateOrEditClass from "./views/Classes/CreateOrEditClass"; // Corrección de importación
 
 import "./App.css";
 
@@ -24,6 +26,9 @@ const App = () => {
               <Route element={<Layout setIsAuthenticated={setIsAuthenticated} />}>
                 <Route path="/" element={<Dashboard />} /> {/* Vista principal de Dashboard */}
                 <Route path="settings" element={<Settings />} />
+                <Route path="classes" element={<Classes />} />
+                <Route path="classes/create" element={<CreateOrEditClass />} /> {/* Crear clase */}
+                <Route path="classes/edit/:id" element={<CreateOrEditClass />} /> {/* Editar clase */}
                 <Route path="*" element={<Navigate to="/" />} />
               </Route>
             </Routes>

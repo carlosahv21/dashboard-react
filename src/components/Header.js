@@ -2,7 +2,7 @@
 import React, { useContext } from "react";
 import { Button, Layout, Dropdown } from "antd";
 import { MenuFoldOutlined, MenuUnfoldOutlined, SettingFilled } from "@ant-design/icons";
-import DynamicMenu from "./Subcomponents/DynamicMenu";
+import DynamicMenu from "./Common/DynamicMenu";
 import { RoutesContext } from "../context/RoutesContext";
 import { useNavigate } from "react-router-dom";
 
@@ -57,7 +57,7 @@ const HeaderComponent = ({ collapsed, setCollapsed, setIsAuthenticated }) => {
                     height: 64,
                 }}
             />
-            <Dropdown overlay={userMenu} placement="bottomRight" trigger={["click"]}>
+            <Dropdown menu={userMenu} placement="bottomRight" trigger={["click"]}>
                 <Button
                     type="text"
                     icon={<SettingFilled />}

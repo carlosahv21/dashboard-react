@@ -1,7 +1,7 @@
 // components/Sidebar.js
 import React, { useContext } from "react";
 import { Layout } from "antd";
-import DynamicMenu from "./Subcomponents/DynamicMenu";
+import DynamicMenu from "./Common/DynamicMenu";
 import { SettingsContext } from "../context/SettingsContext";
 import { RoutesContext } from "../context/RoutesContext";
 import { useNavigate } from "react-router-dom";

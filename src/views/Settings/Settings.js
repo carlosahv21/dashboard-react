@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useContext } from "react";
-import { SettingsContext } from "../context/SettingsContext";
+import { SettingsContext } from "../../context/SettingsContext";
 import { Form, Button, Row, Col, Card, message } from "antd";
-import DynamicInput from "../components/Subcomponents/DynamicInput";
-import useFetch from "../hooks/useFetch";
+import DynamicInput from "../../Components/Common/DynamicInput";
+import useFetch from "../../hooks/useFetch";
 
 const Settings = () => {
     const [form] = Form.useForm();

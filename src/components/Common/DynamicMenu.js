@@ -5,11 +5,11 @@ import * as Icons from "@ant-design/icons";
 const DynamicMenu = ({ routes, theme, onMenuClick }) => {
     const getIcon = (iconName) => {
         const IconComponent = Icons[`${iconName}Outlined`];
-        return IconComponent ? <IconComponent style={{ fontSize: '20px' }} /> : <Icons.QuestionOutlined style={{ fontSize: '20px' }} />;
+        return IconComponent ? <IconComponent /> : <Icons.QuestionOutlined />;
     };
 
     return (
-        <Menu theme={theme} mode="inline" style={{ fontSize: '18px'}}>
+        <Menu theme={theme} mode="inline">
             {routes.map((route) => (
                 <Menu.Item key={route.id} icon={getIcon(route.icon)} onClick={() => onMenuClick(route)}>
                     {route.name}
