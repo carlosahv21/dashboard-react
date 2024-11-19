@@ -1,8 +1,6 @@
-// components/HeaderComponent.js
 import React, { useContext } from "react";
 import { Button, Layout, Dropdown } from "antd";
 import { MenuFoldOutlined, MenuUnfoldOutlined, SettingFilled } from "@ant-design/icons";
-import DynamicMenu from "./Common/DynamicMenu";
 import { RoutesContext } from "../context/RoutesContext";
 import { useNavigate } from "react-router-dom";
 
@@ -26,15 +24,25 @@ const HeaderComponent = ({ collapsed, setCollapsed, setIsAuthenticated }) => {
         navigate("/login");
     };
 
-    const userMenu = (
-        <DynamicMenu routes={[...headerRoutes, { id: "logout", name: "Logout", icon: "Logout", on_click_action: "logout" }]} theme="light" onMenuClick={(route) => {
-            if (route.on_click_action === "logout") {
-                handleLogout();
-            } else {
-                handleMenuClick(route);
-            }
-        }} />
-    );
+    // Convierte las rutas en el formato requerido por Ant Design
+    const userMenuItems = [
+        ...headerRoutes.map(route => ({
+            key: route.id,
+            label: route.name,
+            onClick: () => {
+                if (route.on_click_action === "logout") {
+                    handleLogout();
+                } else {
+                    handleMenuClick(route);
+                }
+            },
+        })),
+        {
+            key: "logout",
+            label: "Logout",
+            onClick: handleLogout,
+        },
+    ];
 
     return (
         <Header
@@ -57,7 +65,11 @@ const HeaderComponent = ({ collapsed, setCollapsed, setIsAuthenticated }) => {
                     height: 64,
                 }}
             />
-            <Dropdown menu={userMenu} placement="bottomRight" trigger={["click"]}>
+            <Dropdown
+                menu={{ items: userMenuItems }}
+                placement="bottomRight"
+                trigger={["click"]}
+            >
                 <Button
                     type="text"
                     icon={<SettingFilled />}

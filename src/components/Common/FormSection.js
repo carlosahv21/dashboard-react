@@ -1,8 +1,8 @@
 import { Row, Col, Divider, Typography } from 'antd';
 import DynamicInput from './DynamicInput';
 
-const FormSection = ({ title, fields, form }) => (
-    <Row style={{ marginBottom: '20px', marginLeft: '20px', marginRight: '20px' }}>
+const FormSection = ({ title, fields, form, onImageUpload }) => (
+    <Row>
         <Divider />
         <Col span={6}>
             <Typography.Text strong>{title}</Typography.Text>
@@ -21,6 +21,7 @@ const FormSection = ({ title, fields, form }) => (
                     readonly={field.readonly}
                     placeholder={field.placeholder}
                     helper_text={field.helper_text}
+                    onImageUpload={onImageUpload}
                 />
             ))}
         </Col>

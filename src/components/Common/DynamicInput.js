@@ -68,7 +68,6 @@ const parseValidationRules = (validationRules, helperText, type) => {
     return parsedRules;
 };
 
-
 const DynamicInput = ({
     label,
     name,
@@ -89,10 +88,14 @@ const DynamicInput = ({
         try {
             await request(`images/`, "DELETE", { imageUrl: file.url || file.response.url });
             message.success("Image removed successfully");
+    
+            // Limpia el valor del campo en el formulario
             form.setFieldsValue({ [name]: null });
-            if (onImageUpload) onImageUpload(null);
+    
+            if (onImageUpload) onImageUpload(null); // Notifica que la imagen fue eliminada
         } catch (error) {
             message.error("Failed to remove image");
+            console.error(error);
         }
     };
 
@@ -103,11 +106,16 @@ const DynamicInput = ({
 
         try {
             const data = await request("images/", "POST", formData);
-            form.setFieldsValue({ [name]: data.url });
-            if (onImageUpload) onImageUpload(data.url);
+
+            // Solo actualiza el formulario con la URL
+            const imageUrl = data.url;
+            form.setFieldsValue({ [name]: imageUrl });
+
+            if (onImageUpload) onImageUpload(imageUrl); // Asegúrate de que `onImageUpload` reciba solo la URL
             onSuccess(data);
         } catch (error) {
             message.error("Failed to upload image");
+            console.error(error);
             onError(error);
         }
     };

@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from "react";
-import { Table, Input, Select, Pagination, Space, Breadcrumb, Button, Popconfirm, message } from "antd";
+import { Table, Input, Select, Pagination, Space, Breadcrumb, Button, Modal, message } from "antd";
+import { DeleteOutlined, EditOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
 import useFetch from "../../hooks/useFetch";
 
 const { Search } = Input;
 const { Option } = Select;
+const { confirm } = Modal;
 
 const Classes = () => {
     const [classes, setClasses] = useState([]);
@@ -42,7 +44,24 @@ const Classes = () => {
             message.error('Failed to delete the class. Please try again.');
         }
     };
-    
+
+    const handleDeleteConfirm = (id) => {
+        confirm({
+            title: 'Are you sure you want to delete this class?',
+            content: 'This action cannot be undone.',
+            okText: 'Yes',
+            okType: 'danger',
+            cancelText: 'No',
+            onOk: async () => {
+                try {
+                    await handleDelete(id); // Llama a tu función de eliminación
+                    message.success('Class deleted successfully!');
+                } catch (error) {
+                    message.error('Failed to delete the class. Please try again.');
+                }
+            },
+        });
+    };
 
     const columns = [
         {
@@ -60,19 +79,17 @@ const Classes = () => {
             key: "actions",
             render: (_, record) => (
                 <Space size="middle">
-                    <Button type="link" onClick={() => navigate(`/classes/edit/${record.id}`)}>
-                        Editar
-                    </Button>
-                    <Popconfirm
-                        title="¿Estás seguro de eliminar esta clase?"
-                        onConfirm={() => handleDelete(record.id)}
-                        okText="Sí"
-                        cancelText="No"
-                    >
-                        <Button type="link" danger>
-                            Eliminar
-                        </Button>
-                    </Popconfirm>
+                    <Button
+                        type="link"
+                        onClick={() => navigate(`/classes/edit/${record.id}`)}
+                        icon={<EditOutlined />}
+                    />
+                    <Button
+                        type="link"
+                        danger
+                        icon={<DeleteOutlined />}
+                        onClick={() => handleDeleteConfirm(record.id)}
+                    />
                 </Space>
             ),
         },
@@ -86,12 +103,12 @@ const Classes = () => {
             </Breadcrumb>
             <Space style={{ marginBottom: 16, display: 'flex', justifyContent: 'end' }}>
                 <Search
-                    placeholder="Buscar clases"
+                    placeholder="Search classes"
                     onSearch={setSearch}
                     style={{ width: 200 }}
                 />
                 <Select
-                    placeholder="Filtrar por nivel"
+                    placeholder="Level filter"
                     onChange={setLevel}
                     allowClear
                     style={{ width: 200 }}
@@ -116,6 +133,7 @@ const Classes = () => {
                 bordered
             />
             <Pagination
+                align="end"
                 current={page}
                 total={total}
                 pageSize={10}
