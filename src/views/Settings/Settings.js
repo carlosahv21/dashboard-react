@@ -1,60 +1,27 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { lazy, Suspense, useContext, useEffect } from "react";
 import { SettingsContext } from "../../context/SettingsContext";
-import { Form, Row, Col, message, Menu } from "antd";
+import { Form, Row, Col, Menu } from "antd";
 import { SettingOutlined, UserOutlined, DollarOutlined } from "@ant-design/icons";
-import useFetch from "../../hooks/useFetch";
+import { Routes, Route, Link, Outlet } from "react-router-dom"; // Importa sin BrowserRouter
 
-// Importar los componentes de las secciones
-import GeneralInformation from "./Sections/GeneralInformation.js";
-import Roles from "./Sections/Roles";
-import Profiles from "./Sections/Profiles";
-import ActiveModules from "./Sections/ActiveModules";
-import Users from "./Sections/Users";
-import Payments from "./Sections/Payments";
-import CustomFields from "./Sections/CustomFields";
+// Lazy loading de las secciones
+const GeneralInformation = lazy(() => import("./Sections/GeneralInformation"));
+const Roles = lazy(() => import("./Sections/Roles"));
+const Profiles = lazy(() => import("./Sections/Profiles"));
+const ActiveModules = lazy(() => import("./Sections/ActiveModules"));
+const Users = lazy(() => import("./Sections/Users"));
+const Payments = lazy(() => import("./Sections/Payments"));
+const CustomFields = lazy(() => import("./Sections/CustomFields"));
 
 const { SubMenu } = Menu;
 
-const Settings = () => {
+const SettingsLayout = () => {
     const [form] = Form.useForm();
     const { setSettings } = useContext(SettingsContext);
-    const { request, error } = useFetch();
-    const [activeSection, setActiveSection] = useState("general");
 
     useEffect(() => {
-        const loadSettings = async () => {
-            try {
-                const fetchedSettings = await request("settings", "GET");
-                setSettings(fetchedSettings);
-                form.setFieldsValue(fetchedSettings);
-            } catch {
-                message.error(error || "Failed to fetch settings.");
-            }
-        };
-
-        loadSettings();
-    }, [request, form, setSettings, error]);
-
-    const renderContent = () => {
-        switch (activeSection) {
-            case "general":
-                return <GeneralInformation />;
-            case "roles":
-                return <Roles />;
-            case "profiles":
-                return <Profiles />;
-            case "activeModules":
-                return <ActiveModules />;
-            case "users":
-                return <Users />;
-            case "payments":
-                return <Payments />;
-            case "customFields":
-                return <CustomFields />;
-            default:
-                return <div>Select a section from the menu.</div>;
-        }
-    };
+        // Puedes manejar aquí cualquier efecto necesario
+    }, [form, setSettings]);
 
     return (
         <Row gutter={24}>
@@ -63,7 +30,6 @@ const Settings = () => {
                     mode="inline"
                     defaultSelectedKeys={["general"]}
                     defaultOpenKeys={["academySettings"]}
-                    onClick={(e) => setActiveSection(e.key)}
                     style={{
                         height: "100%",
                         borderRadius: "8px",
@@ -71,19 +37,19 @@ const Settings = () => {
                     }}
                 >
                     <SubMenu key="academySettings" icon={<SettingOutlined />} title="Academy Settings">
-                        <Menu.Item key="general">General Information</Menu.Item>
-                        <Menu.Item key="activeModules">Active Modules</Menu.Item>
+                        <Menu.Item key="general"><Link to="general">General Information</Link></Menu.Item>
+                        <Menu.Item key="activeModules"><Link to="activeModules">Active Modules</Link></Menu.Item>
                     </SubMenu>
                     <SubMenu key="userManagement" icon={<UserOutlined />} title="User Management">
-                        <Menu.Item key="roles">Roles</Menu.Item>
-                        <Menu.Item key="profiles">Profiles</Menu.Item>
-                        <Menu.Item key="users">Users</Menu.Item>
+                        <Menu.Item key="roles"> <Link to="roles">Roles</Link></Menu.Item>
+                        <Menu.Item key="profiles"> <Link to="profiles">Profiles</Link></Menu.Item>
+                        <Menu.Item key="users"> <Link to="users">Users</Link></Menu.Item>
                     </SubMenu>
                     <SubMenu key="customization" icon={<SettingOutlined />} title="Customization">
-                        <Menu.Item key="customFields">Custom Fields</Menu.Item>
+                        <Menu.Item key="customFields"><Link to="customFields">Custom Fields</Link></Menu.Item>
                     </SubMenu>
                     <SubMenu key="finance" icon={<DollarOutlined />} title="Finance">
-                        <Menu.Item key="payments">Payments</Menu.Item>
+                        <Menu.Item key="payments"><Link to="payments">Payments</Link></Menu.Item>
                     </SubMenu>
                 </Menu>
             </Col>
@@ -96,11 +62,84 @@ const Settings = () => {
                         boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
                     }}
                 >
-                    {renderContent()}
+                    <Suspense fallback={<div>Loading...</div>}>
+                        <Outlet />
+                    </Suspense>
                 </div>
             </Col>
         </Row>
     );
 };
+
+const Settings = () => (
+    <Routes>
+        <Route path="/*" element={<SettingsLayout />}>
+            <Route
+                index
+                element={
+                    <Suspense fallback={<div>Loading...</div>}>
+                        <GeneralInformation />
+                    </Suspense>
+                }
+            />
+            <Route
+                path="general"
+                element={
+                    <Suspense fallback={<div>Loading...</div>}>
+                        <GeneralInformation />
+                    </Suspense>
+                }
+            />
+            <Route
+                path="roles"
+                element={
+                    <Suspense fallback={<div>Loading...</div>}>
+                        <Roles />
+                    </Suspense>
+                }
+            />
+            <Route
+                path="profiles"
+                element={
+                    <Suspense fallback={<div>Loading...</div>}>
+                        <Profiles />
+                    </Suspense>
+                }
+            />
+            <Route
+                path="activeModules"
+                element={
+                    <Suspense fallback={<div>Loading...</div>}>
+                        <ActiveModules />
+                    </Suspense>
+                }
+            />
+            <Route
+                path="users"
+                element={
+                    <Suspense fallback={<div>Loading...</div>}>
+                        <Users />
+                    </Suspense>
+                }
+            />
+            <Route
+                path="payments"
+                element={
+                    <Suspense fallback={<div>Loading...</div>}>
+                        <Payments />
+                    </Suspense>
+                }
+            />
+            <Route
+                path="customFields"
+                element={
+                    <Suspense fallback={<div>Loading...</div>}>
+                        <CustomFields />
+                    </Suspense>
+                }
+            />
+        </Route>
+    </Routes>
+);
 
 export default Settings;

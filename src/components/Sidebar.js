@@ -14,7 +14,7 @@ const Sidebar = ({ collapsed }) => {
   const navigate = useNavigate();
 
   const baseBackend = process.env.REACT_APP_BACKEND;
-  const logo = baseBackend + '/' + settings.logo_url;
+  const logo = baseBackend + '/' + (settings?.logo_url || ""); 
 
   const sidebarRoutes = routes.filter(route => route.location === 'SIDEBAR');
 

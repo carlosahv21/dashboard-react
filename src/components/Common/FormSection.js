@@ -21,6 +21,7 @@ const FormSection = ({ title, fields, form, onImageUpload }) => (
                     readonly={field.readonly}
                     placeholder={field.placeholder}
                     helper_text={field.helper_text}
+                    hidden={field.hidden}
                     onImageUpload={onImageUpload}
                 />
             ))}

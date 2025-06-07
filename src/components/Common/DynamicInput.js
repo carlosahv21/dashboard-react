@@ -1,5 +1,5 @@
 import React from "react";
-import { Form, Input, Select, Upload, DatePicker, TimePicker, message } from "antd";
+import { Form, Input, Select, Upload, DatePicker, TimePicker, Checkbox, message } from "antd";
 import { UploadOutlined } from "@ant-design/icons";
 import useFetch from "../../hooks/useFetch";
 import dayjs from "dayjs";
@@ -183,6 +183,10 @@ const DynamicInput = ({
                             <div style={{ marginTop: 8 }}>Upload</div>
                         </button>
                     </Upload>
+                );
+            case "boolean":
+                return ( 
+                    <Checkbox defaultChecked={default_value} placeholder={placeholder} />
                 );
             default:
                 return <Input defaultValue={default_value} placeholder={placeholder} />;

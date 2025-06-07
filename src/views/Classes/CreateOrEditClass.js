@@ -21,7 +21,7 @@ const CreateOrEditClass = () => {
         const fetchModuleAndClassData = async () => {
             try {
                 // Cargar los datos del módulo
-                const moduleData = await request('modules/5/fields', 'GET');
+                const moduleData = await request('fields/5', 'GET');;
                 setModuleData(moduleData.module);
     
                 // Si estamos en modo edición, cargar los datos de la clase específica

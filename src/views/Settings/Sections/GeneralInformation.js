@@ -18,7 +18,7 @@ const GeneralInformation = () => {
         const loadFieldsAndSettings = async () => {
             try {
                 // Fetch module fields
-                const moduleResponse = await request("modules/1/fields", "GET");
+                const moduleResponse = await request("fields/1", "GET");                
                 if (moduleResponse.success && moduleResponse.module) {
                     setModuleData(moduleResponse.module);
 

@@ -6,10 +6,12 @@ const FormHeader = ({ title, subtitle, onSave, onCancel }) => (
             <Typography.Title level={2} style={{ marginBottom: 0 }}>{title}</Typography.Title>
             <Typography.Text type="secondary">{subtitle}</Typography.Text>
         </Col>
-        <Col style={{ marginRight: '40px' }}>
-            <Button type="default" onClick={onCancel} style={{ marginRight: '8px' }}>Cancel</Button>
-            <Button type="primary" onClick={onSave}>Save</Button>
-        </Col>
+        {onSave && onCancel && (
+            <Col style={{ marginRight: '40px' }}>
+                <Button type="default" onClick={onCancel} style={{ marginRight: '8px' }}>Cancel</Button>
+                <Button type="primary" onClick={onSave}>Save</Button>
+            </Col>
+        )}
     </Row>
 );
 
