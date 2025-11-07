@@ -10,7 +10,7 @@ const Login = ({ setIsAuthenticated }) => {
     const navigate = useNavigate();
     const { request, loading } = useFetch(); // Usa el hook useFetch
 
-    const onFinish = async (values) => {
+    const handleLogin = async (values) => {
         setError("");
     
         const { email, password } = values;
@@ -19,17 +19,28 @@ const Login = ({ setIsAuthenticated }) => {
             // Llama a la API de login usando useFetch
             const data = await request("auth/login", "POST", { email, password });
 
+            if (!data.token) {
+                alert("Invalid email or password.");
+                return;
+            }
+
             // Guarda el token y autentica al usuario
             localStorage.setItem("token", data.token);
-            setIsAuthenticated(true);
 
             // Llama a la API de configuración usando el token obtenido
             const settingsData = await request("settings", "GET", null, {
                 Authorization: `Bearer ${data.token}`,
             });
-            setSettings(settingsData);
 
-            navigate("/dashboard");
+            if (!settingsData) {
+                alert("Failed to load settings.");
+                localStorage.removeItem("token");
+                setIsAuthenticated(false);
+            }
+
+            setIsAuthenticated(true);
+            setSettings(settingsData);
+            navigate("/");
         } catch (err) {
             setError(err.message || "Something went wrong. Please try again.");
         }
@@ -41,7 +52,7 @@ const Login = ({ setIsAuthenticated }) => {
 
             {error && <Alert message={error} type="error" showIcon style={{ marginBottom: 20 }} />}
 
-            <Form name="login-form" layout="vertical" onFinish={onFinish}>
+            <Form name="login-form" layout="vertical" onFinish={handleLogin}>
                 <Form.Item
                     label="Email"
                     name="email"

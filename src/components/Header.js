@@ -20,6 +20,8 @@ const HeaderComponent = ({ collapsed, setCollapsed, setIsAuthenticated }) => {
 
     const handleLogout = () => {
         localStorage.removeItem("token");
+        localStorage.removeItem("settings");
+
         setIsAuthenticated(false);
         navigate("/login");
     };

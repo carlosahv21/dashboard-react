@@ -26,13 +26,13 @@ const useFetch = () => {
             const data = isJson ? await response.json() : null;
 
             if (!response.ok) {
-                throw new Error(data?.message || `Failed to ${method} data`);
+                throw data || { message: `Failed to ${method} data` };
             }
 
             return data;
         } catch (error) {
             setError(error.message || "An error occurred");
-            throw error;
+            throw error; 
         } finally {
             setLoading(false);
         }

@@ -2,9 +2,9 @@ import React, { useState, useEffect, useContext } from "react";
 import { SettingsContext } from "../../../context/SettingsContext";
 import { Form, message } from "antd";
 import useFetch from "../../../hooks/useFetch";
-import FormHeader from "../../../Components/Common/FormHeader";
-import FormSection from "../../../Components/Common/FormSection";
-import FormFooter from "../../../Components/Common/FormFooter";
+import FormHeader from "../../../components/Common/FormHeader";
+import FormSection from "../../../components/Common/FormSection";
+import FormFooter from "../../../components/Common/FormFooter";
 
 const GeneralInformation = () => {
     const [form] = Form.useForm();
@@ -22,28 +22,12 @@ const GeneralInformation = () => {
                 if (moduleResponse.success && moduleResponse.module) {
                     setModuleData(moduleResponse.module);
 
-                    // Prepare default values from module fields
-                    const defaultValues = {};
-                    moduleResponse.module.blocks?.forEach((block) => {
-                        block.fields?.forEach((field) => {
-                            if (field.default_value) {
-                                defaultValues[field.name] = field.default_value;
-                            }
-                        });
-                    });
-
                     // Fetch existing settings
                     const settingsResponse = await request("settings", "GET");
                     setSettings(settingsResponse);
 
-                    // Merge settings into default values
-                    const mergedValues = {
-                        ...defaultValues,
-                        ...mapLocalStorageToForm(settingsResponse),
-                    };
-
                     // Set form values
-                    form.setFieldsValue(mergedValues);
+                    form.setFieldsValue(mapLocalStorageToForm(settingsResponse));
                 }
             } catch (err) {
                 message.error(error || "Failed to load data.");
@@ -74,8 +58,6 @@ const GeneralInformation = () => {
                 ...values,
                 logo_url: imageUrl || values.logo_url, // Usa la URL actual o la del formulario
             };
-    
-            console.log("Valores enviados:", mappedValues);
     
             const response = await request("settings", "POST", mappedValues);
     

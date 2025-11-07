@@ -16,12 +16,8 @@ const FormSection = ({ title, fields, form, onImageUpload }) => (
                     type={field.type}
                     options={field.options || []}
                     form={form}
-                    validation_rules={field.validation_rules}
-                    editable={field.editable}
-                    readonly={field.readonly}
+                    required={field.required}
                     placeholder={field.placeholder}
-                    helper_text={field.helper_text}
-                    hidden={field.hidden}
                     onImageUpload={onImageUpload}
                 />
             ))}

@@ -2,71 +2,64 @@ import React from "react";
 import { Form, Input, Select, Upload, DatePicker, TimePicker, Checkbox, message } from "antd";
 import { UploadOutlined } from "@ant-design/icons";
 import useFetch from "../../hooks/useFetch";
-import dayjs from "dayjs";
-
 const { Option } = Select;
 const { TextArea } = Input;
 
 // Función para convertir `validation_rules` a formato de Ant Design
-const parseValidationRules = (validationRules, helperText, type) => {
-    const rulesArray = validationRules.split("|");
-    let minValue = null;
-    let maxValue = null;
-    const parsedRules = rulesArray.map(rule => {
-        if (rule === "required") {
-            return { required: true, message: helperText || "This field is required" };
-        }
+const parseValidationRules = (required, type) => {
+    const rules = [];
 
-        // Longitud de caracteres para campos de texto
-        if (rule.startsWith("max:") && type === "text") {
-            const maxLength = rule.split(":")[1];
-            return { max: parseInt(maxLength), message: `Must be at most ${maxLength} characters` };
-        }
-        if (rule.startsWith("min:") && type === "text") {
-            const minLength = rule.split(":")[1];
-            return { min: parseInt(minLength), message: `Must be at least ${minLength} characters` };
-        }
-
-        // Rango de valores numéricos para campos numéricos
-        if (rule.startsWith("max:") && type === "number") {
-            maxValue = parseInt(rule.split(":")[1]);
-        }
-        if (rule.startsWith("min:") && type === "number") {
-            minValue = parseInt(rule.split(":")[1]);
-        }
-
-        // Validación para campos tipo select con opciones específicas
-        if (rule.startsWith("in:")) {
-            const options = rule.split(":")[1].split(",");
-            return { type: "enum", enum: options, message: `Must be one of the following: ${options.join(", ")}` };
-        }
-
-        // Validación para enteros
-        if (rule === "integer") {
-            return { pattern: /^\d+$/, message: "Must be an integer" };
-        }
-
-        // Validación para strings que solo permiten letras y espacios
-        if (rule === "string") {
-            return { pattern: /^[A-Za-z\s]+$/, message: "Must contain only letters" };
-        }
-        return null;
-    }).filter(Boolean);
-
-    // Agregar regla personalizada para rango de valores si `minValue` y `maxValue` están definidos
-    if (minValue !== null && maxValue !== null) {
-        parsedRules.push({
-            validator: (_, value) => {
-                if (value >= minValue && value <= maxValue) {
-                    return Promise.resolve();
-                }
-                return Promise.reject(new Error(`Must be between ${minValue} and ${maxValue}`));
-            },
+    // ✅ Validar si el campo es obligatorio
+    if (required) {
+        rules.push({
+            required: true,
+            message: "Este campo es obligatorio",
         });
     }
 
-    return parsedRules;
+    // ✅ Validar el tipo de dato
+    if (type) {
+        switch (type) {
+            case "number":
+                rules.push({
+                    type: "number",
+                    transform: (value) => (value ? Number(value) : value),
+                    message: "Debe ser un número válido",
+                });
+                break;
+            case "date":
+                rules.push({
+                    validator: (_, value) =>
+                        value
+                            ? Promise.resolve()
+                            : Promise.reject(new Error("Debe seleccionar una fecha válida")),
+                });
+                break;
+            case "time":
+                rules.push({
+                    validator: (_, value) =>
+                        value
+                            ? Promise.resolve()
+                            : Promise.reject(new Error("Debe seleccionar una hora válida")),
+                });
+                break;
+            case "boolean":
+                rules.push({
+                    type: "boolean",
+                    message: "Debe ser verdadero o falso",
+                });
+                break;
+            default:
+                rules.push({
+                    type: "string",
+                    message: "Debe ser un texto válido",
+                });
+        }
+    }
+
+    return rules;
 };
+
 
 const DynamicInput = ({
     label,
@@ -74,10 +67,7 @@ const DynamicInput = ({
     type,
     options,
     form,
-    validation_rules = "",
-    default_value,
-    hidden = false,
-    helper_text = "",
+    required,
     onImageUpload,
     placeholder
 }) => {
@@ -88,10 +78,10 @@ const DynamicInput = ({
         try {
             await request(`images/`, "DELETE", { imageUrl: file.url || file.response.url });
             message.success("Image removed successfully");
-    
+
             // Limpia el valor del campo en el formulario
             form.setFieldsValue({ [name]: null });
-    
+
             if (onImageUpload) onImageUpload(null); // Notifica que la imagen fue eliminada
         } catch (error) {
             message.error("Failed to remove image");
@@ -120,55 +110,25 @@ const DynamicInput = ({
         }
     };
 
-    // Renderizar input según el tipo de campo
     const renderInputComponent = () => {
-        if (hidden && !default_value) {
-            return <Input type="hidden" />;
-        }
-
-        if (hidden) {
-            return <Input value={default_value} readOnly />;
-        }
-
         switch (type) {
-            case "text":
-                return <Input defaultValue={default_value} placeholder={placeholder} />;
-            case "number":
-                return <Input type="number" defaultValue={default_value} placeholder={placeholder} />;
+            case "text": return <Input placeholder={placeholder || `Escribe ${label}`} />;
+            case "number": return <Input type="number" placeholder={placeholder || `Escribe ${label}`} />;
             case "select":
                 return (
-                    <Select defaultValue={default_value} placeholder={placeholder}>
-                        {options?.map((option) =>
-                            typeof option === "string" ? (
-                                <Option key={option} value={option}>
-                                    {option}
-                                </Option>
+                    <Select placeholder={placeholder || `Selecciona ${label}`}>
+                        {options?.map(opt =>
+                            typeof opt === "string" ? (
+                                <Option key={opt} value={opt}>{opt}</Option>
                             ) : (
-                                <Option key={option.value} value={option.value}>
-                                    {option.label}
-                                </Option>
+                                <Option key={opt.value} value={opt.value}>{opt.label}</Option>
                             )
                         )}
                     </Select>
                 );
-            case "date":
-                return (
-                    <DatePicker
-                        defaultValue={default_value ? dayjs(default_value) : null}
-                        format="YYYY-MM-DD"
-                        placeholder={placeholder}
-                    />
-                );
-            case "time":
-                return (
-                    <TimePicker
-                        defaultValue={default_value ? dayjs(default_value, "HH:mm") : null}
-                        format="HH:mm"
-                        placeholder={placeholder}
-                    />
-                );
-            case "textarea":
-                return <TextArea defaultValue={default_value} placeholder={placeholder} style={{ resize: "none" }} />;
+            case "date": return <DatePicker format="YYYY-MM-DD" placeholder={placeholder} />;
+            case "time": return <TimePicker format="HH:mm" placeholder={placeholder} />;
+            case "textarea": return <TextArea placeholder={placeholder || `Escribe ${label}`} style={{ resize: "none" }} />;
             case "image":
                 return (
                     <Upload
@@ -184,12 +144,8 @@ const DynamicInput = ({
                         </button>
                     </Upload>
                 );
-            case "boolean":
-                return ( 
-                    <Checkbox defaultChecked={default_value} placeholder={placeholder} />
-                );
-            default:
-                return <Input defaultValue={default_value} placeholder={placeholder} />;
+            case "boolean": return <Checkbox placeholder={placeholder} />;
+            default: return <Input placeholder={placeholder || label} />;
         }
     };
 
@@ -197,7 +153,7 @@ const DynamicInput = ({
         <Form.Item
             label={label}
             name={name}
-            rules={parseValidationRules(validation_rules, helper_text, type)}
+            rules={parseValidationRules(required, type)}
         >
             {renderInputComponent()}
         </Form.Item>

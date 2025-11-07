@@ -2,8 +2,8 @@ import React, { useState, useEffect } from "react";
 import { Divider, Form, Select, Card, message, Row, Col, Button, Modal, Checkbox, Input, Skeleton, Empty, Space, Tooltip } from "antd";
 import { EditOutlined, PlusOutlined, DeleteOutlined } from "@ant-design/icons";
 import useFetch from "../../../hooks/useFetch";
-import FormHeader from "../../../Components/Common/FormHeader";
-import FormFooter from "../../../Components/Common/FormFooter";
+import FormHeader from "../../../components/Common/FormHeader";
+import FormFooter from "../../../components/Common/FormFooter";
 
 const FieldCard = ({ block, onEdit, onAddField, onDeleteField, onDeleteBlock }) => (
     <Card
@@ -117,8 +117,8 @@ const CustomFields = () => {
         setSelectedModule(value);
         setLoading(true);
         try {
-            const response = await request(`fields/${value}`, "GET");
-            setBlocks(response?.module?.blocks || []);
+            const dataFields = await request(`fields/${value}`, "GET");
+            setBlocks(dataFields?.module?.blocks || []);
         } catch (err) {
             message.error(err.message || "Failed to fetch fields.");
         } finally {
@@ -331,33 +331,6 @@ const CustomFields = () => {
                     </Form.Item>
 
                     <Form.Item
-                        label="Read only"
-                        name="readonly"
-                        valuePropName="checked"
-                        style={{ marginBottom: '10px' }}
-                    >
-                        <Checkbox />
-                    </Form.Item>
-
-                    <Form.Item
-                        label="Hidden"
-                        name="hidden"
-                        valuePropName="checked"
-                        style={{ marginBottom: '10px' }}
-                    >
-                        <Checkbox />
-                    </Form.Item>
-
-                    <Form.Item
-                        label="Visible"
-                        name="visible"
-                        valuePropName="checked"
-                        style={{ marginBottom: '10px' }}
-                    >
-                        <Checkbox />
-                    </Form.Item>
-
-                    <Form.Item
                         label="Label"
                         name="label"
                         rules={[{ required: true, message: "Label is required" }]}
@@ -366,17 +339,6 @@ const CustomFields = () => {
                         <Input placeholder='Label' />
                     </Form.Item>
 
-                    <Form.Item label="Helper text" name="helper_text" style={{ marginBottom: '10px' }}>
-                        <Input placeholder='Helper text' />
-                    </Form.Item>
-
-                    <Form.Item label="Default value" name="default_value" style={{ marginBottom: '10px' }}>
-                        <Input placeholder='Default value' />
-                    </Form.Item>
-
-                    <Form.Item label="Placeholder" name="placeholder" style={{ marginBottom: '10px' }}>
-                        <Input placeholder='Placeholder' />
-                    </Form.Item>
 
                     {editField?.type === 'select' && (
                         <Form.Item name="options" label="Options" style={{ marginBottom: '10px' }}>
@@ -462,13 +424,6 @@ const CustomFields = () => {
                         <Input placeholder="Ej. Nombre completo" />
                     </Form.Item>
 
-                    <Form.Item
-                        label="Placeholder"
-                        name="placeholder"
-                        rules={[{ required: true, message: "El placeholder es obligatorio" }]}
-                    >
-                        <Input placeholder="Ej. Ingresa tu nombre" />
-                    </Form.Item>
 
                     <Form.Item
                         label="Tipo de campo"
@@ -493,33 +448,9 @@ const CustomFields = () => {
 
                     <Space flex="auto">
                         <Form.Item name="required" valuePropName="checked">
-                            <Checkbox>Requerido</Checkbox>
-                        </Form.Item>
-
-                        <Form.Item name="visible" valuePropName="checked">
-                            <Checkbox>Visible</Checkbox>
-                        </Form.Item>
-
-                        <Form.Item name="editable" valuePropName="checked">
-                            <Checkbox>Editable</Checkbox>
-                        </Form.Item>
-
-                        <Form.Item name="readonly" valuePropName="checked">
-                            <Checkbox>Solo lectura</Checkbox>
-                        </Form.Item>
-
-                        <Form.Item name="hidden" valuePropName="checked">
-                            <Checkbox>Oculto</Checkbox>
+                            <Checkbox>Required</Checkbox>
                         </Form.Item>
                     </Space>
-
-                    <Form.Item label="Helper text" name="helper_text">
-                        <Input placeholder="Ej. Coloca tu nombre completo" />
-                    </Form.Item>
-
-                    <Form.Item label="Valor por defecto" name="default_value">
-                        <Input placeholder="Ej. Juan Pérez" />
-                    </Form.Item>
 
                     <FormFooter
                         onCancel={() => {

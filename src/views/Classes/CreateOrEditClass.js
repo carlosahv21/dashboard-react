@@ -1,13 +1,14 @@
 import React, { useEffect, useState } from 'react';
-import { Form, message } from 'antd';
+import { Empty, Form, message } from 'antd';
 
-import FormHeader from '../../Components/Common/FormHeader';
-import FormSection from '../../Components/Common/FormSection';
-import FormFooter from '../../Components/Common/FormFooter';
+import FormHeader from '../../components/Common/FormHeader';
+import FormSection from '../../components/Common/FormSection';
+import FormFooter from '../../components/Common/FormFooter';
 
 import { useNavigate, useParams } from 'react-router-dom';
 import useFetch from '../../hooks/useFetch';
 import dayjs from 'dayjs';
+import { toBeEmpty } from '@testing-library/jest-dom/dist/matchers';
 
 const CreateOrEditClass = () => {
     const [form] = Form.useForm();
@@ -21,9 +22,9 @@ const CreateOrEditClass = () => {
         const fetchModuleAndClassData = async () => {
             try {
                 // Cargar los datos del módulo
-                const moduleData = await request('fields/5', 'GET');;
+                const moduleData = await request('fields/5', 'GET');
                 setModuleData(moduleData.module);
-    
+
                 // Si estamos en modo edición, cargar los datos de la clase específica
                 if (isEditMode) {
                     const classData = await request(`classes/${id}`, 'GET'); // Llama al endpoint para obtener la clase
@@ -36,18 +37,18 @@ const CreateOrEditClass = () => {
                 console.error('Error fetching data:', err);
             }
         };
-    
+
         fetchModuleAndClassData();
     }, [request, id, isEditMode, form]);
-    
+
 
     const handleSubmit = async (values) => {
+        form.setFields([]);
+
         const transformedValues = {
-            ...values,
-            date: values.date ? dayjs(values.date).format('YYYY-MM-DD') : null,
-            hour: values.hour ? dayjs(values.hour).format('HH:mm') : null,
-        };
-    
+            ...values
+        };  
+
         try {
             if (isEditMode) {
                 // Usa el método genérico `request` con 'PUT'
@@ -60,11 +61,18 @@ const CreateOrEditClass = () => {
             }
             navigate('/classes');
         } catch (error) {
-            console.error('Error saving class:', error);
-            message.error('Failed to save the class. Please try again.');
+            if (error.errors) {
+                const fieldsWithErrors = error.errors.map(err => ({
+                    name: err.field,     // el backend envía 'field', no 'path'
+                    errors: [err.message]
+                }));
+                form.setFields(fieldsWithErrors);
+            } else {
+                message.error(error?.message || 'Failed to save the class. Please try again.');
+            }
         }
     };
-    
+
 
     return (
         <>
@@ -83,6 +91,10 @@ const CreateOrEditClass = () => {
                 form={form}
                 layout="vertical"
                 onFinish={handleSubmit}
+                onValuesChange={(changedValues) => {
+                    const fieldName = Object.keys(changedValues)[0];
+                    form.setFields([{ name: fieldName, errors: [] }]); // limpia el error del campo modificado
+                }}
                 style={{
                     marginTop: '20px',
                     padding: '20px',

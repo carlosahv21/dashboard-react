@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import { Layout } from "antd";
-import Footer from "../../Components/Footer";
-import Sidebar from "../../Components/Sidebar";
-import HeaderComponent from "../../Components/Header";
+import Footer from "../../components/Footer";
+import Sidebar from "../../components/Sidebar";
+import HeaderComponent from "../../components/Header";
 import { Outlet } from "react-router-dom"; // Outlet para renderizar las rutas hijas
 
 const { Content } = Layout;

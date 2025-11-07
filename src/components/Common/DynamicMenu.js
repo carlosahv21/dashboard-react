@@ -9,13 +9,17 @@ const DynamicMenu = ({ routes, theme, onMenuClick }) => {
     };
 
     return (
-        <Menu theme={theme} mode="inline">
-            {routes.map((route) => (
-                <Menu.Item key={route.id} icon={getIcon(route.icon)} onClick={() => onMenuClick(route)}>
-                    {route.name}
-                </Menu.Item>
-            ))}
-        </Menu>
+        <Menu
+            theme={theme}
+            mode="inline"
+            items={routes.map((route) => ({
+                key: route.id,
+                icon: getIcon(route.icon),
+                label: route.name,
+                onClick: () => onMenuClick(route),
+            }))}
+        />
+
     );
 };
 

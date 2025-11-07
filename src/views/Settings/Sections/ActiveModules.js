@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Table, Switch, message } from "antd";
-import FormHeader from "../../../Components/Common/FormHeader";
+import FormHeader from "../../../components/Common/FormHeader";
 import useFetch from "../../../hooks/useFetch";
 
 const ActiveModules = () => {
