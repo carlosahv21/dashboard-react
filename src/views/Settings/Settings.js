@@ -35,23 +35,51 @@ const SettingsLayout = () => {
                         borderRadius: "8px",
                         boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
                     }}
-                >
-                    <SubMenu key="academySettings" icon={<SettingOutlined />} title="Academy Settings">
-                        <Menu.Item key="general"><Link to="general">General Information</Link></Menu.Item>
-                        <Menu.Item key="activeModules"><Link to="activeModules">Active Modules</Link></Menu.Item>
-                    </SubMenu>
-                    <SubMenu key="userManagement" icon={<UserOutlined />} title="User Management">
-                        <Menu.Item key="roles"> <Link to="roles">Roles</Link></Menu.Item>
-                        <Menu.Item key="profiles"> <Link to="profiles">Profiles</Link></Menu.Item>
-                        <Menu.Item key="users"> <Link to="users">Users</Link></Menu.Item>
-                    </SubMenu>
-                    <SubMenu key="customization" icon={<SettingOutlined />} title="Customization">
-                        <Menu.Item key="customFields"><Link to="customFields">Custom Fields</Link></Menu.Item>
-                    </SubMenu>
-                    <SubMenu key="finance" icon={<DollarOutlined />} title="Finance">
-                        <Menu.Item key="payments"><Link to="payments">Payments</Link></Menu.Item>
-                    </SubMenu>
-                </Menu>
+                    items={[
+                        {
+                            key: "academySettings",
+                            icon: <SettingOutlined />,
+                            label: "Academy Settings",
+                            children: [
+                                {
+                                    key: "general",
+                                    label: <Link to="general">General Information</Link>,
+                                },
+                                {
+                                    key: "activeModules",
+                                    label: <Link to="activeModules">Active Modules</Link>,
+                                },
+                            ],
+                        },
+                        {
+                            key: "userManagement",
+                            icon: <UserOutlined />,
+                            label: "User Management",
+                            children: [
+                                { key: "roles", label: <Link to="roles">Roles</Link> },
+                                { key: "profiles", label: <Link to="profiles">Profiles</Link> },
+                                { key: "users", label: <Link to="users">Users</Link> },
+                            ],
+                        },
+                        {
+                            key: "customization",
+                            icon: <SettingOutlined />,
+                            label: "Customization",
+                            children: [
+                                { key: "customFields", label: <Link to="customFields">Custom Fields</Link> },
+                            ],
+                        },
+                        {
+                            key: "finance",
+                            icon: <DollarOutlined />,
+                            label: "Finance",
+                            children: [
+                                { key: "payments", label: <Link to="payments">Payments</Link> },
+                            ],
+                        },
+                    ]}
+                />
+
             </Col>
             <Col span={18}>
                 <div

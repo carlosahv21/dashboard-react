@@ -49,6 +49,12 @@ const parseValidationRules = (required, type) => {
                     message: "Debe ser verdadero o falso",
                 });
                 break;
+            case "image":
+                rules.push({
+                    required: true,
+                    message: "Debe subir una imagen",
+                });
+                break;
             default:
                 rules.push({
                     type: "string",
@@ -136,6 +142,21 @@ const DynamicInput = ({
                         showUploadList={{ showRemoveIcon: true, showPreviewIcon: false }}
                         maxCount={1}
                         customRequest={customRequest}
+                        beforeUpload={(file) => {
+                            const isJpgOrPng = file.type === "image/jpeg" || file.type === "image/png";
+                            if (!isJpgOrPng) {
+                                message.error("Solo se permiten archivos JPG o PNG");
+                                return Upload.LIST_IGNORE; // evita que se agregue el archivo
+                            }
+
+                            const isLt5M = file.size / 1024 / 1024 < 5;
+                            if (!isLt5M) {
+                                message.error("La imagen debe ser menor a 5MB");
+                                return Upload.LIST_IGNORE;
+                            }
+
+                            return true; // permite subir
+                        }}
                         onRemove={handleRemoveImage}
                     >
                         <button style={{ border: 0, background: "none" }} type="button">

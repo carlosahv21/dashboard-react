@@ -8,9 +8,9 @@ const FormSection = ({ title, fields, form, onImageUpload }) => (
             <Typography.Text strong>{title}</Typography.Text>
         </Col>
         <Col span={18}>
-            {fields.map(field => (
+            {fields.map((field, index) => (
                 <DynamicInput
-                    key={field.field_id}
+                    key={field.name || `${field.label}-${index}`}
                     label={field.label}
                     name={field.name}
                     type={field.type}
