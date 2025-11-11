@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react"; 
 import { Table, Input, Select, Pagination, Space, Breadcrumb, Button, Modal, message } from "antd";
 import { DeleteOutlined, EditOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
@@ -13,67 +13,74 @@ const Classes = () => {
     const [page, setPage] = useState(1);
     const [total, setTotal] = useState(0);
     const [search, setSearch] = useState("");
-    const [level, setLevel] = useState("");
+    const [loading, setLoading] = useState(false);
 
     const { request } = useFetch();
     const navigate = useNavigate();
 
     const fetchClasses = async () => {
         try {
-            const data = await request("classes/", "GET", { page, search, level });
+            setLoading(true);
+
+            // ✅ Enviar solo parámetros que tengan valor
+            const params = { page, search };
+            const queryParams = new URLSearchParams(
+                Object.entries(params).filter(([_, v]) => v)
+            ).toString();
+
+            const data = await request(`classes/?${queryParams}`, "GET");
+
             setClasses(data.data);
             setTotal(data.total);
         } catch (error) {
             console.error("Error fetching classes:", error);
+        } finally {
+            setLoading(false);
         }
     };
 
     useEffect(() => {
-        fetchClasses();
-    }, [page, search, level]);
+        const delayDebounce = setTimeout(() => {
+            if (search.length >= 3 || search.length === 0) {
+                setPage(1); // reinicia paginación cuando cambia filtro o búsqueda
+                fetchClasses();
+            }
+        }, 500);
 
+        return () => clearTimeout(delayDebounce);
+    }, [search]);
+
+    useEffect(() => {
+        fetchClasses();
+    }, [page]);
+
+    // ✅ Manejo de eliminación con confirmación
     const handleDelete = async (id) => {
         try {
-            // Usa el método genérico `request` con 'DELETE'
-            await request(`classes/${id}`, 'DELETE');
-            message.success('Class deleted successfully!');
-            // Actualiza la lista localmente
+            await request(`classes/${id}`, "DELETE");
+            message.success("Clase eliminada correctamente");
             setClasses((prev) => prev.filter((cls) => cls.id !== id));
         } catch (error) {
-            console.error('Error deleting class:', error);
-            message.error('Failed to delete the class. Please try again.');
+            console.error("Error deleting class:", error);
+            message.error("Error al eliminar la clase");
         }
     };
 
     const handleDeleteConfirm = (id) => {
         confirm({
-            title: 'Are you sure you want to delete this class?',
-            content: 'This action cannot be undone.',
-            okText: 'Yes',
-            okType: 'danger',
-            cancelText: 'No',
-            onOk: async () => {
-                try {
-                    await handleDelete(id); // Llama a tu función de eliminación
-                    message.success('Class deleted successfully!');
-                } catch (error) {
-                    message.error('Failed to delete the class. Please try again.');
-                }
-            },
+            title: "¿Eliminar clase?",
+            content: "Esta acción no se puede deshacer.",
+            okText: "Sí, eliminar",
+            okType: "danger",
+            cancelText: "Cancelar",
+            onOk: () => handleDelete(id),
         });
     };
 
     const columns = [
-        {
-            title: "Nombre",
-            dataIndex: "name",
-            key: "name",
-        },
-        {
-            title: "Nivel",
-            dataIndex: "level",
-            key: "level",
-        },
+        { title: "Nombre", dataIndex: "name", key: "name" },
+        { title: "Nivel", dataIndex: "level", key: "level" },
+        { title: "Genero", dataIndex: "genre", key: "genre" },
         {
             title: "Acciones",
             key: "actions",
@@ -81,8 +88,8 @@ const Classes = () => {
                 <Space size="middle">
                     <Button
                         type="link"
-                        onClick={() => navigate(`/classes/edit/${record.id}`)}
                         icon={<EditOutlined />}
+                        onClick={() => navigate(`/classes/edit/${record.id}`)}
                     />
                     <Button
                         type="link"
@@ -101,37 +108,38 @@ const Classes = () => {
                 <Breadcrumb.Item>Dashboard</Breadcrumb.Item>
                 <Breadcrumb.Item>Clases</Breadcrumb.Item>
             </Breadcrumb>
-            <Space style={{ marginBottom: 16, display: 'flex', justifyContent: 'end' }}>
+
+            <Space
+                style={{
+                    marginBottom: 16,
+                    display: "flex",
+                    justifyContent: "end",
+                }}
+            >
                 <Search
-                    placeholder="Search classes"
-                    onSearch={setSearch}
+                    placeholder="Search Classes"
+                    allowClear
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
                     style={{ width: 200 }}
                 />
-                <Select
-                    placeholder="Level filter"
-                    onChange={setLevel}
-                    allowClear
-                    style={{ width: 200 }}
-                >
-                    <Option value="Basic">Basic</Option>
-                    <Option value="Intermediate">Intermediate</Option>
-                    <Option value="Advanced">Advanced</Option>
-                </Select>
                 <Button
                     type="primary"
-                    onClick={() => navigate('/classes/create')}
+                    onClick={() => navigate("/classes/create")}
                 >
                     Crear Clase
                 </Button>
             </Space>
+
             <Table
                 columns={columns}
                 dataSource={classes}
-                loading={false}
+                loading={loading}
                 pagination={false}
                 rowKey="id"
                 bordered
             />
+
             <Pagination
                 align="end"
                 current={page}
