@@ -1,105 +1,99 @@
-import React, { useEffect, useState } from "react"; 
-import { Table, Input, Select, Pagination, Space, Breadcrumb, Button, Modal, message } from "antd";
-import { DeleteOutlined, EditOutlined } from "@ant-design/icons";
+import React, { useEffect, useState } from "react";
+import { Breadcrumb, message } from "antd";
 import { useNavigate } from "react-router-dom";
 import useFetch from "../../hooks/useFetch";
-
-const { Search } = Input;
-const { Option } = Select;
-const { confirm } = Modal;
+import SearchFilter from "../../components/Common/SearchFilter";
+import DataTable from "../../components/Common/DataTable";
+import PaginationControl from "../../components/Common/PaginationControl";
 
 const Classes = () => {
     const [classes, setClasses] = useState([]);
-    const [page, setPage] = useState(1);
-    const [total, setTotal] = useState(0);
-    const [search, setSearch] = useState("");
     const [loading, setLoading] = useState(false);
+    const [search, setSearch] = useState("");
+    const [pagination, setPagination] = useState({ current: 1, pageSize: 2, total: 0 });
 
     const { request } = useFetch();
     const navigate = useNavigate();
 
-    const fetchClasses = async () => {
+    const fetchClasses = async (page = pagination.current) => {
         try {
             setLoading(true);
 
-            // ✅ Enviar solo parámetros que tengan valor
-            const params = { page, search };
+            const params = {
+                page,
+                limit: pagination.pageSize,
+                search: search.length >= 3 ? search : undefined,
+            };
+
             const queryParams = new URLSearchParams(
-                Object.entries(params).filter(([_, v]) => v)
+                Object.entries(params).filter(([_, v]) => v !== undefined && v !== "")
             ).toString();
 
             const data = await request(`classes/?${queryParams}`, "GET");
 
-            setClasses(data.data);
-            setTotal(data.total);
+            setClasses(data.data || []);
+
+            // Ajustamos total y current de manera dinámica
+            const total = data.total || 0;
+            const lastPage = Math.max(1, Math.ceil(total / pagination.pageSize));
+            const current = page > lastPage ? lastPage : page;
+
+            setPagination(prev => ({ ...prev, total, current }));
         } catch (error) {
-            console.error("Error fetching classes:", error);
+            console.error(error);
+            message.error("Error al cargar las clases");
         } finally {
             setLoading(false);
         }
     };
 
+    // --- Búsqueda con debounce ---
     useEffect(() => {
-        const delayDebounce = setTimeout(() => {
-            if (search.length >= 3 || search.length === 0) {
-                setPage(1); // reinicia paginación cuando cambia filtro o búsqueda
-                fetchClasses();
-            }
-        }, 500);
-
-        return () => clearTimeout(delayDebounce);
+        const delay = setTimeout(() => fetchClasses(1), 500);
+        return () => clearTimeout(delay);
     }, [search]);
 
-    useEffect(() => {
-        fetchClasses();
-    }, [page]);
+    // --- Cambio de página desde PaginationControl ---
+    const handlePageChange = (newPage) => {
+        fetchClasses(newPage);
+    };
 
-    // ✅ Manejo de eliminación con confirmación
+    // --- Eliminar registro ---
     const handleDelete = async (id) => {
         try {
             await request(`classes/${id}`, "DELETE");
             message.success("Clase eliminada correctamente");
-            setClasses((prev) => prev.filter((cls) => cls.id !== id));
+
+            setClasses(prev => prev.filter(cls => cls.id !== id));
+
+            // Recalculamos el total y la última página
+            const newTotal = pagination.total - 1;
+            const lastPage = Math.max(1, Math.ceil(newTotal / pagination.pageSize));
+            const newCurrent = pagination.current > lastPage ? lastPage : pagination.current;
+
+            setPagination(prev => ({ ...prev, total: newTotal, current: newCurrent }));
+
+            if (newCurrent !== pagination.current) {
+                fetchClasses(newCurrent);
+            }
         } catch (error) {
-            console.error("Error deleting class:", error);
             message.error("Error al eliminar la clase");
         }
     };
 
-    const handleDeleteConfirm = (id) => {
-        confirm({
-            title: "¿Eliminar clase?",
-            content: "Esta acción no se puede deshacer.",
-            okText: "Sí, eliminar",
-            okType: "danger",
-            cancelText: "Cancelar",
-            onOk: () => handleDelete(id),
-        });
-    };
-
     const columns = [
-        { title: "Nombre", dataIndex: "name", key: "name" },
-        { title: "Nivel", dataIndex: "level", key: "level" },
-        { title: "Genero", dataIndex: "genre", key: "genre" },
+        { title: "Nombre", dataIndex: "name", key: "name", sorter: true },
         {
-            title: "Acciones",
-            key: "actions",
-            render: (_, record) => (
-                <Space size="middle">
-                    <Button
-                        type="link"
-                        icon={<EditOutlined />}
-                        onClick={() => navigate(`/classes/edit/${record.id}`)}
-                    />
-                    <Button
-                        type="link"
-                        danger
-                        icon={<DeleteOutlined />}
-                        onClick={() => handleDeleteConfirm(record.id)}
-                    />
-                </Space>
-            ),
+            title: "Nivel",
+            dataIndex: "level",
+            key: "level",
+            filters: [
+                { text: "Básico", value: "Basic" },
+                { text: "Intermedio", value: "Intermediate" },
+                { text: "Avanzado", value: "Advanced" },
+            ],
         },
+        { title: "Genero", dataIndex: "genre", key: "genre" },
     ];
 
     return (
@@ -109,44 +103,26 @@ const Classes = () => {
                 <Breadcrumb.Item>Clases</Breadcrumb.Item>
             </Breadcrumb>
 
-            <Space
-                style={{
-                    marginBottom: 16,
-                    display: "flex",
-                    justifyContent: "end",
-                }}
-            >
-                <Search
-                    placeholder="Search Classes"
-                    allowClear
-                    value={search}
-                    onChange={(e) => setSearch(e.target.value)}
-                    style={{ width: 200 }}
-                />
-                <Button
-                    type="primary"
-                    onClick={() => navigate("/classes/create")}
-                >
-                    Crear Clase
-                </Button>
-            </Space>
-
-            <Table
-                columns={columns}
-                dataSource={classes}
-                loading={loading}
-                pagination={false}
-                rowKey="id"
-                bordered
+            <SearchFilter
+                search={search}
+                setSearch={setSearch}
+                onCreate={() => navigate("/classes/create")}
             />
 
-            <Pagination
-                align="end"
-                current={page}
-                total={total}
-                pageSize={10}
-                onChange={setPage}
-                style={{ marginTop: 16 }}
+            <DataTable
+                columns={columns}
+                data={classes}
+                loading={loading}
+                pagination={pagination}
+                onEdit={(id) => navigate(`/classes/edit/${id}`)}
+                onDelete={handleDelete}
+            />
+
+            <PaginationControl
+                page={pagination.current}
+                total={pagination.total}
+                pageSize={pagination.pageSize}
+                onChange={handlePageChange}
             />
         </div>
     );
