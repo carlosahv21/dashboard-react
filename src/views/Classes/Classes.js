@@ -10,7 +10,7 @@ const Classes = () => {
     const [classes, setClasses] = useState([]);
     const [loading, setLoading] = useState(false);
     const [search, setSearch] = useState("");
-    const [pagination, setPagination] = useState({ current: 1, pageSize: 2, total: 0 });
+    const [pagination, setPagination] = useState({ current: 1, pageSize: 10, total: 0 });
 
     const { request } = useFetch();
     const navigate = useNavigate();
@@ -94,6 +94,8 @@ const Classes = () => {
             ],
         },
         { title: "Genero", dataIndex: "genre", key: "genre" },
+        { title: "Dias de clase", dataIndex: "date", key: "date" },
+        { title: "Horas de clase", dataIndex: "hour", key: "hour" },
     ];
 
     return (

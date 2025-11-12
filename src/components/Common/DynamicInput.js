@@ -133,7 +133,7 @@ const DynamicInput = ({
                     </Select>
                 );
             case "date": return <DatePicker format="YYYY-MM-DD" placeholder={placeholder} />;
-            case "time": return <TimePicker format="HH:mm" placeholder={placeholder} />;
+            case "time": return <TimePicker format="HH:mm" placeholder={placeholder} needConfirm={false} minuteStep={15} use12Hours  />;
             case "textarea": return <TextArea placeholder={placeholder || `Escribe ${label}`} style={{ resize: "none" }} />;
             case "image":
                 return (

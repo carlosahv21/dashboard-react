@@ -45,9 +45,16 @@ const CreateOrEditClass = () => {
         form.setFields([]);
 
         const transformedValues = {
-            ...values
-        };  
-
+            ...values,
+            hour: values.hour
+                ? new Date(values.hour).toLocaleTimeString("es-CO", {
+                    hour: "2-digit",
+                    minute: "2-digit",
+                    hour12: false, // cambia a true si prefieres am/pm
+                })
+                : null,
+        };
+        
         try {
             if (isEditMode) {
                 // Usa el método genérico `request` con 'PUT'
