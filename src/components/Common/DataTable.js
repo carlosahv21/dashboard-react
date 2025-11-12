@@ -4,7 +4,7 @@ import { EditOutlined, DeleteOutlined } from "@ant-design/icons";
 
 const { confirm } = Modal;
 
-const DataTable = ({ columns, data, loading, onEdit, onDelete }) => {
+const DataTable = ({ columns, data, loading, onEdit, onDelete, showActions = true }) => {
     const handleDeleteConfirm = (id) => {
         confirm({
             title: "¿Eliminar?",
@@ -12,23 +12,38 @@ const DataTable = ({ columns, data, loading, onEdit, onDelete }) => {
             okText: "Sí",
             okType: "danger",
             cancelText: "Cancelar",
-            onOk: () => onDelete(id),
+            onOk: () => onDelete && onDelete(id),
         });
     };
 
-    const enhancedColumns = [
-        ...columns,
-        {
-            title: "Acciones",
-            key: "actions",
-            render: (_, record) => (
-                <Space size="middle">
-                    <Button type="link" icon={<EditOutlined />} onClick={() => onEdit(record.id)} />
-                    <Button type="link" danger icon={<DeleteOutlined />} onClick={() => handleDeleteConfirm(record.id)} />
-                </Space>
-            ),
-        },
-    ];
+    const enhancedColumns = showActions && (onEdit || onDelete)
+        ? [
+            ...columns,
+            {
+                title: "Acciones",
+                key: "actions",
+                render: (_, record) => (
+                    <Space size="middle">
+                        {onEdit && (
+                            <Button
+                                type="link"
+                                icon={<EditOutlined />}
+                                onClick={() => onEdit(record.id)}
+                            />
+                        )}
+                        {onDelete && (
+                            <Button
+                                type="link"
+                                danger
+                                icon={<DeleteOutlined />}
+                                onClick={() => handleDeleteConfirm(record.id)}
+                            />
+                        )}
+                    </Space>
+                ),
+            },
+        ]
+        : columns;
 
     return (
         <Table

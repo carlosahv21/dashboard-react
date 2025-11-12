@@ -1,106 +1,119 @@
 import React, { useEffect, useState } from "react";
-import { Breadcrumb, message, Button } from "antd";
-import { useNavigate } from "react-router-dom";
+import { message } from "antd";
 import useFetch from "../../../hooks/useFetch";
-import DataTable from "../../../components/Common/DataTable";
-import PaginationControl from "../../../components/Common/PaginationControl";
-import SearchFilter from "../../../components/Common/SearchFilter";
 import FormHeader from "../../../components/Common/FormHeader";
+import DataTable from "../../../components/Common/DataTable";
 
-const Permissions = () => {
-    const [permissions, setPermissions] = useState([]);
+const RolePermissions = () => {
+    const [permissions, setPermissions] = useState([]); // Lista de todos los permisos
+    const [roles, setRoles] = useState([]); // Lista de roles
+    const [rolePermissions, setRolePermissions] = useState([]); // Lista de relaciones role-permission
     const [loading, setLoading] = useState(false);
-    const [search, setSearch] = useState("");
-    const [pagination, setPagination] = useState({ current: 1, pageSize: 10, total: 0 });
-
     const { request } = useFetch();
-    const navigate = useNavigate();
 
-    const fetchPermissions = async (page = pagination.current) => {
+    // --- Cargar permisos por rol ---
+    const fetchRolePermissions = async () => {
         try {
             setLoading(true);
-            const params = {
-                page,
-                limit: pagination.pageSize,
-                search: search.length >= 3 ? search : undefined,
-            };
-            const queryParams = new URLSearchParams(
-                Object.entries(params).filter(([_, v]) => v !== undefined && v !== "")
-            ).toString();
+            const data = await request("rolePermissions", "GET");
 
-            const data = await request(`permissions?${queryParams}`, "GET");
-            setPermissions(data.data || []);
+            const allPermissions = [];
+            const allRolePermissions = [];
 
-            const total = data.total || 0;
-            const lastPage = Math.max(1, Math.ceil(total / pagination.pageSize));
-            const current = page > lastPage ? lastPage : page;
+            data.forEach(role => {
+                role.permissions.forEach(p => {
+                    if (!allPermissions.find(ap => ap.id === p.id)) allPermissions.push(p);
+                    allRolePermissions.push({ role_id: role.role_id, permission_id: p.id });
+                });
+            });
 
-            setPagination(prev => ({ ...prev, total, current }));
+            setPermissions(allPermissions);
+            setRoles(data.map(r => ({ id: r.role_id, name: r.role_name })));
+            setRolePermissions(allRolePermissions);
         } catch (error) {
             console.error(error);
-            message.error("Error al cargar perfiles");
+            message.error("Error al cargar permisos por rol");
         } finally {
             setLoading(false);
         }
     };
 
-    // --- Búsqueda con debounce ---
     useEffect(() => {
-        const delay = setTimeout(() => fetchPermissions(1), 500);
-        return () => clearTimeout(delay);
-    }, [search]);
+        fetchRolePermissions();
+    }, []);
 
-    // --- Cambio de página desde PaginationControl ---
-    const handlePageChange = (newPage) => {
-        fetchPermissions(newPage);
-    };
-
-    const handleDelete = async (id) => {
+    // --- Toggle permiso ---
+    const togglePermission = async (roleId, permissionId) => {
         try {
-            await request(`permissions/${id}`, "DELETE");
-            message.success("Perfil eliminado correctamente");
-            setPermissions(prev => prev.filter(profile => profile.id !== id));
-            setPagination(prev => ({ ...prev, total: prev.total - 1 }));
+            const exists = rolePermissions.some(
+                rp => rp.role_id === roleId && rp.permission_id === permissionId
+            );
+
+            if (exists) {
+                // Quitar permiso
+                await request(`rolePermissions/${roleId}/${permissionId}`, "DELETE");
+                setRolePermissions(prev =>
+                    prev.filter(rp => !(rp.role_id === roleId && rp.permission_id === permissionId))
+                );
+                message.success("Permiso removido correctamente");
+            } else {
+                // Añadir permiso
+                await request(`rolePermissions/${roleId}`, "POST", { permission_ids: [permissionId] });
+                setRolePermissions(prev => [...prev, { role_id: roleId, permission_id: permissionId }]);
+                message.success("Permiso añadido correctamente");
+            }
         } catch (error) {
-            message.error("Error al eliminar el perfil");
+            console.error(error);
+            message.error("Error al actualizar permiso");
         }
     };
 
+    // --- Columnas para DataTable ---
     const columns = [
-        { title: "Nombre", dataIndex: "name", key: "name" },
-        { title: "Descripción", dataIndex: "description", key: "description" },
+        {
+            title: "Permiso",
+            dataIndex: "name",
+            key: "name",
+            render: (text) => <span>{text}</span>
+        },
+        ...roles.map(role => ({
+            title: role.name,
+            key: role.id,
+            render: (_, record) => {
+                const hasPermission = rolePermissions.some(
+                    rp => rp.role_id === role.id && rp.permission_id === record.id
+                );
+
+                // Deshabilitar checkbox si es admin
+                const isAdmin = role.name.toLowerCase() === "admin";
+
+                return (
+                    <input
+                        type="checkbox"
+                        checked={hasPermission}
+                        disabled={isAdmin}
+                        onChange={() => togglePermission(role.id, record.id)}
+                    />
+                );
+            }
+        }))
     ];
 
     return (
         <div>
             <FormHeader
-                title="Perfiles"
-                subtitle="Administrar perfiles del sistema"
-            />
-            <SearchFilter
-                search={search}
-                setSearch={setSearch}
-                onCreate={() => navigate("/permissions/create")}
-                title="Perfil"
+                title="Permisos por Rol"
+                subtitle="Gestiona qué permisos tiene cada rol"
             />
 
             <DataTable
                 columns={columns}
                 data={permissions}
                 loading={loading}
-                onEdit={(id) => navigate(`/permissions/edit/${id}`)}
-                onDelete={handleDelete}
-                pagination={pagination}
-            />
-
-            <PaginationControl
-                page={pagination.current}
-                total={pagination.total}
-                pageSize={pagination.pageSize}
-                onChange={handlePageChange}
+                showActions={false} // No mostrar columna de acciones
             />
         </div>
     );
 };
 
-export default Permissions;
+export default RolePermissions;

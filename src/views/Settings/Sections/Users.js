@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Breadcrumb, message, Button } from "antd";
+import { message } from "antd";
 import { useNavigate } from "react-router-dom";
 import useFetch from "../../../hooks/useFetch";
 import DataTable from "../../../components/Common/DataTable";
@@ -71,7 +71,7 @@ const Users = () => {
             render: (_, record) => `${record.first_name} ${record.last_name}`,
         },
         { title: "Email", dataIndex: "email", key: "email" },
-        { title: "Rol", dataIndex: "role", key: "role" },
+        { title: "Rol", dataIndex: "role_name", key: "role_name",  render: (text) => text ? text.charAt(0).toUpperCase() + text.slice(1) : "" },
     ];
 
     return (
