@@ -109,6 +109,7 @@ const Classes = () => {
                 search={search}
                 setSearch={setSearch}
                 onCreate={() => navigate("/classes/create")}
+                title="Clase"
             />
 
             <DataTable
