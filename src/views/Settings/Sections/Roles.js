@@ -5,6 +5,7 @@ import useFetch from "../../../hooks/useFetch";
 import DataTable from "../../../components/Common/DataTable";
 import PaginationControl from "../../../components/Common/PaginationControl";
 import SearchFilter from "../../../components/Common/SearchFilter";
+import FormHeader from "../../../components/Common/FormHeader";
 
 const Roles = () => {
     const [roles, setRoles] = useState([]);
@@ -70,6 +71,10 @@ const Roles = () => {
 
     return (
         <div>
+            <FormHeader
+                title="Roles"
+                subtitle="Administrar roles del sistema"
+            />
             <SearchFilter
                 search={search}
                 setSearch={setSearch}

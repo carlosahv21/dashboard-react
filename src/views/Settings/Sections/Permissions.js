@@ -7,16 +7,16 @@ import PaginationControl from "../../../components/Common/PaginationControl";
 import SearchFilter from "../../../components/Common/SearchFilter";
 import FormHeader from "../../../components/Common/FormHeader";
 
-const Users = () => {
-    const [users, setUsers] = useState([]);
+const Permissions = () => {
+    const [permissions, setPermissions] = useState([]);
     const [loading, setLoading] = useState(false);
     const [search, setSearch] = useState("");
-    const [pagination, setPagination] = useState({ current: 1, pageSize: 5, total: 0 });
+    const [pagination, setPagination] = useState({ current: 1, pageSize: 10, total: 0 });
 
     const { request } = useFetch();
     const navigate = useNavigate();
 
-    const fetchUsers = async (page = pagination.current) => {
+    const fetchPermissions = async (page = pagination.current) => {
         try {
             setLoading(true);
             const params = {
@@ -28,8 +28,8 @@ const Users = () => {
                 Object.entries(params).filter(([_, v]) => v !== undefined && v !== "")
             ).toString();
 
-            const data = await request(`users?${queryParams}`, "GET");
-            setUsers(data.data || []);
+            const data = await request(`permissions?${queryParams}`, "GET");
+            setPermissions(data.data || []);
 
             const total = data.total || 0;
             const lastPage = Math.max(1, Math.ceil(total / pagination.pageSize));
@@ -38,61 +38,57 @@ const Users = () => {
             setPagination(prev => ({ ...prev, total, current }));
         } catch (error) {
             console.error(error);
-            message.error("Error al cargar usuarios");
+            message.error("Error al cargar perfiles");
         } finally {
             setLoading(false);
         }
     };
 
+    // --- Búsqueda con debounce ---
     useEffect(() => {
-        const delay = setTimeout(() => fetchUsers(1), 300);
+        const delay = setTimeout(() => fetchPermissions(1), 500);
         return () => clearTimeout(delay);
     }, [search]);
 
+    // --- Cambio de página desde PaginationControl ---
     const handlePageChange = (newPage) => {
-        fetchUsers(newPage);
+        fetchPermissions(newPage);
     };
 
     const handleDelete = async (id) => {
         try {
-            await request(`users/${id}`, "DELETE");
-            message.success("Usuario eliminado correctamente");
-            setUsers(prev => prev.filter(user => user.id !== id));
+            await request(`permissions/${id}`, "DELETE");
+            message.success("Perfil eliminado correctamente");
+            setPermissions(prev => prev.filter(profile => profile.id !== id));
             setPagination(prev => ({ ...prev, total: prev.total - 1 }));
         } catch (error) {
-            message.error("Error al eliminar el usuario");
+            message.error("Error al eliminar el perfil");
         }
     };
 
     const columns = [
-        {
-            title: "Nombre",
-            key: "full_name",
-            render: (_, record) => `${record.first_name} ${record.last_name}`,
-        },
-        { title: "Email", dataIndex: "email", key: "email" },
-        { title: "Rol", dataIndex: "role", key: "role" },
+        { title: "Nombre", dataIndex: "name", key: "name" },
+        { title: "Descripción", dataIndex: "description", key: "description" },
     ];
 
     return (
         <div>
             <FormHeader
-                title="Usuarios"
-                subtitle="Administrar usuarios del sistema"
+                title="Perfiles"
+                subtitle="Administrar perfiles del sistema"
             />
-
             <SearchFilter
                 search={search}
                 setSearch={setSearch}
-                onCreate={() => navigate("/users/create")}
-                title="Usuario"
+                onCreate={() => navigate("/permissions/create")}
+                title="Perfil"
             />
 
             <DataTable
                 columns={columns}
-                data={users}
+                data={permissions}
                 loading={loading}
-                onEdit={(id) => navigate(`/users/edit/${id}`)}
+                onEdit={(id) => navigate(`/permissions/edit/${id}`)}
                 onDelete={handleDelete}
                 pagination={pagination}
             />
@@ -107,4 +103,4 @@ const Users = () => {
     );
 };
 
-export default Users;
+export default Permissions;

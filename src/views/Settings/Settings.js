@@ -7,7 +7,7 @@ import { Routes, Route, Link, Outlet } from "react-router-dom"; // Importa sin B
 // Lazy loading de las secciones
 const GeneralInformation = lazy(() => import("./Sections/GeneralInformation"));
 const Roles = lazy(() => import("./Sections/Roles"));
-const Profiles = lazy(() => import("./Sections/Profiles"));
+const Permissions = lazy(() => import("./Sections/Permissions"));
 const ActiveModules = lazy(() => import("./Sections/ActiveModules"));
 const Users = lazy(() => import("./Sections/Users"));
 const Payments = lazy(() => import("./Sections/Payments"));
@@ -57,7 +57,7 @@ const SettingsLayout = () => {
                             label: "User Management",
                             children: [
                                 { key: "roles", label: <Link to="roles">Roles</Link> },
-                                { key: "profiles", label: <Link to="profiles">Profiles</Link> },
+                                { key: "permissions", label: <Link to="permissions">Permissions</Link> },
                                 { key: "users", label: <Link to="users">Users</Link> },
                             ],
                         },
@@ -127,10 +127,10 @@ const Settings = () => (
                 }
             />
             <Route
-                path="profiles"
+                path="permissions"
                 element={
                     <Suspense fallback={<div>Loading...</div>}>
-                        <Profiles />
+                        <Permissions />
                     </Suspense>
                 }
             />
