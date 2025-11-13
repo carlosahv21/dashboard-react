@@ -1,5 +1,6 @@
+// components/BaseCrudView.jsx
 import React, { useEffect, useState } from "react";
-import { message, Modal, Form, Breadcrumb } from "antd";
+import { message, Modal, Form, Breadcrumb, Select, Space } from "antd";
 import DataTable from "./DataTable";
 import PaginationControl from "./PaginationControl";
 import SearchFilter from "./SearchFilter";
@@ -29,12 +30,12 @@ const BaseCrudView = ({
     const [form] = Form.useForm();
 
     // --- Fetch items ---
-    const fetchItems = async (page = pagination.current) => {
+    const fetchItems = async (page = pagination.current, limit = pagination.pageSize) => {
         try {
             setLoading(true);
             const params = {
                 page,
-                limit: pagination.pageSize,
+                limit,
                 search: search.length >= 3 ? search : undefined,
             };
             const queryParams = new URLSearchParams(
@@ -45,7 +46,7 @@ const BaseCrudView = ({
 
             setItems(data.data || []);
             const total = data.total || 0;
-            const lastPage = Math.max(1, Math.ceil(total / pagination.pageSize));
+            const lastPage = Math.max(1, Math.ceil(total / limit));
             const current = page > lastPage ? lastPage : page;
             setPagination(prev => ({ ...prev, total, current }));
         } catch (error) {
@@ -62,6 +63,10 @@ const BaseCrudView = ({
     }, [search]);
 
     const handlePageChange = (newPage) => fetchItems(newPage);
+    const handlePageSizeChange = (newSize) => {
+        setPagination(prev => ({ ...prev, pageSize: newSize, current: 1 }));
+        fetchItems(1, newSize);
+    };
 
     // --- Delete ---
     const handleDelete = async (id) => {
@@ -144,17 +149,32 @@ const BaseCrudView = ({
         <div>
             <Breadcrumb style={{ marginBottom: 16 }}
                 items={[
-                    { title: 'Dashboard'},
-                    { title: titlePlural},
+                    { title: 'Dashboard' },
+                    { title: titlePlural },
                 ]}
             />
 
-            <SearchFilter
-                search={search}
-                setSearch={setSearch}
-                onCreate={() => openModal()}
-                title={titleSingular}
-            />
+            <Space style={{ width: '100%', justifyContent: 'space-between', marginBottom: 16 }}>
+                
+                <Select
+                    value={pagination.pageSize}
+                    style={{ width: 120 }}
+                    onChange={handlePageSizeChange}
+                    options={[
+                        { value: 5, label: '5 / page' },
+                        { value: 10, label: '10 / page' },
+                        { value: 20, label: '20 / page' },
+                        { value: 50, label: '50 / page' },
+                        { value: 100, label: '100 / page' },
+                    ]}
+                />
+                <SearchFilter
+                    search={search}
+                    setSearch={setSearch}
+                    onCreate={() => openModal()}
+                    title={titleSingular}
+                />
+            </Space>
 
             <DataTable
                 columns={columns}
