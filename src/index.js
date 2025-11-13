@@ -9,7 +9,6 @@ import Layout from "./views/Layout/Layout";
 import Dashboard from "./views/Dashboard/Dashboard";
 import Settings from "./views/Settings/Settings";
 import Classes from "./views/Classes/Classes";
-import CreateOrEditClass from "./views/Classes/CreateOrEditClass";
 
 import "./App.css";
 
@@ -25,8 +24,6 @@ const App = () => {
                             <Route element={<Layout setIsAuthenticated={setIsAuthenticated} />}>
                                 <Route path="/" element={<Dashboard />} />
                                 <Route path="classes" element={<Classes />} />
-                                <Route path="classes/create" element={<CreateOrEditClass />} />
-                                <Route path="classes/edit/:id" element={<CreateOrEditClass />} />
 
                                 {/* Rutas anidadas para Settings */}
                                 <Route path="settings/*" element={<Settings />} /> {/* Importante el /* */}

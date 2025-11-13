@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { message } from "antd";
+import { message, Checkbox } from "antd";
 import useFetch from "../../../hooks/useFetch";
 import FormHeader from "../../../components/Common/FormHeader";
 import DataTable from "../../../components/Common/DataTable";
@@ -84,12 +84,10 @@ const RolePermissions = () => {
                     rp => rp.role_id === role.id && rp.permission_id === record.id
                 );
 
-                // Deshabilitar checkbox si es admin
                 const isAdmin = role.name.toLowerCase() === "admin";
 
                 return (
-                    <input
-                        type="checkbox"
+                    <Checkbox
                         checked={hasPermission}
                         disabled={isAdmin}
                         onChange={() => togglePermission(role.id, record.id)}

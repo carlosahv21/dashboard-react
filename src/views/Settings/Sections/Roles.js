@@ -88,8 +88,10 @@ const Roles = () => {
                 loading={loading}
                 onEdit={(id) => navigate(`/roles/edit/${id}`)}
                 onDelete={handleDelete}
-                pagination={pagination}
+                showActions={true}
+                disableDelete={(record) => ["admin", "student", "teacher"].includes(record.name.toLowerCase())}
             />
+
 
             <PaginationControl
                 page={pagination.current}

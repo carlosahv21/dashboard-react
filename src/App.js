@@ -8,7 +8,6 @@ import Layout from "./views/Layout/Layout";
 import Dashboard from "./views/Dashboard/Dashboard";
 import Settings from "./views/Settings/Settings";
 import Classes from "./views/Classes/Classes";
-import CreateOrEditClass from "./views/Classes/CreateOrEditClass";
 
 import PrivateRoute from "./routes/PrivateRoute";
 import PublicRoute from "./routes/PublicRoute";
@@ -48,8 +47,6 @@ const App = () => {
                         >
                             <Route index element={<Dashboard />} />
                             <Route path="classes" element={<Classes />} />
-                            <Route path="classes/create" element={<CreateOrEditClass />} />
-                            <Route path="classes/edit/:id" element={<CreateOrEditClass />} />
                             <Route path="settings/*" element={<Settings />} />
                             <Route path="*" element={<Navigate to="/" />} />
                         </Route>
