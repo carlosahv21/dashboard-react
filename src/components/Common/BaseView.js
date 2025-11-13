@@ -15,6 +15,9 @@ const BaseCrudView = ({
     columns,           // columnas para la tabla
     titleSingular,     // 'Clase'
     titlePlural,       // 'Clases'
+    filters,           // filtros para la consulta
+    fixedValues,       // valores fijos para la consulta
+    hiddenFields,      // campos ocultos en el formulario
 }) => {
     const [items, setItems] = useState([]);
     const [loading, setLoading] = useState(false);
@@ -36,6 +39,7 @@ const BaseCrudView = ({
                 page,
                 limit,
                 search: search.length >= 3 ? search : undefined,
+                ...filters,
             };
             const queryParams = new URLSearchParams(
                 Object.entries(params).filter(([_, v]) => v !== undefined && v !== "")
@@ -112,7 +116,7 @@ const BaseCrudView = ({
     // --- Submit ---
     const handleSubmit = async (values) => {
         // Copiamos los valores recibidos
-        const transformedValues = { ...values };
+        const transformedValues = { ...values, ...fixedValues, };
 
         // Transformar 'hour' si existe
         if ('hour' in values && values.hour) {
@@ -229,7 +233,7 @@ const BaseCrudView = ({
                                     <FormSection
                                         key={block.block_id}
                                         title={block.block_name}
-                                        fields={block.fields}
+                                        fields={block.fields.filter(f => !hiddenFields?.includes(f.name))}
                                     />
                                 ))}
                                 <FormFooter onCancel={closeModal} onSave={() => form.submit()} />
