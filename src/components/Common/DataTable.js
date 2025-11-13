@@ -11,7 +11,8 @@ const DataTable = ({
     onEdit,
     onDelete,
     showActions = true,
-    disableDelete // función: record => boolean
+    disableDelete,
+    disableEdit
 }) => {
     const handleDeleteConfirm = (id, record) => {
         confirm({
@@ -31,14 +32,17 @@ const DataTable = ({
                 title: "Acciones",
                 key: "actions",
                 render: (_, record) => {
-                    const isDisabled = disableDelete ? disableDelete(record) : false;
+                    const editDisabled = disableEdit ? disableEdit(record) : false;
+                    const deleteDisabled = disableDelete ? disableDelete(record) : false;
+
                     return (
                         <Space size="middle">
                             {onEdit && (
                                 <Button
                                     type="link"
                                     icon={<EditOutlined />}
-                                    onClick={() => onEdit(record.id)}
+                                    onClick={() => !editDisabled && onEdit(record)}
+                                    disabled={editDisabled}
                                 />
                             )}
                             {onDelete && (
@@ -46,13 +50,14 @@ const DataTable = ({
                                     type="link"
                                     danger
                                     icon={<DeleteOutlined />}
-                                    onClick={() => !isDisabled && handleDeleteConfirm(record.id, record)}
-                                    disabled={isDisabled}
+                                    onClick={() => !deleteDisabled && handleDeleteConfirm(record.id, record)}
+                                    disabled={deleteDisabled}
                                 />
                             )}
                         </Space>
                     );
-                },
+                }
+
             },
         ]
         : columns;

@@ -7,7 +7,6 @@ import SearchFilter from "./SearchFilter";
 import FormSection from "./FormSection";
 import FormFooter from "./FormFooter";
 import FormHeader from "./FormHeader";
-import dayjs from "dayjs";
 import useFetch from "../../hooks/useFetch";
 
 const BaseCrudView = ({
@@ -91,10 +90,9 @@ const BaseCrudView = ({
 
             if (id) {
                 const itemData = await request(`${endpoint}/${id}`, 'GET');
-                form.setFieldsValue({
-                    ...itemData,
-                    hour: itemData.hour ? dayjs(itemData.hour, "HH:mm") : null,
-                });
+                // Vaciar contraseña para no mostrar hash
+                if ('password' in itemData) itemData.password = "";
+                form.setFieldsValue(itemData);
             } else {
                 form.resetFields();
             }
@@ -111,17 +109,24 @@ const BaseCrudView = ({
         fetchItems();
     };
 
+    // --- Submit ---
     const handleSubmit = async (values) => {
-        const transformedValues = {
-            ...values,
-            hour: values.hour
-                ? new Date(values.hour).toLocaleTimeString("es-CO", {
-                    hour: "2-digit",
-                    minute: "2-digit",
-                    hour12: false,
-                })
-                : null,
-        };
+        // Copiamos los valores recibidos
+        const transformedValues = { ...values };
+
+        // Transformar 'hour' si existe
+        if ('hour' in values && values.hour) {
+            transformedValues.hour = new Date(values.hour).toLocaleTimeString("es-CO", {
+                hour: "2-digit",
+                minute: "2-digit",
+                hour12: false,
+            });
+        }
+
+        // Si la contraseña quedó vacía, no enviarla al backend
+        if ('password' in transformedValues && !transformedValues.password) {
+            delete transformedValues.password;
+        }
 
         try {
             if (editingId) {
@@ -155,7 +160,6 @@ const BaseCrudView = ({
             />
 
             <Space style={{ width: '100%', justifyContent: 'space-between', marginBottom: 16 }}>
-                
                 <Select
                     value={pagination.pageSize}
                     style={{ width: 120 }}
@@ -181,8 +185,10 @@ const BaseCrudView = ({
                 data={items}
                 loading={loading}
                 pagination={pagination}
-                onEdit={(id) => openModal(id)}
-                onDelete={handleDelete}
+                onEdit={(record) => openModal(record.id)}
+                onDelete={(record) => handleDelete(record.id)}
+                disableEdit={(record) => ["admin"].includes(record.role_name?.toLowerCase())}
+                disableDelete={(record) => ["admin"].includes(record.role_name?.toLowerCase())}
             />
 
             <PaginationControl
@@ -200,28 +206,45 @@ const BaseCrudView = ({
                 onCancel={closeModal}
                 destroyOnClose
             >
-                {moduleData?.blocks?.length > 0 && (
-                    <>
-                        <FormHeader
-                            title={editingId ? `Editar ${titleSingular}` : `Crear ${titleSingular}`}
-                            subtitle={editingId ? `Edita los datos del ${titleSingular.toLowerCase()}` : `Completa los datos para crear un nuevo ${titleSingular.toLowerCase()}`}
-                            onSave={() => form.submit()}
-                            onCancel={closeModal}
-                        />
-                        <Form
-                            form={form}
-                            layout="vertical"
-                            onFinish={handleSubmit}
-                            style={{ padding: 20 }}
-                        >
-                            {moduleData.blocks.map(block => (
-                                <FormSection key={block.block_id} title={block.block_name} fields={block.fields} />
-                            ))}
-                            <FormFooter onCancel={closeModal} onSave={() => form.submit()} />
-                        </Form>
-                    </>
+                {moduleData ? (
+                    moduleData.blocks?.length > 0 ? (
+                        <>
+                            <FormHeader
+                                title={editingId ? `Editar ${titleSingular}` : `Crear ${titleSingular}`}
+                                subtitle={
+                                    editingId
+                                        ? `Edita los datos del ${titleSingular.toLowerCase()}`
+                                        : `Completa los datos para crear un nuevo ${titleSingular.toLowerCase()}`
+                                }
+                                onSave={() => form.submit()}
+                                onCancel={closeModal}
+                            />
+                            <Form
+                                form={form}
+                                layout="vertical"
+                                onFinish={handleSubmit}
+                                style={{ padding: 20 }}
+                            >
+                                {moduleData.blocks.map((block) => (
+                                    <FormSection
+                                        key={block.block_id}
+                                        title={block.block_name}
+                                        fields={block.fields}
+                                    />
+                                ))}
+                                <FormFooter onCancel={closeModal} onSave={() => form.submit()} />
+                            </Form>
+                        </>
+                    ) : (
+                        <div style={{ textAlign: "center", padding: 50 }}>
+                            No hay campos para mostrar.
+                        </div>
+                    )
+                ) : (
+                    <div style={{ textAlign: "center", padding: 50 }}>Cargando...</div>
                 )}
             </Modal>
+
         </div>
     );
 };
