@@ -1,44 +1,27 @@
 import React, { useContext } from "react";
 import { Button, Layout, Dropdown } from "antd";
 import { MenuFoldOutlined, MenuUnfoldOutlined, SettingFilled } from "@ant-design/icons";
-import { RoutesContext } from "../context/RoutesContext";
 import { useNavigate } from "react-router-dom";
+import { AuthContext } from "../context/AuthContext";
 
 const { Header } = Layout;
 
-const HeaderComponent = ({ collapsed, setCollapsed, setIsAuthenticated }) => {
-    const { routes } = useContext(RoutesContext);
+const HeaderComponent = ({ collapsed, setCollapsed }) => {
     const navigate = useNavigate();
-
-    const headerRoutes = routes.filter(route => route.location === "HEADER");
-
-    const handleMenuClick = (route) => {
-        if (route.on_click_action === "navigate") {
-            navigate(route.path);
-        }
-    };
+    const { logout } = useContext(AuthContext);
 
     const handleLogout = () => {
-        localStorage.removeItem("token");
-        localStorage.removeItem("settings");
-
-        setIsAuthenticated(false);
-        navigate("/login");
+        localStorage.clear();   // Limpia toda la sesión
+        logout();               // Actualiza el estado global del AuthContext
+        navigate("/login");     // Redirección
     };
 
-    // Convierte las rutas en el formato requerido por Ant Design
-    const userMenuItems = [
-        ...headerRoutes.map(route => ({
-            key: route.id,
-            label: route.name,
-            onClick: () => {
-                if (route.on_click_action === "logout") {
-                    handleLogout();
-                } else {
-                    handleMenuClick(route);
-                }
-            },
-        })),
+    const menuItems = [
+        {
+            key: "settings",
+            label: "Settings",
+            onClick: () => navigate("/settings"),
+        },
         {
             key: "logout",
             label: "Logout",
@@ -61,26 +44,18 @@ const HeaderComponent = ({ collapsed, setCollapsed, setIsAuthenticated }) => {
                 type="text"
                 icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
                 onClick={() => setCollapsed(!collapsed)}
-                style={{
-                    fontSize: "18px",
-                    width: 64,
-                    height: 64,
-                }}
+                style={{ fontSize: 18, width: 64, height: 64 }}
             />
+
             <Dropdown
-                menu={{ items: userMenuItems }}
+                menu={{ items: menuItems }}
                 placement="bottomRight"
                 trigger={["click"]}
             >
                 <Button
                     type="text"
                     icon={<SettingFilled />}
-                    style={{
-                        fontSize: "18px",
-                        width: 64,
-                        height: 64,
-                        marginRight: 20,
-                    }}
+                    style={{ fontSize: 18, width: 64, height: 64, marginRight: 20 }}
                 />
             </Dropdown>
         </Header>

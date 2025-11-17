@@ -1,45 +1,34 @@
-import React, { useContext, useState } from "react";
+import React, { useState, useContext } from "react";
 import { Form, Input, Button, Alert } from "antd";
 import { useNavigate } from "react-router-dom";
-import { SettingsContext } from "../../context/SettingsContext";
+import { AuthContext } from "../../context/AuthContext";
 import useFetch from "../../hooks/useFetch";
 
-const Login = ({ setIsAuthenticated }) => {
+const Login = () => {
     const [error, setError] = useState("");
-    const { setSettings } = useContext(SettingsContext);
+    const { setUser, setSettings, setRoutes, setToken } = useContext(AuthContext);
     const navigate = useNavigate();
-    const { request, loading } = useFetch(); // Usa el hook useFetch
+    const { request, loading } = useFetch();
 
     const handleLogin = async (values) => {
         setError("");
-    
-        const { email, password } = values;
 
         try {
-            // Llama a la API de login usando useFetch
-            const data = await request("auth/login", "POST", { email, password });
+            const data = await request("auth/login", "POST", values);
 
             if (!data.token) {
-                alert("Invalid email or password.");
+                setError("Invalid email or password.");
                 return;
             }
 
-            // Guarda el token y autentica al usuario
+            // Guardar token en localStorage
             localStorage.setItem("token", data.token);
 
-            // Llama a la API de configuración usando el token obtenido
-            const settingsData = await request("settings", "GET", null, {
-                Authorization: `Bearer ${data.token}`,
-            });
+            setToken(data.token);
+            setUser(data.user);
+            setSettings(data.settings);
+            setRoutes(data.routes || []);
 
-            if (!settingsData) {
-                alert("Failed to load settings.");
-                localStorage.removeItem("token");
-                setIsAuthenticated(false);
-            }
-
-            setIsAuthenticated(true);
-            setSettings(settingsData);
             navigate("/");
         } catch (err) {
             setError(err.message || "Something went wrong. Please try again.");

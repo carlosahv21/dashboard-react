@@ -11,16 +11,18 @@ const useFetch = () => {
         setError(null);
 
         try {
-            // Configuración de opciones sin body en métodos GET y HEAD
+            const token = localStorage.getItem("token");
+
             const options = {
                 method,
                 headers: {
                     ...(body && !(body instanceof FormData) && method !== "GET" && { "Content-Type": "application/json" }),
+                    ...(token && { Authorization: `Bearer ${token}` }),
                     ...headers,
                 },
                 ...(method !== "GET" && method !== "HEAD" && { body: body instanceof FormData ? body : JSON.stringify(body) })
             };
-
+            
             const response = await fetch(`${API_BASE_URL}/api/${endpoint}`, options);
             const isJson = response.headers.get("content-type")?.includes("application/json");
             const data = isJson ? await response.json() : null;
@@ -32,7 +34,7 @@ const useFetch = () => {
             return data;
         } catch (error) {
             setError(error.message || "An error occurred");
-            throw error; 
+            throw error;
         } finally {
             setLoading(false);
         }

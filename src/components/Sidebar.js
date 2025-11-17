@@ -1,39 +1,79 @@
 // components/Sidebar.js
 import React, { useContext } from "react";
-import { Layout } from "antd";
-import DynamicMenu from "./Common/DynamicMenu";
-import { SettingsContext } from "../context/SettingsContext";
-import { RoutesContext } from "../context/RoutesContext";
+import { Layout, Menu } from "antd";
+import { AuthContext } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
+import * as Icons from "@ant-design/icons";
 
 const { Sider } = Layout;
 
 const Sidebar = ({ collapsed }) => {
-  const { settings } = useContext(SettingsContext);
-  const { routes } = useContext(RoutesContext);
+  const { settings, routes } = useContext(AuthContext);
   const navigate = useNavigate();
 
-  const baseBackend = process.env.REACT_APP_BACKEND;
-  const logo = baseBackend + '/' + (settings?.logo_url || ""); 
-
-  const sidebarRoutes = routes.filter(route => route.location === 'SIDEBAR');
-
-  const handleMenuClick = (route) => {
-    if (route.on_click_action === 'navigate') {
-      navigate(route.path);
-    }
+  const getIcon = (iconName) => {
+    if (!iconName) return <Icons.QuestionOutlined />;
+    const IconComponent = Icons[`${iconName}Outlined`] || Icons[iconName] || Icons.QuestionOutlined;
+    return <IconComponent />;
   };
 
+  // Filtrar rutas que van al menú
+  const menuRoutes = routes.filter((r) => r.is_menu === 1);
+
+  // Convertir estructura del backend → estructura del Menu de Ant Design
+  const buildMenuItems = (routeList) =>
+    routeList.map((r) => {
+      const hasChildren = r.children && r.children.length > 0;
+
+      return {
+        key: r.id,
+        icon: getIcon(r.icon),
+        label: r.label || "No Label",
+        children: hasChildren ? buildMenuItems(r.children.filter(c => c.is_menu === 1)) : undefined,
+        onClick: () => {
+          if (!hasChildren) navigate(r.full_path);
+        },
+      };
+    });
+
+  const items = buildMenuItems(menuRoutes);
+
+  const baseBackend = process.env.REACT_APP_BACKEND;
+  const logo = baseBackend + "/" + (settings?.logo_url || "");
+
   return (
-    <Sider theme={settings.theme} trigger={null} collapsible collapsed={collapsed}>
-      <div className="logo" style={{ height: collapsed ? 32 : 'auto', margin: collapsed ? 8 : 16, display: "flex", justifyContent: "center", alignItems: "center", overflow: "hidden" }}>
-        {settings.logo_url && (
-          <a href="/dashboard">
-            <img src={logo} alt="Logo" style={{ width: collapsed ? "30px" : "120px", height: "auto", transition: "width 0.2s ease" }} />
+    <Sider theme={settings?.theme || "light"} collapsible collapsed={collapsed}>
+      <div
+        className="logo"
+        style={{
+          height: collapsed ? 40 : "auto",
+          margin: collapsed ? 8 : 16,
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          overflow: "hidden",
+        }}
+      >
+        {settings?.logo_url && (
+          <a href="/">
+            <img
+              src={logo}
+              alt="Logo"
+              style={{
+                width: collapsed ? "40px" : "120px",
+                height: "auto",
+                transition: "width 0.2s ease",
+              }}
+            />
           </a>
         )}
       </div>
-      <DynamicMenu routes={sidebarRoutes} theme={settings.theme} onMenuClick={handleMenuClick} />
+
+      <Menu
+        theme={settings?.theme || "light"}
+        mode="inline"
+        items={items}
+      />
     </Sider>
   );
 };

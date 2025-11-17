@@ -1,33 +1,42 @@
-import React from "react";
-import { Card, Typography, Row, Col } from "antd";
+import React, { useState, useContext } from "react";
+import { Layout } from "antd";
+import Sidebar from "../../components/Sidebar";
+import HeaderComponent from "../../components/Header";
+import Footer from "../../components/Footer";
+import { Outlet } from "react-router-dom";
+import { AuthContext } from "../../context/AuthContext";
 
-const { Title, Paragraph } = Typography;
+const { Content } = Layout;
 
-const DashboardHome = () => {
+const Dashboard = () => {
+    const [collapsed, setCollapsed] = useState(false);
+    const { routes } = useContext(AuthContext);
+
     return (
-        <div>
-            <Title level={2}>Welcome to the Dashboard</Title>
-            <Paragraph>This is the main overview of your application.</Paragraph>
+        <Layout style={{ minHeight: "100vh" }}>
+            {/* Sidebar */}
+            <Sidebar collapsed={collapsed} routes={routes} />
 
-            <Row gutter={[16, 16]}>
-                <Col span={8}>
-                    <Card title="Statistics" bordered={false}>
-                        <p>Overview of statistics</p>
-                    </Card>
-                </Col>
-                <Col span={8}>
-                    <Card title="Recent Activities" bordered={false}>
-                        <p>List of recent activities</p>
-                    </Card>
-                </Col>
-                <Col span={8}>
-                    <Card title="Quick Actions" bordered={false}>
-                        <p>Shortcut links to common actions</p>
-                    </Card>
-                </Col>
-            </Row>
-        </div>
+            {/* Layout principal */}
+            <Layout>
+                {/* Header */}
+                <HeaderComponent collapsed={collapsed} setCollapsed={setCollapsed} />
+
+                {/* Contenido de las rutas hijas */}
+                <Content
+                    style={{
+                        padding: 24,
+                        minHeight: 280
+                    }}
+                >
+                    <Outlet />
+                </Content>
+
+                {/* Footer */}
+                <Footer />
+            </Layout>
+        </Layout>
     );
 };
 
-export default DashboardHome;
+export default Dashboard;
