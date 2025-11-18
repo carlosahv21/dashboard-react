@@ -108,7 +108,7 @@ const RolePermissions = () => {
                 columns={columns}
                 data={permissions}
                 loading={loading}
-                showActions={false} // No mostrar columna de acciones
+                showActions={false}
             />
         </div>
     );

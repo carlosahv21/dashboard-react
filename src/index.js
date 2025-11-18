@@ -12,54 +12,45 @@ import DashboardView from "./views/Dashboard/DashboardView";
 import Classes from "./views/Classes/Classes";
 import Students from "./views/Students/Students";
 import Teachers from "./views/Teachers/Teachers";
-import Settings from "./views/Settings/Settings";
 
-import "./App.css";
+// Settings
+import SettingsLayout from "./views/Settings/SettingsLayouts";
 
 const AppRoutes = () => {
     const { user, routes, loading } = useContext(AuthContext);
 
     if (loading) return <LoadingScreen />;
-
     if (!user) return <Login />;
 
-    const resolveComponent = (routeName) => {
-        switch (routeName) {
-            case "dashboard": return DashboardView;
-            case "classes": return Classes;
-            case "students": return Students;
-            case "teachers": return Teachers;
-            case "settings": return Settings;
-
-            // Todas las subrutas de settings van al mismo componente
-            case "settings.general":
-            case "settings.activeModules":
-            case "settings.roles":
-            case "settings.permissions":
-            case "settings.users":
-            case "settings.customFields":
-            case "settings.payments":
-                return Settings;
-
-            default:
-                return null;
-        }
-    };
-
+    // Solo renderizamos rutas que NO son hijos de Settings
     const renderRoutes = (routesArray) =>
-        routesArray.flatMap((r) => {
-            if (r.children?.length > 0) return renderRoutes(r.children);
+        routesArray.flatMap(r => {
+            if (r.name === "settings") {
+                // La ruta padre Settings
+                return (
+                    <Route
+                        key={r.id}
+                        path={r.full_path + "/*"} // importante el /* para Outlet
+                        element={<SettingsLayout />}
+                    />
+                );
+            }
 
-            const Component = resolveComponent(r.name);
-            if (!Component) return null;
+            if (r.children?.length > 0) {
+                return renderRoutes(r.children);
+            }
 
-            return (
-                <Route
-                    key={r.id}
-                    path={r.full_path}
-                    element={<Component />}
-                />
-            );
+            // Componente principal de la ruta
+            let Component;
+            switch (r.name) {
+                case "dashboard": Component = DashboardView; break;
+                case "classes": Component = Classes; break;
+                case "students": Component = Students; break;
+                case "teachers": Component = Teachers; break;
+                default: return null;
+            }
+
+            return <Route key={r.id} path={r.full_path} element={<Component />} />;
         });
 
     return (

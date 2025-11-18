@@ -5,71 +5,76 @@ import useFetch from "../../../hooks/useFetch";
 import FormHeader from "../../../components/Common/FormHeader";
 import FormFooter from "../../../components/Common/FormFooter";
 
-const FieldCard = ({ block, onEdit, onAddField, onDeleteField, onDeleteBlock }) => (
-    <Card
-        style={{ marginBottom: '10px' }}
-        type="inner"
-        title={
-            <Space style={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
-                <Space>
-                    {block.block_name}
-                </Space>
-                <Space>
-                    <Tooltip title="Agregar campo">
-                        <Button
-                            size="small"
-                            type="text"
-                            icon={<PlusOutlined />}
-                            onClick={() => onAddField(block.block_id)}
-                        ></Button>
-                    </Tooltip>
-                    <Tooltip title="Eliminar bloque">
-                        <Button
-                            size="small"
-                            type="link"
-                            danger
-                            onClick={() => onDeleteBlock(block.block_id)}
-                            icon={<DeleteOutlined />} ></Button>
-                    </Tooltip>
-                </Space>
-            </Space>
-        }
-    >
-        <Row>
-            {block.fields.map(field => (
-                <Col
-                    key={field.field_id}
-                    span={12}
-                    style={{
-                        marginTop: '10px',
-                        marginBottom: '10px',
-                        backgroundColor: '#f5f5f5',
-                        padding: '10px'
-                    }}
-                >
+const FieldCard = ({ block, onEdit, onAddField, onDeleteField, onDeleteBlock }) => {
+    const isInheritedBlock = block.inherited; // true si bloque es del padre
+    return (
+        <Card
+            style={{ marginBottom: '10px' }}
+            type="inner"
+            title={
+                <Space style={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
+                    <Space>{block.block_name}</Space>
                     <Space>
-                        <span>
-                            {field.label}
-                            {field.required === 1 && <span style={{ color: 'red' }}> *</span>}
-                        </span>
-                        <Button
-                            type="link"
-                            icon={<EditOutlined />}
-                            onClick={() => onEdit(field)}
-                        />
-                        <Button
-                            type="link"
-                            danger
-                            icon={<DeleteOutlined />}
-                            onClick={() => onDeleteField(field.field_id)}
-                        />
+                        <Tooltip title={isInheritedBlock ? "No se puede agregar campo a bloque heredado" : "Agregar campo"}>
+                            <Button
+                                size="small"
+                                type="text"
+                                icon={<PlusOutlined />}
+                                onClick={() => !isInheritedBlock && onAddField(block.block_id)}
+                                disabled={isInheritedBlock}
+                            />
+                        </Tooltip>
+                        <Tooltip title={isInheritedBlock ? "No se puede eliminar bloque heredado" : "Eliminar bloque"}>
+                            <Button
+                                size="small"
+                                type="link"
+                                danger
+                                onClick={() => !isInheritedBlock && onDeleteBlock(block.block_id)}
+                                icon={<DeleteOutlined />}
+                                disabled={isInheritedBlock}
+                            />
+                        </Tooltip>
                     </Space>
-                </Col>
-            ))}
-        </Row>
-
-    </Card>
-);
+                </Space>
+            }
+        >
+            <Row>
+                {block.fields.map(field => (
+                    <Col
+                        key={field.field_id}
+                        span={12}
+                        style={{
+                            marginTop: '10px',
+                            marginBottom: '10px',
+                            backgroundColor: '#f5f5f5',
+                            padding: '10px'
+                        }}
+                    >
+                        <Space>
+                            <span>
+                                {field.label}
+                                {field.required === 1 && <span style={{ color: 'red' }}> *</span>}
+                            </span>
+                            <Button
+                                type="link"
+                                icon={<EditOutlined />}
+                                onClick={() => !field.inherited && onEdit(field)}
+                                disabled={field.inherited}
+                            />
+                            <Button
+                                type="link"
+                                danger
+                                icon={<DeleteOutlined />}
+                                onClick={() => !field.inherited && onDeleteField(field.field_id)}
+                                disabled={field.inherited}
+                            />
+                        </Space>
+                    </Col>
+                ))}
+            </Row>
+        </Card>
+    );
+};
 
 const CustomFields = () => {
     const { request } = useFetch();
@@ -96,8 +101,8 @@ const CustomFields = () => {
         const fetchFields = async () => {
             setLoading(true);
             try {
-                const response = await request("modules", "GET");
-                const modulesWithFields = response.data.filter(module => module.has_fields);
+                const response = await request("modules?has_custom_fields=true", "GET");
+                const modulesWithFields = response.data.filter(m => m.has_custom_fields);
                 setModules(modulesWithFields);
 
                 if (modulesWithFields.length > 0) {
@@ -208,7 +213,7 @@ const CustomFields = () => {
                 ...values,
                 block_id: currentBlockId
             };
-            
+
             await request("fields", "POST", payload);
             message.success("Campo creado exitosamente.");
             setIsFieldModalOpen(false);
@@ -276,7 +281,10 @@ const CustomFields = () => {
                             value={selectedModule}
                         >
                             {modules.map(module => (
-                                <Select.Option key={module.id} value={module.id}>{module.name}</Select.Option>
+                                <Select.Option key={module.id} value={module.id}>
+                                    {module.name}
+                                </Select.Option>
+
                             ))}
                         </Select>
                         <Button type="primary" icon={<PlusOutlined />} onClick={handleAddBlock}>Agregar bloque</Button>
