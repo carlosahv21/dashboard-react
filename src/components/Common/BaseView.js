@@ -10,6 +10,7 @@ import FormHeader from "./FormHeader";
 import useFetch from "../../hooks/useFetch";
 
 const BaseCrudView = ({
+    breadcrumb = true,        // mostrar breadcrumb
     endpoint,          // ej: 'classes'
     moduleFieldId,     // ej: 5 para cargar campos dinámicos
     columns,           // columnas para la tabla
@@ -156,12 +157,14 @@ const BaseCrudView = ({
 
     return (
         <div>
-            <Breadcrumb style={{ marginBottom: 16 }}
-                items={[
-                    { title: 'Dashboard' },
-                    { title: titlePlural },
-                ]}
-            />
+            {breadcrumb && (
+                <Breadcrumb style={{ marginBottom: 16 }}
+                    items={[
+                        { title: 'Dashboard' },
+                        { title: titlePlural },
+                    ]}
+                />
+            )}
 
             <Space style={{ width: '100%', justifyContent: 'space-between', marginBottom: 16 }}>
                 <Select
@@ -227,7 +230,7 @@ const BaseCrudView = ({
                                 form={form}
                                 layout="vertical"
                                 onFinish={handleSubmit}
-                                style={{ padding: 20 }}
+                                style={{ padding: "0 10px" }}
                             >
                                 {moduleData.blocks.map((block) => (
                                     <FormSection

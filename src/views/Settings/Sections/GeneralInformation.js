@@ -81,8 +81,7 @@ const GeneralInformation = () => {
                 layout="vertical"
                 onFinish={handleSubmit}
                 style={{
-                    marginTop: 20,
-                    padding: 20,
+                    padding: "0 10px",
                     backgroundColor: "#fff",
                     borderRadius: 8,
                 }}

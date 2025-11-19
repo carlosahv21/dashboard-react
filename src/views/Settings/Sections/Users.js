@@ -1,5 +1,6 @@
 import React from "react";
 import BaseCrudView from "../../../components/Common/BaseView";
+import FormHeader from "../../../components/Common/FormHeader";
 
 const Users = () => {
     const columns = [
@@ -19,13 +20,20 @@ const Users = () => {
     ];
 
     return (
-        <BaseCrudView
-            endpoint="users"
-            moduleFieldId={3}
-            columns={columns}
-            titleSingular="Usuario"
-            titlePlural="Usuarios"
-        />
+        <>
+            <FormHeader
+                title="Users"
+                subtitle="Gestiona los usuarios del sistema"
+            />
+            <BaseCrudView
+                breadcrumb={false}
+                endpoint="users"
+                moduleFieldId={3}
+                columns={columns}
+                titleSingular="Usuario"
+                titlePlural="Usuarios"
+            />
+        </>
     );
 };
 

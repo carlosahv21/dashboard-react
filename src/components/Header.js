@@ -32,7 +32,7 @@ const HeaderComponent = ({ collapsed, setCollapsed }) => {
     return (
         <Header
             style={{
-                padding: 0,
+                padding: "0px 0px 20px",
                 backgroundColor: "#fff",
                 display: "flex",
                 alignItems: "center",
