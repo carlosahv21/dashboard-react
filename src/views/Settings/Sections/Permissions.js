@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { message, Checkbox, Select } from "antd";
+import { message, Checkbox, Select, Button } from "antd";
 import useFetch from "../../../hooks/useFetch";
 import FormHeader from "../../../components/Common/FormHeader";
 import DataTable from "../../../components/Common/DataTable";
@@ -12,7 +12,12 @@ const RolePermissions = () => {
     const [roles, setRoles] = useState([]);
     const [rolePermissions, setRolePermissions] = useState([]);
     const [selectedRole, setSelectedRole] = useState(null);
+
+    // Nuevo: permisos seleccionados localmente
+    const [localRolePermissions, setLocalRolePermissions] = useState([]);
+
     const [loading, setLoading] = useState(false);
+
     const { request } = useFetch();
 
     const fetchRolePermissions = async () => {
@@ -25,8 +30,14 @@ const RolePermissions = () => {
 
             data.forEach(role => {
                 role.permissions.forEach(p => {
-                    if (p.id != null && !allPermissions.find(ap => ap.id === p.id)) allPermissions.push(p);
-                    if (p.id != null) allRolePermissions.push({ role_id: role.role_id, permission_id: p.id });
+                    if (p.id != null && !allPermissions.find(ap => ap.id === p.id))
+                        allPermissions.push(p);
+
+                    if (p.id != null)
+                        allRolePermissions.push({
+                            role_id: role.role_id,
+                            permission_id: p.id
+                        });
                 });
             });
 
@@ -34,8 +45,10 @@ const RolePermissions = () => {
             setRoles(data.map(r => ({ id: r.role_id, name: r.role_name })));
             setRolePermissions(allRolePermissions);
 
-            const admin = data.find(r => r.role_name.toLowerCase() === "admin");
-            if (admin) setSelectedRole(admin.role_id);
+            if (!selectedRole) {
+                const admin = data.find(r => r.role_name.toLowerCase() === "admin");
+                if (admin) setSelectedRole(admin.role_id);
+            }
         } catch (error) {
             console.error(error);
             message.error("Error al cargar permisos por rol");
@@ -48,26 +61,39 @@ const RolePermissions = () => {
         fetchRolePermissions();
     }, []);
 
-    const togglePermission = async (roleId, permissionId) => {
-        try {
-            const exists = rolePermissions.some(
-                rp => rp.role_id === roleId && rp.permission_id === permissionId
-            );
+    // Cargar permisos locales cuando cambia el rol
+    useEffect(() => {
+        if (!selectedRole) return;
 
-            if (exists) {
-                await request(`rolePermissions/${roleId}/${permissionId}`, "DELETE");
-                setRolePermissions(prev =>
-                    prev.filter(rp => !(rp.role_id === roleId && rp.permission_id === permissionId))
-                );
-                message.success("Permiso removido correctamente");
-            } else {
-                await request(`rolePermissions/${roleId}`, "POST", { permission_ids: [permissionId] });
-                setRolePermissions(prev => [...prev, { role_id: roleId, permission_id: permissionId }]);
-                message.success("Permiso añadido correctamente");
-            }
+        const current = rolePermissions
+            .filter(rp => rp.role_id === selectedRole)
+            .map(rp => rp.permission_id);
+
+        setLocalRolePermissions(current);
+    }, [selectedRole, rolePermissions]);
+
+    // Cambiar en local, sin backend
+    const toggleLocalPermission = (permissionId) => {
+        setLocalRolePermissions(prev =>
+            prev.includes(permissionId)
+                ? prev.filter(id => id !== permissionId)
+                : [...prev, permissionId]
+        );
+    };
+
+    // Enviar al backend
+    const savePermissions = async () => {
+        try {
+            await request(`rolePermissions/${selectedRole}`, "POST", {
+                permission_ids: localRolePermissions
+            });
+
+            message.success("Permisos actualizados correctamente");
+
+            fetchRolePermissions();
         } catch (error) {
             console.error(error);
-            message.error("Error al actualizar permiso");
+            message.error("Error al guardar permisos");
         }
     };
 
@@ -78,7 +104,6 @@ const RolePermissions = () => {
         return name.charAt(0).toUpperCase() + name.slice(1);
     };
 
-    // Agrupar permisos por módulo
     const groupedPermissions = permissions.reduce((acc, perm) => {
         const moduleName = formatModuleName(perm.module);
         if (!acc[moduleName]) acc[moduleName] = {};
@@ -87,7 +112,7 @@ const RolePermissions = () => {
     }, {});
 
     const dataTableData = Object.entries(groupedPermissions).map(([module, perms]) => ({
-        key: module, // este key sigue siendo único por módulo
+        key: module,
         module,
         ...perms
     }));
@@ -103,25 +128,16 @@ const RolePermissions = () => {
             key: action,
             render: (_, record) => {
                 const perm = record[action];
-                if (!perm) return <Checkbox disabled key={`empty-${record.key}-${action}`} />;
+                if (!perm) return <Checkbox disabled />;
 
-                // Filtrar solo permisos del rol seleccionado
-                const selectedRolePerms = rolePermissions.filter(
-                    rp => rp.role_id === selectedRole
-                );
-                
-                const hasPermission = selectedRolePerms.some(
-                    rp => rp.permission_id === perm.id
-                );
-
+                const checked = localRolePermissions.includes(perm.id);
                 const isAdmin = roles.find(r => r.id === selectedRole)?.name.toLowerCase() === "admin";
 
                 return (
                     <Checkbox
-                        key={`perm-${perm.id}`}
-                        checked={hasPermission}
+                        checked={checked}
                         disabled={isAdmin}
-                        onChange={() => togglePermission(selectedRole, perm.id)}
+                        onChange={() => toggleLocalPermission(perm.id)}
                     />
                 );
             }
@@ -135,7 +151,7 @@ const RolePermissions = () => {
                 subtitle="Gestiona los permisos del rol seleccionado"
             />
 
-            <div style={{ paddingTop: 20, paddingBottom: 20 }}>
+            <div style={{ paddingTop: 20, paddingBottom: 20, display: "flex", gap: 20 }}>
                 <Select
                     style={{ width: 300 }}
                     placeholder="Selecciona un rol"
@@ -149,6 +165,14 @@ const RolePermissions = () => {
                         </Option>
                     ))}
                 </Select>
+
+                <Button
+                    type="primary"
+                    onClick={savePermissions}
+                    disabled={!selectedRole}
+                >
+                    Guardar cambios
+                </Button>
             </div>
 
             <DataTable
