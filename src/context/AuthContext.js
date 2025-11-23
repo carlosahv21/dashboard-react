@@ -6,58 +6,83 @@ export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
     const { request } = useFetch();
-    const modalShownRef = useRef(false); // ← ref para controlar la aparición
+    const modalShownRef = useRef(false);
+
     const [user, setUser] = useState(null);
     const [settings, setSettings] = useState(null);
     const [routes, setRoutes] = useState([]);
+    const [permissions, setPermissions] = useState([]);
     const [token, setToken] = useState(localStorage.getItem("token") || null);
     const [loading, setLoading] = useState(true);
 
-    useEffect(() => {
-        const storedToken = localStorage.getItem("token");
-
-        if (storedToken && !user) {
-            setLoading(true);
-            request(`auth/me`, "GET", null, {
-                Authorization: `Bearer ${storedToken}`,
-            })
-                .then(data => {
-                    setUser(data.user);
-                    setRoutes(data.routes);
-                    setSettings(data.settings);
-                    setToken(storedToken);
-                })
-                .catch((err) => {
-                    // Si el error es token inválido o expirado
-                    if (err.message === "Invalid or expired token" && !modalShownRef.current) {
-                        modalShownRef.current = true; 
-                        Modal.confirm({
-                            title: "Sesión expirada",
-                            content: "Tu sesión ha expirado. Debes iniciar sesión nuevamente.",
-                            okText: "Aceptar",
-                            onOk: () => logout(), // Limpia estado y token
-                            cancelButtonProps: { style: { display: "none" } }
-                        });
-                    } else {
-                        logout(); // Otros errores también pueden limpiar el estado
-                    }
-                })
-                .finally(() => setLoading(false));
-        } else {
-            setLoading(false);
-        }
-    }, [token, user, request]);
-
     const logout = () => {
+        localStorage.removeItem("token");
         setUser(null);
         setSettings(null);
         setRoutes([]);
+        setPermissions([]);
         setToken(null);
+        modalShownRef.current = false;
     };
+
+    const login = (newToken) => {
+        localStorage.setItem("token", newToken);
+        setToken(newToken);
+    };
+
+    const fetchUserData = async (storedToken) => {
+        try {
+            const data = await request(`auth/me`, "GET", null, {
+                Authorization: `Bearer ${storedToken}`,
+            });
+            setUser(data.user);
+            setRoutes(data.routes);
+            setSettings(data.settings);
+
+            if (data.permissions) {
+                setPermissions(data.permissions);
+            }
+        } catch (err) {
+            if (err.message === "Invalid or expired token" && !modalShownRef.current) {
+                modalShownRef.current = true;
+                Modal.confirm({
+                    title: "Sesión expirada",
+                    content: "Tu sesión ha expirado. Debes iniciar sesión nuevamente.",
+                    okText: "Aceptar",
+                    onOk: () => logout(),
+                    cancelButtonProps: { style: { display: "none" } }
+                });
+            } else {
+                logout();
+            }
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        if (token) {
+            if (!user) {
+                setLoading(true);
+                fetchUserData(token);
+            } else {
+                setLoading(false);
+            }
+        } else {
+            setLoading(false);
+        }
+    }, [token]);
+
+    const hasPermission = (permName) => permissions.includes(permName);
 
     return (
         <AuthContext.Provider
-            value={{ user, setUser, settings, setSettings, routes, setRoutes, token, setToken, logout, loading }}
+            value={{
+                user, setUser, settings, setSettings, routes, setRoutes,
+                permissions, hasPermission, token, setToken,
+                logout, login,
+                loading
+            }}
         >
             {children}
         </AuthContext.Provider>

@@ -1,0 +1,245 @@
+/* * ============================================
+ * Estilos Generales y Layout de la Página
+ * ============================================
+ */
+body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+        'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+        sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    background-color: #f0f2f5; 
+}
+
+#root {
+    background-color: #f7f9fc;
+}
+
+/* Contenedor Principal: Row de Ant Design */
+.login-page-container {
+    min-height: 100vh;
+    overflow: hidden;
+}
+
+/* * ============================================
+ * Panel Izquierdo (Branding y Ilustración)
+ * ============================================
+ */
+.login-left-panel {
+    /* Fondo con degradado, color y borde curvado */
+    background: linear-gradient(135deg, #6c79e0, #8d98ef);
+    padding: 40px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: flex-start;
+    position: relative;
+    color: white; /* Color del texto para el logo y copyright */
+    border-radius: 0 50px 50px 0;
+}
+
+/* Área donde va la imagen de la doctora */
+.login-illustration {
+    width: 100%;
+    /* Altura basada en el diseño de la imagen */
+    height: 100%; 
+    /* IMPORTANTE: Reemplaza con la ruta de tu imagen de doctora */
+    background: 
+        linear-gradient(to top, rgba(108, 121, 224, 0.5) 0%, rgba(108, 121, 224, 0) 50%), 
+        url('../../../public/dancer_2.png'); /* Imagen de la doctora */
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center bottom;
+    
+    position: absolute;
+    bottom: 80px; 
+    left: 0;
+    right: 0;
+    margin: auto;
+    z-index: 1;
+}
+
+.login-copyright {
+    width: 100%;
+    text-align: center; 
+    font-size: 14px;
+    opacity: 0.8;
+    color: white; 
+}
+
+/* * ============================================
+ * Panel Derecho (Formulario)
+ * ============================================
+ */
+.login-right-panel {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #f7f9fc;
+    padding: 40px;
+}
+
+/* Contenedor del formulario (Card de Ant Design) */
+.login-form-card {
+    border: none !important;
+    border-radius: 15px !important;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08) !important;
+    width: 100%;
+    max-width: 420px;
+}
+
+.login-title {
+    text-align: center;
+    margin-bottom: 50px !important;
+    color: #333 !important;
+    font-size: 28px !important;
+    font-weight: bold !important;
+}
+
+/* * ============================================
+ * Estilos Específicos de Componentes
+ * ============================================
+ */
+
+/* Pestañas (Tabs) */
+.login-tabs {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 30px;
+}
+
+.login-tab {
+    padding: 10px 20px;
+    cursor: pointer;
+    font-weight: 500;
+    color: #8c8c8c !important;
+    position: relative;
+    font-size: 16px !important;
+}
+
+.login-tab.active {
+    color: #1890ff !important;
+    font-weight: bold !important;
+}
+
+/* Línea azul debajo del tab activo */
+.login-tab.active::after {
+    content: '';
+    position: absolute;
+    bottom: 0; /* Ajustamos a 0 para que esté en el borde inferior del tab */
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60%;
+    height: 3px;
+    background-color: #1890ff; 
+    border-radius: 2px;
+}
+
+/* Botón de Login (Button de Ant Design) */
+.ant-btn-primary {
+    border-radius: 8px !important;
+    height: 45px !important;
+    font-size: 18px !important;
+    font-weight: bold !important;
+    background-color: #6c79e0 !important; /* Color principal del diseño */
+    border-color: #6c79e0 !important;
+}
+
+.ant-btn-primary:hover, .ant-btn-primary:focus {
+    background-color: #8d98ef !important; 
+    border-color: #8d98ef !important;
+}
+
+/* Inputs de Ant Design */
+.ant-input, .ant-input-password {
+    border-radius: 8px !important;
+    padding: 10px 15px !important;
+    font-size: 16px !important;
+}
+
+/* Etiqueta del formulario */
+.ant-form-item-label > label {
+    font-weight: 600;
+    color: #555 !important;
+}
+
+/* Pie de página (Links) */
+.login-footer-links {
+    text-align: center;
+    margin-top: 20px;
+    font-size: 14px;
+}
+
+.signup-prompt a {
+    color: #1890ff;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.signup-prompt a:hover {
+    text-decoration: underline;
+}
+
+/* * ============================================
+ * Información de Contacto y Redes Sociales
+ * ============================================
+ */
+.social-media-links {
+    text-align: center;
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 1px solid #f0f0f0; /* Separador sutil */
+}
+
+.social-icon {
+    font-size: 20px;
+    color: #8c8c8c;
+    transition: color 0.3s;
+}
+
+.social-icon:hover {
+    color: #6c79e0;
+}
+
+.contact-info {
+    text-align: center;
+    margin-top: 20px;
+    color: #8c8c8c;
+    font-size: 14px;
+}
+
+/* * ============================================
+ * Adaptabilidad (Media Queries)
+ * ============================================
+ */
+@media (max-width: 992px) {
+    /* Oculta el panel izquierdo en pantallas tablet y móviles */
+    .login-left-panel {
+        display: none; 
+    }
+    
+    /* El panel derecho ocupa todo el ancho */
+    .login-right-panel {
+        flex: 1; 
+        padding: 20px;
+    }
+    
+    .login-form-card {
+        padding: 30px;
+    }
+}
+
+@media (max-width: 576px) {
+    .login-form-card {
+        padding: 20px;
+        margin: 20px;
+    }
+    .login-title {
+        font-size: 24px !important;
+    }
+    .ant-btn-primary {
+        height: 40px !important;
+        font-size: 16px !important;
+    }
+}

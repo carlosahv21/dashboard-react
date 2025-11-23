@@ -1,4 +1,3 @@
-// components/Sidebar.js
 import React, { useContext } from "react";
 import { Layout, Menu } from "antd";
 import { AuthContext } from "../context/AuthContext";
@@ -8,7 +7,7 @@ import * as Icons from "@ant-design/icons";
 const { Sider } = Layout;
 
 const Sidebar = ({ collapsed }) => {
-  const { settings, routes } = useContext(AuthContext);
+  const { settings, routes, hasPermission } = useContext(AuthContext); // ← obtener hasPermission
   const navigate = useNavigate();
 
   const getIcon = (iconName) => {
@@ -18,23 +17,27 @@ const Sidebar = ({ collapsed }) => {
   };
 
   // Filtrar rutas que van al menú
-  const menuRoutes = routes.filter((r) => r.is_menu === 1);
+  const menuRoutes = routes.filter(r => r.is_menu === 1);
 
   // Convertir estructura del backend → estructura del Menu de Ant Design
   const buildMenuItems = (routeList) =>
-    routeList.map((r) => {
-      const hasChildren = r.children && r.children.length > 0;
+    routeList
+      .filter(r => !r.permission || hasPermission(r.permission)) // ← solo incluir si no requiere permiso o si tiene permiso
+      .map((r) => {
+        const hasChildren = r.children && r.children.length > 0;
 
-      return {
-        key: r.id,
-        icon: getIcon(r.icon),
-        label: r.label || "No Label",
-        children: hasChildren ? buildMenuItems(r.children.filter(c => c.is_menu === 1)) : undefined,
-        onClick: () => {
-          if (!hasChildren) navigate(r.full_path);
-        },
-      };
-    });
+        return {
+          key: r.id,
+          icon: getIcon(r.icon),
+          label: r.label || "No Label",
+          children: hasChildren
+            ? buildMenuItems(r.children.filter(c => c.is_menu === 1))
+            : undefined,
+          onClick: () => {
+            if (!hasChildren) navigate(r.full_path);
+          },
+        };
+      });
 
   const items = buildMenuItems(menuRoutes);
 
@@ -69,11 +72,7 @@ const Sidebar = ({ collapsed }) => {
         )}
       </div>
 
-      <Menu
-        theme={settings?.theme || "light"}
-        mode="inline"
-        items={items}
-      />
+      <Menu theme={settings?.theme || "light"} mode="inline" items={items} />
     </Sider>
   );
 };

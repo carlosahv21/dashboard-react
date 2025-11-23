@@ -1,5 +1,5 @@
 // components/BaseCrudView.jsx
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react"; // ⬅️ AÑADIDO useContext
 import { message, Modal, Form, Breadcrumb, Select, Space } from "antd";
 import DataTable from "./DataTable";
 import PaginationControl from "./PaginationControl";
@@ -8,18 +8,22 @@ import FormSection from "./FormSection";
 import FormFooter from "./FormFooter";
 import FormHeader from "./FormHeader";
 import useFetch from "../../hooks/useFetch";
+import { AuthContext } from "../../context/AuthContext"; // ⬅️ IMPORTAR CONTEXTO
 
 const BaseCrudView = ({
-    breadcrumb = true,        // mostrar breadcrumb
-    endpoint,          // ej: 'classes'
-    moduleFieldId,     // ej: 5 para cargar campos dinámicos
-    columns,           // columnas para la tabla
-    titleSingular,     // 'Clase'
-    titlePlural,       // 'Clases'
-    filters,           // filtros para la consulta
-    fixedValues,       // valores fijos para la consulta
-    hiddenFields,      // campos ocultos en el formulario
+    breadcrumb = true,
+    endpoint,         // ej: 'classes' (usado para el permiso: 'classes:view')
+    moduleFieldId,
+    columns,
+    titleSingular,
+    titlePlural,
+    filters,
+    fixedValues,
+    hiddenFields,
 }) => {
+    // --- Hook de Permisos ---
+    const { hasPermission } = useContext(AuthContext); // ⬅️ EXTRAER hasPermission
+
     const [items, setItems] = useState([]);
     const [loading, setLoading] = useState(false);
     const [search, setSearch] = useState("");
@@ -74,6 +78,11 @@ const BaseCrudView = ({
 
     // --- Delete ---
     const handleDelete = async (id) => {
+        if (!hasPermission(`${endpoint}:delete`)) {
+            message.error(`Acceso denegado. Permiso 'Eliminar' requerido.`);
+            return;
+        }
+
         try {
             await request(`${endpoint}/${id}`, "DELETE");
             message.success(`${titleSingular} eliminad${titleSingular.endsWith('a') ? 'a' : 'o'} correctamente`);
@@ -86,6 +95,12 @@ const BaseCrudView = ({
 
     // --- Modal ---
     const openModal = async (id = null) => {
+        const requiredPermission = id ? `${endpoint}:edit` : `${endpoint}:create`;
+        if (!hasPermission(requiredPermission)) {
+            message.error(`Acceso denegado. Permiso '${id ? 'Editar' : 'Crear'}' requerido.`);
+            return;
+        }
+
         setEditingId(id);
         setModalVisible(true);
 
@@ -116,8 +131,7 @@ const BaseCrudView = ({
 
     // --- Submit ---
     const handleSubmit = async (values) => {
-        // Copiamos los valores recibidos
-        const transformedValues = { ...values, ...fixedValues, };
+        const transformedValues = { ...values, ...fixedValues };
 
         // Transformar 'hour' si existe
         if ('hour' in values && values.hour) {
@@ -135,9 +149,11 @@ const BaseCrudView = ({
 
         try {
             if (editingId) {
+                if (!hasPermission(`${endpoint}:edit`)) throw new Error("Acceso denegado. Permiso 'Editar' requerido.");
                 await request(`${endpoint}/${editingId}`, 'PUT', transformedValues);
                 message.success(`${titleSingular} actualizad${titleSingular.endsWith('a') ? 'a' : 'o'} correctamente`);
             } else {
+                if (!hasPermission(`${endpoint}:create`)) throw new Error("Acceso denegado. Permiso 'Crear' requerido.");
                 await request(`${endpoint}/`, 'POST', transformedValues);
                 message.success(`${titleSingular} cread${titleSingular.endsWith('a') ? 'a' : 'o'} correctamente`);
             }
@@ -154,6 +170,10 @@ const BaseCrudView = ({
             }
         }
     };
+
+    const canCreate = hasPermission(`${endpoint}:create`);
+    const canEdit = hasPermission(`${endpoint}:edit`);
+    const canDelete = hasPermission(`${endpoint}:delete`);
 
     return (
         <div>
@@ -182,7 +202,7 @@ const BaseCrudView = ({
                 <SearchFilter
                     search={search}
                     setSearch={setSearch}
-                    onCreate={() => openModal()}
+                    onCreate={canCreate ? () => openModal() : undefined}
                     title={titleSingular}
                 />
             </Space>
@@ -192,8 +212,8 @@ const BaseCrudView = ({
                 data={items}
                 loading={loading}
                 pagination={pagination}
-                onEdit={(record) => openModal(record.id)}
-                onDelete={(record) => handleDelete(record.id)}
+                onEdit={canEdit ? (record) => openModal(record.id) : undefined}
+                onDelete={canDelete ? (record) => handleDelete(record.id) : undefined}
                 disableEdit={(record) => ["admin"].includes(record.role_name?.toLowerCase())}
                 disableDelete={(record) => ["admin"].includes(record.role_name?.toLowerCase())}
             />
