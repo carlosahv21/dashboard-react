@@ -122,7 +122,7 @@ const CustomFields = () => {
         setSelectedModule(value);
         setLoading(true);
         try {
-            const dataFields = await request(`fields/${value}`, "GET");
+            const dataFields = await request(`fields/module/${value}`, "GET");
             setBlocks(dataFields?.module?.blocks || []);
         } catch (err) {
             message.error(err.message || "Failed to fetch fields.");
@@ -257,6 +257,7 @@ const CustomFields = () => {
         { value: "number", label: "Número" },
         { value: "select", label: "Selección" },
         { value: "date", label: "Fecha" },
+        { value: "time", label: "Hora" },
         { value: "checkbox", label: "Checkbox" },
         { value: "image", label: "Imagen" },
         { value: "textarea", label: "Textarea" }

@@ -136,28 +136,6 @@ body {
     border-radius: 2px;
 }
 
-/* Botón de Login (Button de Ant Design) */
-.ant-btn-primary {
-    border-radius: 8px !important;
-    height: 45px !important;
-    font-size: 18px !important;
-    font-weight: bold !important;
-    background-color: #6c79e0 !important; /* Color principal del diseño */
-    border-color: #6c79e0 !important;
-}
-
-.ant-btn-primary:hover, .ant-btn-primary:focus {
-    background-color: #8d98ef !important; 
-    border-color: #8d98ef !important;
-}
-
-/* Inputs de Ant Design */
-.ant-input, .ant-input-password {
-    border-radius: 8px !important;
-    padding: 10px 15px !important;
-    font-size: 16px !important;
-}
-
 /* Etiqueta del formulario */
 .ant-form-item-label > label {
     font-weight: 600;

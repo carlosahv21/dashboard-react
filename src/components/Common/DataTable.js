@@ -15,6 +15,9 @@ const DataTable = ({
     disableEdit
 }) => {
     const handleDeleteConfirm = (id, record) => {
+        console.log(id);
+        console.log(record);
+        
         confirm({
             title: "¿Eliminar?",
             content: "Esta acción no se puede deshacer.",

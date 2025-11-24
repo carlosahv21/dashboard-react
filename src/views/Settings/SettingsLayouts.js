@@ -71,6 +71,7 @@ const SettingsLayout = () => {
                 <Menu
                     mode="inline"
                     selectedKeys={[selectedKey]}
+                    defaultOpenKeys={[menuItems[0]?.key]}
                     style={{
                         height: "100%",
                         borderRadius: "8px",

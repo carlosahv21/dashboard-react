@@ -40,12 +40,11 @@ const Sidebar = ({ collapsed }) => {
       });
 
   const items = buildMenuItems(menuRoutes);
-
-  const baseBackend = process.env.REACT_APP_BACKEND;
-  const logo = baseBackend + "/" + (settings?.logo_url || "");
+      
+  const logo = settings?.logo_url;
 
   return (
-    <Sider theme={settings?.theme || "light"} collapsible collapsed={collapsed}>
+    <Sider theme={settings?.theme || "light"} trigger={null} collapsible collapsed={collapsed}>
       <div
         className="logo"
         style={{
