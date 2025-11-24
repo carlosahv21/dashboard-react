@@ -7,7 +7,7 @@ import * as Icons from "@ant-design/icons";
 const { Sider } = Layout;
 
 const Sidebar = ({ collapsed }) => {
-  const { settings, routes, hasPermission } = useContext(AuthContext); // ← obtener hasPermission
+  const { settings, hasPermission } = useContext(AuthContext);
   const navigate = useNavigate();
 
   const getIcon = (iconName) => {
@@ -16,31 +16,56 @@ const Sidebar = ({ collapsed }) => {
     return <IconComponent />;
   };
 
-  // Filtrar rutas que van al menú
-  const menuRoutes = routes.filter(r => r.is_menu === 1);
+  const staticMenuDefinition = [
+    {
+      label: "Dashboard",
+      icon: "Dashboard",
+      path: "/",
+      permissionRequired: "dashboard:view",
+    },
+    {
+      label: "Clases",
+      icon: "Read",
+      path: "/classes",
+      permissionRequired: "classes:view",
+    },
+    {
+      label: "Estudiantes",
+      icon: "Team",
+      path: "/students",
+      permissionRequired: "students:view",
+    },
+    {
+      label: "Profesores",
+      icon: "UsergroupAdd",
+      path: "/teachers",
+      permissionRequired: "teachers:view",
+    },
+  ];
 
-  // Convertir estructura del backend → estructura del Menu de Ant Design
-  const buildMenuItems = (routeList) =>
-    routeList
-      .filter(r => !r.permission || hasPermission(r.permission)) // ← solo incluir si no requiere permiso o si tiene permiso
-      .map((r) => {
-        const hasChildren = r.children && r.children.length > 0;
+  const buildMenuItems = (menuDefinition) =>
+    menuDefinition
+      .filter(item => hasPermission(item.permissionRequired))
+      .map((item) => {
+        const hasChildren = item.children && item.children.length > 0;
 
         return {
-          key: r.id,
-          icon: getIcon(r.icon),
-          label: r.label || "No Label",
+          key: item.path,
+          icon: getIcon(item.icon),
+          label: item.label,
           children: hasChildren
-            ? buildMenuItems(r.children.filter(c => c.is_menu === 1))
+            ? buildMenuItems(item.children)
             : undefined,
           onClick: () => {
-            if (!hasChildren) navigate(r.full_path);
+            if (!hasChildren) navigate(item.path);
           },
         };
-      });
+      })
+      .filter(item => !item.children || (item.children && item.children.length > 0));
 
-  const items = buildMenuItems(menuRoutes);
-      
+
+  const items = buildMenuItems(staticMenuDefinition);
+
   const logo = settings?.logo_url;
 
   return (
@@ -66,6 +91,7 @@ const Sidebar = ({ collapsed }) => {
                 height: "auto",
                 transition: "width 0.2s ease",
               }}
+              onError={(e) => { e.target.onerror = null; e.target.src = "https://placehold.co/120x40/cccccc/333333?text=Logo"; }}
             />
           </a>
         )}

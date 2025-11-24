@@ -22,6 +22,16 @@ const componentsMap = {
     "settings.payments": SettingsPayments,
 };
 
+const staticSettingsSections = [
+    { path: "general", label: "Información General", name: "settings.general", permission: "settings:view", group: "academySettings" },
+    { path: "activeModules", label: "Módulos Activos", name: "settings.activeModules", permission: "modules:view", group: "academySettings" },
+    { path: "roles", label: "Roles", name: "settings.roles", permission: "roles:view", group: "userManagement" },
+    { path: "permissions", label: "Permisos", name: "settings.permissions", permission: "permissions:view", group: "userManagement" },
+    { path: "users", label: "Usuarios", name: "settings.users", permission: "users:view", group: "userManagement" },
+    { path: "customFields", label: "Campos Personalizados", name: "settings.customFields", permission: "fields:view", group: "customization" },
+    { path: "payments", label: "Pagos", name: "settings.payments", permission: "settings:view", group: "finance" },
+];
+
 const iconMap = {
     academySettings: <SettingOutlined />,
     userManagement: <UserOutlined />,
@@ -29,41 +39,46 @@ const iconMap = {
     finance: <DollarOutlined />,
 };
 
+const menuGroups = [
+    { key: "academySettings", label: "Configuración de Academia" },
+    { key: "userManagement", label: "Gestión de Usuarios" },
+    { key: "customization", label: "Personalización" },
+    { key: "finance", label: "Finanzas" },
+];
+
+
 const SettingsLayout = () => {
-    const { routes } = useContext(AuthContext);
+    const { hasPermission } = useContext(AuthContext);
     const location = useLocation();
 
     const settingsRoutes = useMemo(() => {
-        const settings = routes.find(r => r.name === "settings");
-        return settings?.children || [];
-    }, [routes]);
-
-    // Agrupar por secciones para el menú
-    const groups = {
-        academySettings: ["general", "activeModules"],
-        userManagement: ["roles", "permissions", "users"],
-        customization: ["customFields"],
-        finance: ["payments"],
-    };
-
+        return staticSettingsSections.filter(r => hasPermission(r.permission));
+    }, [hasPermission]);
     const menuItems = useMemo(() => {
-        return Object.entries(groups).map(([groupKey, keys]) => ({
-            key: groupKey,
-            icon: iconMap[groupKey],
-            label: groupKey === "academySettings" ? "Academy Settings" :
-                groupKey === "userManagement" ? "User Management" :
-                    groupKey === "customization" ? "Customization" :
-                        "Finance",
-            children: settingsRoutes
-                .filter(r => keys.includes(r.path))
-                .map(r => ({
-                    key: r.path,
-                    label: <Link to={r.path}>{r.label}</Link>,
-                })),
-        }));
+        return menuGroups
+            .map(group => {
+                const childrenRoutes = settingsRoutes.filter(r => r.group === group.key);
+
+                if (childrenRoutes.length === 0) {
+                    return null;
+                }
+
+                return {
+                    key: group.key,
+                    icon: iconMap[group.key],
+                    label: group.label,
+                    children: childrenRoutes.map(r => ({
+                        key: r.path,
+                        label: <Link to={r.path}>{r.label}</Link>,
+                    })),
+                };
+            })
+            .filter(item => item !== null);
     }, [settingsRoutes]);
 
-    const selectedKey = location.pathname.split("/").pop() || "general";
+    const selectedKey = location.pathname.split("/").pop() || (settingsRoutes[0]?.path || "general");
+    const defaultOpenKey = menuItems[0]?.key;
+
 
     return (
         <Row gutter={24}>
@@ -71,7 +86,7 @@ const SettingsLayout = () => {
                 <Menu
                     mode="inline"
                     selectedKeys={[selectedKey]}
-                    defaultOpenKeys={[menuItems[0]?.key]}
+                    defaultOpenKeys={[defaultOpenKey]}
                     style={{
                         height: "100%",
                         borderRadius: "8px",
@@ -92,9 +107,19 @@ const SettingsLayout = () => {
                     <Routes>
                         {settingsRoutes.map(r => {
                             const Component = componentsMap[r.name];
-                            return <Route key={r.id} path={r.path} element={<Component />} />;
+                            if (!Component) return null;
+
+                            return <Route key={r.name} path={r.path} element={<Component />} />;
                         })}
-                        <Route path="*" element={<Navigate to="general" replace />} />
+                        <Route
+                            path="*"
+                            element={
+                                <Navigate
+                                    to={settingsRoutes[0]?.path || "general"}
+                                    replace
+                                />
+                            }
+                        />
                     </Routes>
                 </div>
             </Col>

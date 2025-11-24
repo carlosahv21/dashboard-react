@@ -10,7 +10,6 @@ export const AuthProvider = ({ children }) => {
 
     const [user, setUser] = useState(null);
     const [settings, setSettings] = useState(null);
-    const [routes, setRoutes] = useState([]);
     const [permissions, setPermissions] = useState([]);
     const [token, setToken] = useState(localStorage.getItem("token") || null);
     const [loading, setLoading] = useState(true);
@@ -19,7 +18,6 @@ export const AuthProvider = ({ children }) => {
         localStorage.removeItem("token");
         setUser(null);
         setSettings(null);
-        setRoutes([]);
         setPermissions([]);
         setToken(null);
         modalShownRef.current = false;
@@ -35,14 +33,16 @@ export const AuthProvider = ({ children }) => {
             const data = await request(`auth/me`, "GET", null, {
                 Authorization: `Bearer ${storedToken}`,
             });
+            
             setUser(data.user);
-            setRoutes(data.routes);
             setSettings(data.settings);
 
             if (data.permissions) {
                 setPermissions(data.permissions);
             }
         } catch (err) {
+            console.log(err);
+            
             if (err.message === "Invalid or expired token" && !modalShownRef.current) {
                 modalShownRef.current = true;
                 Modal.confirm({
@@ -78,7 +78,7 @@ export const AuthProvider = ({ children }) => {
     return (
         <AuthContext.Provider
             value={{
-                user, setUser, settings, setSettings, routes, setRoutes,
+                user, setUser, settings, setSettings,
                 permissions, hasPermission, token, setToken,
                 logout, login,
                 loading

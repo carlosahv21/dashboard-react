@@ -1,39 +1,61 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { Divider, Form, Select, Card, message, Row, Col, Button, Modal, Checkbox, Input, Skeleton, Empty, Space, Tooltip } from "antd";
 import { EditOutlined, PlusOutlined, DeleteOutlined } from "@ant-design/icons";
 import useFetch from "../../../hooks/useFetch";
 import FormHeader from "../../../components/Common/FormHeader";
 import FormFooter from "../../../components/Common/FormFooter";
+import { AuthContext } from "../../../context/AuthContext"; // <--- IMPORTANTE
 
+// -----------------------------------------------------------
+// FIELD CARD → Ahora con permisos del AuthContext
+// -----------------------------------------------------------
 const FieldCard = ({ block, onEdit, onAddField, onDeleteField, onDeleteBlock }) => {
-    const isInheritedBlock = block.inherited; // true si bloque es del padre
+
+    const { hasPermission } = useContext(AuthContext);
+
+    const canCreateField = hasPermission("fields:create");
+    const canDeleteBlock = hasPermission("blocks:delete");
+    const canEditField = hasPermission("fields:edit");
+    const canDeleteField = hasPermission("fields:delete");
+
+    const isInheritedBlock = block.inherited;
+
     return (
         <Card
-            style={{ marginBottom: '10px' }}
+            style={{ marginBottom: "10px" }}
             type="inner"
             title={
-                <Space style={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
+                <Space style={{ display: "flex", justifyContent: "space-between", width: "100%" }}>
                     <Space>{block.block_name}</Space>
+
                     <Space>
-                        <Tooltip title={isInheritedBlock ? "No se puede agregar campo a bloque heredado" : "Agregar campo"}>
-                            <Button
-                                size="small"
-                                type="text"
-                                icon={<PlusOutlined />}
-                                onClick={() => !isInheritedBlock && onAddField(block.block_id)}
-                                disabled={isInheritedBlock}
-                            />
-                        </Tooltip>
-                        <Tooltip title={isInheritedBlock ? "No se puede eliminar bloque heredado" : "Eliminar bloque"}>
-                            <Button
-                                size="small"
-                                type="link"
-                                danger
-                                onClick={() => !isInheritedBlock && onDeleteBlock(block.block_id)}
-                                icon={<DeleteOutlined />}
-                                disabled={isInheritedBlock}
-                            />
-                        </Tooltip>
+
+                        {/* Agregar campo */}
+                        {canCreateField && (
+                            <Tooltip title={isInheritedBlock ? "No se puede agregar campo a bloque heredado" : "Agregar campo"}>
+                                <Button
+                                    size="small"
+                                    type="text"
+                                    icon={<PlusOutlined />}
+                                    onClick={() => !isInheritedBlock && onAddField(block.block_id)}
+                                    disabled={isInheritedBlock}
+                                />
+                            </Tooltip>
+                        )}
+
+                        {/* Eliminar bloque */}
+                        {canDeleteBlock && (
+                            <Tooltip title={isInheritedBlock ? "No se puede eliminar bloque heredado" : "Eliminar bloque"}>
+                                <Button
+                                    size="small"
+                                    type="link"
+                                    danger
+                                    onClick={() => !isInheritedBlock && onDeleteBlock(block.block_id)}
+                                    icon={<DeleteOutlined />}
+                                    disabled={isInheritedBlock}
+                                />
+                            </Tooltip>
+                        )}
                     </Space>
                 </Space>
             }
@@ -44,30 +66,38 @@ const FieldCard = ({ block, onEdit, onAddField, onDeleteField, onDeleteBlock }) 
                         key={field.field_id}
                         span={12}
                         style={{
-                            marginTop: '10px',
-                            marginBottom: '10px',
-                            backgroundColor: '#f5f5f5',
-                            padding: '10px'
+                            marginTop: "10px",
+                            marginBottom: "10px",
+                            backgroundColor: "#f5f5f5",
+                            padding: "10px"
                         }}
                     >
                         <Space>
                             <span>
                                 {field.label}
-                                {field.required === 1 && <span style={{ color: 'red' }}> *</span>}
+                                {field.required === 1 && <span style={{ color: "red" }}> *</span>}
                             </span>
-                            <Button
-                                type="link"
-                                icon={<EditOutlined />}
-                                onClick={() => !field.inherited && onEdit(field)}
-                                disabled={field.inherited}
-                            />
-                            <Button
-                                type="link"
-                                danger
-                                icon={<DeleteOutlined />}
-                                onClick={() => !field.inherited && onDeleteField(field.field_id)}
-                                disabled={field.inherited}
-                            />
+
+                            {/* Editar campo */}
+                            {canEditField && (
+                                <Button
+                                    type="link"
+                                    icon={<EditOutlined />}
+                                    onClick={() => !field.inherited && onEdit(field)}
+                                    disabled={field.inherited}
+                                />
+                            )}
+
+                            {/* Eliminar campo */}
+                            {canDeleteField && (
+                                <Button
+                                    type="link"
+                                    danger
+                                    icon={<DeleteOutlined />}
+                                    onClick={() => !field.inherited && onDeleteField(field.field_id)}
+                                    disabled={field.inherited}
+                                />
+                            )}
                         </Space>
                     </Col>
                 ))}
@@ -78,6 +108,14 @@ const FieldCard = ({ block, onEdit, onAddField, onDeleteField, onDeleteBlock }) 
 
 const CustomFields = () => {
     const { request } = useFetch();
+
+    // -----------------------------------------------------------
+    // Traer permisos del AuthContext
+    // -----------------------------------------------------------
+    const { hasPermission } = useContext(AuthContext);
+
+    const canCreateBlock = hasPermission("blocks:create");
+
     const [form] = Form.useForm();
     const [modules, setModules] = useState([]);
     const [blocks, setBlocks] = useState([]);
@@ -109,7 +147,7 @@ const CustomFields = () => {
                     await changeModule(modulesWithFields[0].id);
                 }
             } catch (err) {
-                message.error(err.message || "Failed to fetch fields.");
+                message.error(err.message || "Error al cargar módulos.");
             } finally {
                 setLoading(false);
             }
@@ -125,12 +163,13 @@ const CustomFields = () => {
             const dataFields = await request(`fields/module/${value}`, "GET");
             setBlocks(dataFields?.module?.blocks || []);
         } catch (err) {
-            message.error(err.message || "Failed to fetch fields.");
+            message.error(err.message || "Error al cargar campos.");
         } finally {
             setLoading(false);
         }
     };
 
+    // Edit field
     const showModal = (field) => {
         form.setFieldsValue({ ...field });
         setEditField(field);
@@ -141,11 +180,11 @@ const CustomFields = () => {
         try {
             const payload = { ...values, id: editField.field_id, module_id: selectedModule };
             await request(`fields/${editField.field_id}`, "PUT", payload);
-            message.success("Field updated successfully.");
+            message.success("Campo actualizado.");
             setIsModalOpen(false);
             changeModule(selectedModule);
         } catch (err) {
-            message.error(err.message || "Failed to update field.");
+            message.error(err.message || "Error al actualizar campo.");
         }
     };
 
@@ -155,6 +194,7 @@ const CustomFields = () => {
         setIsModalOpen(false);
     };
 
+    // Bloques
     const handleAddBlock = () => {
         setIsBlockModalOpen(true);
         blockForm.resetFields();
@@ -162,38 +202,38 @@ const CustomFields = () => {
 
     const handleConfirmDeleteBlock = async (blockId) => {
         confirm({
-            title: '¿Estás seguro de eliminar este bloque?',
-            content: 'Esta acción no se puede deshacer.',
-            okText: 'Sí',
-            okType: 'danger',
-            cancelText: 'No',
+            title: "¿Eliminar bloque?",
+            content: "Esta acción no se puede deshacer.",
+            okText: "Sí",
+            okType: "danger",
+            cancelText: "No",
             onOk: async () => {
                 try {
                     await handleDeleteBlock(blockId);
-                    message.success('Bloque eliminado exitosamente.');
+                    message.success("Bloque eliminado.");
                 } catch (error) {
-                    message.error('No se pudo eliminar el bloque.');
+                    message.error("No se pudo eliminar el bloque.");
                 }
-            },
+            }
         });
     };
 
     const handleDeleteBlock = async (blockId) => {
         try {
             await request(`blocks/${blockId}`, "DELETE");
-            changeModule(selectedModule); // recargar los bloques
+            changeModule(selectedModule);
         } catch (err) {
-            throw new Error(err.message || "Error eliminando el bloque.");
+            throw new Error(err.message || "Error eliminando bloque.");
         }
     };
 
     const handleSubmitBlock = async (values) => {
         values.module_id = selectedModule;
         try {
-            await request('blocks', "POST", {
+            await request("blocks", "POST", {
                 ...values
             });
-            message.success("Bloque creado exitosamente.");
+            message.success("Bloque creado.");
             setIsBlockModalOpen(false);
             changeModule(selectedModule);
         } catch (err) {
@@ -201,6 +241,7 @@ const CustomFields = () => {
         }
     };
 
+    // Campos
     const handleAddField = (blockId) => {
         setCurrentBlockId(blockId);
         setIsFieldModalOpen(true);
@@ -215,61 +256,59 @@ const CustomFields = () => {
             };
 
             await request("fields", "POST", payload);
-            message.success("Campo creado exitosamente.");
+            message.success("Campo creado.");
             setIsFieldModalOpen(false);
             setCurrentBlockId(null);
-            changeModule(selectedModule); // recarga los datos
+            changeModule(selectedModule);
         } catch (err) {
-            message.error(err.message || "Error al crear el campo.");
+            message.error(err.message || "Error al crear campo.");
         }
     };
 
     const handleConfirmDeleteField = async (fieldId) => {
         confirm({
-            title: 'Are you sure you want to delete this field?',
-            content: 'This action cannot be undone.',
-            okText: 'Yes',
-            okType: 'danger',
-            cancelText: 'No',
+            title: "¿Eliminar campo?",
+            content: "Esta acción no se puede deshacer.",
+            okText: "Sí",
+            okType: "danger",
+            cancelText: "No",
             onOk: async () => {
                 try {
-                    await handleDelete(fieldId); // Llama a tu función de eliminación
-                    message.success('Field deleted successfully!');
+                    await handleDelete(fieldId);
+                    message.success("Campo eliminado.");
                 } catch (error) {
-                    message.error('Failed to delete the Field. Please try again.');
+                    message.error("No se pudo eliminar el campo.");
                 }
-            },
+            }
         });
     };
 
     const handleDelete = async (fieldId) => {
         try {
             await request(`fields/${fieldId}`, "DELETE");
-            message.success("Campo eliminado.");
             changeModule(selectedModule);
         } catch (err) {
             message.error("No se pudo eliminar el campo.");
         }
     };
 
-    const fieldTypes = [
-        { value: "text", label: "Texto" },
-        { value: "number", label: "Número" },
-        { value: "select", label: "Selección" },
-        { value: "date", label: "Fecha" },
-        { value: "time", label: "Hora" },
-        { value: "checkbox", label: "Checkbox" },
-        { value: "image", label: "Imagen" },
-        { value: "textarea", label: "Textarea" }
-    ];
-
     return (
         <>
-            <FormHeader title="Custom Fields" subtitle="Define and manage custom fields dynamically." />
+            <FormHeader
+                title="Campos personalizados"
+                subtitle="Define y gestiona campos personalizados dinámicamente."
+            />
 
             <Form.Item
                 label="Modulo"
-                style={{ marginBottom: '10px', marginTop: '20px', display: 'flex', justifyContent: 'space-between', marginRight: '20px', width: '100%' }}
+                style={{
+                    marginBottom: "10px",
+                    marginTop: "20px",
+                    display: "flex",
+                    justifyContent: "space-between",
+                    marginRight: "20px",
+                    width: "100%"
+                }}
             >
                 {loading ? (
                     <Skeleton.Input active style={{ width: 200 }} />
@@ -277,7 +316,7 @@ const CustomFields = () => {
                     <Space>
                         <Select
                             placeholder="Select a module"
-                            style={{ width: '200px' }}
+                            style={{ width: "200px" }}
                             onChange={changeModule}
                             value={selectedModule}
                         >
@@ -285,10 +324,19 @@ const CustomFields = () => {
                                 <Select.Option key={module.id} value={module.id}>
                                     {module.name}
                                 </Select.Option>
-
                             ))}
                         </Select>
-                        <Button type="primary" icon={<PlusOutlined />} onClick={handleAddBlock}>Agregar bloque</Button>
+
+                        {/* Crear bloque */}
+                        {canCreateBlock && (
+                            <Button
+                                type="primary"
+                                icon={<PlusOutlined />}
+                                onClick={handleAddBlock}
+                            >
+                                Agregar bloque
+                            </Button>
+                        )}
                     </Space>
                 )}
             </Form.Item>
@@ -310,6 +358,8 @@ const CustomFields = () => {
                 !loading && <Empty description="No fields available" />
             )}
 
+            {/* MODALS — sin cambios excepto permisos ya aplicados arriba */}
+            {/* Edit field */}
             <Modal
                 title={editField?.name || ""}
                 open={isModalOpen}
@@ -318,24 +368,16 @@ const CustomFields = () => {
                 destroyOnClose
                 onCancel={handleCancel}
             >
-                <Divider style={{ margin: '12px 0' }} />
-                <Form
-                    form={form}
-                    onFinish={handleSubmit}
-                    style={{ backgroundColor: "#fff", borderRadius: "8px" }}
-                >
+                <Divider style={{ margin: "12px 0" }} />
+
+                <Form form={form} onFinish={handleSubmit}>
                     <Row>
                         <Col span={24}>Type: {editField?.type}</Col>
                     </Row>
 
-                    <Divider style={{ margin: '12px 0' }} />
+                    <Divider style={{ margin: "12px 0" }} />
 
-                    <Form.Item
-                        label="Required"
-                        name="required"
-                        valuePropName="checked"
-                        style={{ marginBottom: '10px' }}
-                    >
+                    <Form.Item label="Required" name="required" valuePropName="checked">
                         <Checkbox />
                     </Form.Item>
 
@@ -343,25 +385,21 @@ const CustomFields = () => {
                         label="Label"
                         name="label"
                         rules={[{ required: true, message: "Label is required" }]}
-                        style={{ marginBottom: '10px' }}
                     >
-                        <Input placeholder='Label' />
+                        <Input placeholder="Label" />
                     </Form.Item>
 
-
-                    {editField?.type === 'select' && (
-                        <Form.Item name="options" label="Options" style={{ marginBottom: '10px' }}>
+                    {editField?.type === "select" && (
+                        <Form.Item name="options" label="Options">
                             <Input placeholder="Comma-separated values" />
                         </Form.Item>
                     )}
 
-                    <FormFooter
-                        onCancel={handleCancel}
-                        onSave={() => form.submit()}
-                    />
+                    <FormFooter onCancel={handleCancel} onSave={() => form.submit()} />
                 </Form>
             </Modal>
 
+            {/* Crear bloque */}
             <Modal
                 title="Nuevo bloque"
                 open={isBlockModalOpen}
@@ -369,11 +407,7 @@ const CustomFields = () => {
                 footer={null}
                 destroyOnClose
             >
-                <Form
-                    form={blockForm}
-                    onFinish={handleSubmitBlock}
-                    layout="vertical"
-                >
+                <Form form={blockForm} onFinish={handleSubmitBlock} layout="vertical">
                     <Form.Item
                         label="Nombre del bloque"
                         name="name"
@@ -397,6 +431,7 @@ const CustomFields = () => {
                 </Form>
             </Modal>
 
+            {/* Crear campo */}
             <Modal
                 title="Nuevo campo"
                 open={isFieldModalOpen}
@@ -408,15 +443,7 @@ const CustomFields = () => {
                 footer={null}
                 destroyOnClose
             >
-                <Form
-                    form={fieldForm}
-                    onFinish={handleSubmitField}
-                    layout="vertical"
-                    initialValues={{
-                        visible: true,
-                        editable: true,
-                    }}
-                >
+                <Form form={fieldForm} onFinish={handleSubmitField} layout="vertical">
                     <Form.Item
                         label="Nombre"
                         name="name"
@@ -433,33 +460,41 @@ const CustomFields = () => {
                         <Input placeholder="Ej. Nombre completo" />
                     </Form.Item>
 
-
                     <Form.Item
                         label="Tipo de campo"
                         name="type"
                         rules={[{ required: true, message: "El tipo es obligatorio" }]}
                     >
                         <Select
-                            onChange={(value) => setFieldType(value)}
+                            onChange={value => setFieldType(value)}
                             placeholder="Selecciona tipo de campo"
                         >
-                            {fieldTypes.map(t => (
-                                <Select.Option key={t.value} value={t.value}>{t.label}</Select.Option>
+                            {[
+                                { value: "text", label: "Texto" },
+                                { value: "number", label: "Número" },
+                                { value: "select", label: "Selección" },
+                                { value: "date", label: "Fecha" },
+                                { value: "time", label: "Hora" },
+                                { value: "checkbox", label: "Checkbox" },
+                                { value: "image", label: "Imagen" },
+                                { value: "textarea", label: "Textarea" }
+                            ].map(t => (
+                                <Select.Option key={t.value} value={t.value}>
+                                    {t.label}
+                                </Select.Option>
                             ))}
                         </Select>
                     </Form.Item>
 
                     {fieldType === "select" && (
-                        <Form.Item label="Opciones" name="options">
-                            <Input placeholder="Ej. rojo,verde,azul" />
+                        <Form.Item name="options" label="Opciones">
+                            <Input placeholder="rojo,verde,azul" />
                         </Form.Item>
                     )}
 
-                    <Space flex="auto">
-                        <Form.Item name="required" valuePropName="checked">
-                            <Checkbox>Required</Checkbox>
-                        </Form.Item>
-                    </Space>
+                    <Form.Item name="required" valuePropName="checked">
+                        <Checkbox>Required</Checkbox>
+                    </Form.Item>
 
                     <FormFooter
                         onCancel={() => {

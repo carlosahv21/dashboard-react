@@ -8,18 +8,18 @@ const { Header } = Layout;
 
 const HeaderComponent = ({ collapsed, setCollapsed }) => {
     const navigate = useNavigate();
-    const { logout } = useContext(AuthContext);
+    const { logout, hasPermission } = useContext(AuthContext);
 
     const handleLogout = () => {
-        localStorage.clear();   // Limpia toda la sesión
-        logout();               // Actualiza el estado global del AuthContext
-        navigate("/login");     // Redirección
+        localStorage.clear();
+        logout();
     };
 
-    const menuItems = [
+    const allMenuItems = [
         {
             key: "settings",
             label: "Settings",
+            permission: "settings:view",
             onClick: () => navigate("/settings"),
         },
         {
@@ -28,6 +28,13 @@ const HeaderComponent = ({ collapsed, setCollapsed }) => {
             onClick: handleLogout,
         },
     ];
+
+    const menuItems = allMenuItems.filter(item => {
+        if (!item.permission) {
+            return true;
+        }
+        return hasPermission(item.permission);
+    });
 
     return (
         <Header

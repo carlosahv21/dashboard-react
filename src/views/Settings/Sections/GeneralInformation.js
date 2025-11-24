@@ -14,7 +14,7 @@ const GeneralInformation = () => {
     const [uploadKey, setUploadKey] = useState(Date.now());
 
     const moduleData = {
-        module_name: "Configuración General",
+        module_name: "Información General",
         blocks: [
             {
                 block_name: "Información de la Academia",
@@ -71,7 +71,7 @@ const GeneralInformation = () => {
         <>
             <FormHeader
                 title={moduleData.module_name}
-                subtitle="Edit general settings for the academy"
+                subtitle="Edita la información general de la academía"
                 onCancel={() => null}
                 onSave={() => form.submit()}
             />

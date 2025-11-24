@@ -13,51 +13,45 @@ import Classes from "./views/Classes/Classes";
 import Students from "./views/Students/Students";
 import Teachers from "./views/Teachers/Teachers";
 
-// Settings
+// Settings & Sub-rutas
 import SettingsLayout from "./views/Settings/SettingsLayouts";
 
+
 const AppRoutes = () => {
-    const { user, routes, loading } = useContext(AuthContext);
+    const { user, loading, hasPermission } = useContext(AuthContext);
 
     if (loading) return <LoadingScreen />;
-    if (!user) return <Login />;
 
-    // Solo renderizamos rutas que NO son hijos de Settings
-    const renderRoutes = (routesArray) =>
-        routesArray.flatMap(r => {
-            if (r.name === "settings") {
-                // La ruta padre Settings
-                return (
-                    <Route
-                        key={r.id}
-                        path={r.full_path + "/*"} // importante el /* para Outlet
-                        element={<SettingsLayout />}
-                    />
-                );
-            }
-
-            if (r.children?.length > 0) {
-                return renderRoutes(r.children);
-            }
-
-            // Componente principal de la ruta
-            let Component;
-            switch (r.name) {
-                case "dashboard": Component = DashboardView; break;
-                case "classes": Component = Classes; break;
-                case "students": Component = Students; break;
-                case "teachers": Component = Teachers; break;
-                default: return null;
-            }
-
-            return <Route key={r.id} path={r.full_path} element={<Component />} />;
-        });
+    if (!user) return <Routes><Route path="*" element={<Login />} /></Routes>;
 
     return (
         <Routes>
             <Route element={<DashboardLayout />}>
-                {renderRoutes(routes)}
+
+                <Route path="/" element={<DashboardView />} />
+
+                {/* Clases */}
+                {hasPermission('classes:view') && (
+                    <Route path="classes" element={<Classes />} />
+                )}
+
+                {/* Estudiantes */}
+                {hasPermission('students:view') && (
+                    <Route path="students" element={<Students />} />
+                )}
+
+                {/* Profesores */}
+                {hasPermission('teachers:view') && (
+                    <Route path="teachers" element={<Teachers />} />
+                )}
+
+                {hasPermission('settings:view') && (
+                    <Route path="settings/*" element={<SettingsLayout />}>
+                    </Route>
+                )}
+
                 <Route path="*" element={<Navigate to="/" />} />
+
             </Route>
         </Routes>
     );
