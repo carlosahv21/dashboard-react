@@ -1,17 +1,22 @@
 // components/BaseCrudView.jsx
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
+
 import { message, Modal, Form, Breadcrumb, Select, Space } from "antd";
+
 import DataTable from "./DataTable";
 import PaginationControl from "./PaginationControl";
 import SearchFilter from "./SearchFilter";
 import FormSection from "./FormSection";
 import FormFooter from "./FormFooter";
 import FormHeader from "./FormHeader";
+
 import useFetch from "../../hooks/useFetch";
+import { AuthContext } from "../../context/AuthContext";
+
 import dayjs from "dayjs";
 
 const BaseCrudView = ({
-    breadcrumb = true,        // mostrar breadcrumb
+    breadcrumb = true, // mostrar breadcrumb
     endpoint,          // ej: 'classes'
     moduleFieldId,     // ej: 5 para cargar campos dinámicos
     columns,           // columnas para la tabla
@@ -21,6 +26,8 @@ const BaseCrudView = ({
     fixedValues,       // valores fijos para la consulta
     hiddenFields,      // campos ocultos en el formulario
 }) => {
+    const { hasPermission } = useContext(AuthContext);
+
     const [items, setItems] = useState([]);
     const [loading, setLoading] = useState(false);
     const [search, setSearch] = useState("");
@@ -185,6 +192,7 @@ const BaseCrudView = ({
                 <SearchFilter
                     search={search}
                     setSearch={setSearch}
+                    canCreate={hasPermission(`${endpoint}:create`)}
                     onCreate={() => openModal()}
                     title={titleSingular}
                 />
@@ -195,8 +203,8 @@ const BaseCrudView = ({
                 data={items}
                 loading={loading}
                 pagination={pagination}
-                onEdit={(record) => openModal(record.id)}
-                onDelete={(id) => handleDelete(id)}
+                onEdit={hasPermission(`${endpoint}:edit`) ? (record) => openModal(record.id) : undefined}
+                onDelete={hasPermission(`${endpoint}:delete`) ? (id) => handleDelete(id) : undefined}
                 disableEdit={(record) => ["admin"].includes(record.role_name?.toLowerCase())}
                 disableDelete={(record) => ["admin"].includes(record.role_name?.toLowerCase())}
             />
