@@ -25,9 +25,9 @@ const Teachers = () => {
             columns={columns}
             titleSingular="Profesor"
             titlePlural="Profesores"
-            filters={{ role: "teacher" }}
-            fixedValues={{ role: "teacher" }}
-            hiddenFields={["role"]}
+            filters={{ role_id: "3" }}
+            fixedValues={{ role_id: "3" }}
+            hiddenFields={["role_id"]}
         />
 
     );

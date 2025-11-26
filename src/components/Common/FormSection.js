@@ -15,6 +15,7 @@ const FormSection = ({ title, fields, form, onImageUpload }) => (
                     name={field.name}
                     type={field.type}
                     options={field.options || []}
+                    relationConfig={field.relation_config}
                     form={form}
                     required={field.required}
                     placeholder={field.placeholder}

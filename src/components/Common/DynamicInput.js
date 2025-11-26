@@ -1,9 +1,20 @@
-import React from "react";
+import React, { useState, useCallback } from "react";
 import { Form, Input, Select, Upload, DatePicker, TimePicker, Checkbox, message } from "antd";
 import { UploadOutlined } from "@ant-design/icons";
 import useFetch from "../../hooks/useFetch";
 const { Option } = Select;
 const { TextArea } = Input;
+
+// Utility function to debounce API calls, crucial for searchable selects
+const debounce = (func, delay) => {
+    let timeoutId;
+    return (...args) => {
+        clearTimeout(timeoutId);
+        timeoutId = setTimeout(() => {
+            func.apply(this, args);
+        }, delay);
+    };
+};
 
 // Función para convertir `validation_rules` a formato de Ant Design
 const parseValidationRules = (required, type) => {
@@ -55,6 +66,12 @@ const parseValidationRules = (required, type) => {
                     message: "Debe subir una imagen",
                 });
                 break;
+            case "relation":
+                rules.push({
+                    required: true,
+                    message: "Debe seleccionar una opción",
+                });
+                break;
             default:
                 rules.push({
                     type: "string",
@@ -66,18 +83,57 @@ const parseValidationRules = (required, type) => {
     return rules;
 };
 
-
 const DynamicInput = ({
     label,
     name,
     type,
-    options,
+    options, // Para selects estáticos
+    relationConfig,
     form,
     required,
-    onImageUpload,
-    placeholder
+    placeholder,
+    onImageUpload
 }) => {
     const { request } = useFetch();
+
+    // Estado para manejar las opciones de relación y la carga
+    const [relationOptions, setRelationOptions] = useState([]);
+    const [loadingOptions, setLoadingOptions] = useState(false);
+
+    /**
+     * Función para buscar opciones de relación en el backend.
+     * Ahora usa POST para enviar la configuración en el cuerpo (body).
+     */
+    const fetchRelationOptions = useCallback(
+        debounce(async (term) => {
+            if (!relationConfig) return;
+
+            setLoadingOptions(true);
+            try {
+                const payload = {
+                    relation_config: relationConfig,
+                    search: term,
+                };
+
+                const data = await request(`fields/relation`, "POST", payload);
+                setRelationOptions(data.options);
+            } catch (error) {
+                message.error("Error al cargar opciones de relación.");
+                console.error("Error fetching relation options:", error);
+                setRelationOptions([]);
+            } finally {
+                setLoadingOptions(false);
+            }
+        }, 300),
+        [relationConfig, request]
+    );
+
+    React.useEffect(() => {
+        if (type === "relation" && relationConfig) {
+            fetchRelationOptions("");
+        }
+    }, [type, relationConfig, fetchRelationOptions]);
+
 
     // Manejador para remover la imagen
     const handleRemoveImage = async (file) => {
@@ -85,17 +141,15 @@ const DynamicInput = ({
             await request(`images/`, "DELETE", { imageUrl: file.url || file.response.url });
             message.success("Image removed successfully");
 
-            // Limpia el valor del campo en el formulario
             form.setFieldsValue({ [name]: null });
 
-            if (onImageUpload) onImageUpload(null); // Notifica que la imagen fue eliminada
+            if (onImageUpload) onImageUpload(null);
         } catch (error) {
             message.error("Failed to remove image");
             console.error(error);
         }
     };
 
-    // Manejador para subir la imagen
     const customRequest = async ({ file, onSuccess, onError }) => {
         const formData = new FormData();
         formData.append("logo", file);
@@ -103,11 +157,10 @@ const DynamicInput = ({
         try {
             const data = await request("images/", "POST", formData);
 
-            // Solo actualiza el formulario con la URL
             const imageUrl = data.url;
             form.setFieldsValue({ [name]: imageUrl });
 
-            if (onImageUpload) onImageUpload(imageUrl); // Asegúrate de que `onImageUpload` reciba solo la URL
+            if (onImageUpload) onImageUpload(imageUrl);
             onSuccess(data);
         } catch (error) {
             message.error("Failed to upload image");
@@ -132,8 +185,29 @@ const DynamicInput = ({
                         )}
                     </Select>
                 );
+            case "relation":
+                if (!relationConfig) {
+                    console.error(`DynamicInput: El campo '${name}' de tipo 'relation' requiere 'relationConfig'.`);
+                    return <Input disabled value="Error: Falta Configuración de Relación" />;
+                }
+                return (
+                    <Select
+                        placeholder={placeholder || `Busca y selecciona ${label}`}
+                        showSearch // Permite la búsqueda
+                        loading={loadingOptions} // Muestra el estado de carga
+                        onSearch={fetchRelationOptions} // Dispara la búsqueda al escribir (con debounce)
+                        filterOption={false} // Deshabilita el filtro del lado del cliente, ya que el backend lo hace
+                        notFoundContent={loadingOptions ? 'Cargando opciones...' : 'No se encontraron resultados'}
+                    >
+                        {relationOptions?.map(opt => (
+                            <Option key={opt.value} value={opt.value}>
+                                {opt.label}
+                            </Option>
+                        ))}
+                    </Select>
+                );
             case "date": return <DatePicker format="YYYY-MM-DD" placeholder={placeholder} />;
-            case "time": return <TimePicker format="HH:mm" placeholder={placeholder} needConfirm={false} minuteStep={15} use12Hours  />;
+            case "time": return <TimePicker format="HH:mm" placeholder={placeholder} needConfirm={false} minuteStep={15} use12Hours />;
             case "textarea": return <TextArea placeholder={placeholder || `Escribe ${label}`} style={{ resize: "none" }} />;
             case "image":
                 return (
@@ -170,11 +244,19 @@ const DynamicInput = ({
         }
     };
 
+    const valueProp = type === 'boolean' ? { valuePropName: 'checked' } : {};
+    const imageProps = type === 'image' ? {
+        getValueFromEvent: ({ fileList }) => fileList.length > 0 ? form.getFieldValue(name) : null
+    } : {};
+
+
     return (
         <Form.Item
             label={label}
             name={name}
             rules={parseValidationRules(required, type)}
+            {...valueProp}
+            {...imageProps}
         >
             {renderInputComponent()}
         </Form.Item>

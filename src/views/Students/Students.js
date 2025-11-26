@@ -25,9 +25,9 @@ const Students = () => {
             columns={columns}
             titleSingular="Estudiante"
             titlePlural="Estudiantes"
-            filters={{ role: "student" }}
-            fixedValues={{ role: "student" }}        // ← rol fijo
-            hiddenFields={["role"]}                 // ← ocultar el campo en el formulario
+            filters={{ role_id: "2" }}
+            fixedValues={{ role_id: "2" }}
+            hiddenFields={["role_id"]}
         />
 
 
