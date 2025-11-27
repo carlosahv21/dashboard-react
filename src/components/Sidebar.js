@@ -24,6 +24,12 @@ const Sidebar = ({ collapsed }) => {
       permissionRequired: "dashboard:view",
     },
     {
+      label: "Planes",
+      icon: "SolutionOutlined",
+      path: "/plans",
+      permissionRequired: "plans:view",
+    },
+    {
       label: "Clases",
       icon: "Read",
       path: "/classes",

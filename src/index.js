@@ -12,6 +12,7 @@ import DashboardView from "./views/Dashboard/DashboardView";
 import Classes from "./views/Classes/Classes";
 import Students from "./views/Students/Students";
 import Teachers from "./views/Teachers/Teachers";
+import Plans from "./views/Plans/Plans";
 
 // Settings & Sub-rutas
 import SettingsLayout from "./views/Settings/SettingsLayouts";
@@ -29,6 +30,11 @@ const AppRoutes = () => {
             <Route element={<DashboardLayout />}>
 
                 <Route path="/" element={<DashboardView />} />
+
+                {/* Planes*/}
+                {hasPermission('plans:view') && (
+                    <Route path="plans" element={<Plans />} />
+                )}
 
                 {/* Clases */}
                 {hasPermission('classes:view') && (

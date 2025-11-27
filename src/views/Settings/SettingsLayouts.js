@@ -2,7 +2,7 @@ import React, { useContext, useMemo } from "react";
 import { Row, Col, Menu } from "antd";
 import { Link, useLocation, Routes, Route, Navigate } from "react-router-dom";
 import { AuthContext } from "../../context/AuthContext";
-import { SettingOutlined, UserOutlined, DollarOutlined } from "@ant-design/icons";
+import { SettingOutlined, UserOutlined, DollarOutlined, AppstoreAddOutlined } from "@ant-design/icons";
 
 import SettingsGeneral from "./Sections/GeneralInformation";
 import SettingsActiveModules from "./Sections/ActiveModules";
@@ -35,7 +35,7 @@ const staticSettingsSections = [
 const iconMap = {
     academySettings: <SettingOutlined />,
     userManagement: <UserOutlined />,
-    customization: <SettingOutlined />,
+    customization: <AppstoreAddOutlined />,
     finance: <DollarOutlined />,
 };
 

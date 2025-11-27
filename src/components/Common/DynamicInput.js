@@ -31,11 +31,30 @@ const parseValidationRules = (required, type) => {
     // ✅ Validar el tipo de dato
     if (type) {
         switch (type) {
+            case "text":
+                rules.push({
+                    type: "string",
+                    message: "Debe ser un texto válido",
+                });
+                break;
             case "number":
                 rules.push({
-                    type: "number",
-                    transform: (value) => (value ? Number(value) : value),
-                    message: "Debe ser un número válido",
+                    validator: (_, value) => {
+                        if (!value) return Promise.resolve(); // vacío pasa si no es requerido
+                        if (value === "Ilimitadas") return Promise.resolve(); // para max_sessions
+                        if (!isNaN(Number(value))) return Promise.resolve();
+                        return Promise.reject(new Error("Debe ser un número válido"));
+                    },
+                });
+                break;
+
+            case "select":
+                rules.push({
+                    validator: (_, value) => {
+                        if (!value) return Promise.resolve(); // permite vacío si no es requerido
+                        if (typeof value === "string" || typeof value === "number") return Promise.resolve();
+                        return Promise.reject(new Error("Debe seleccionar una opción válida"));
+                    },
                 });
                 break;
             case "date":
@@ -176,14 +195,13 @@ const DynamicInput = ({
             case "select":
                 return (
                     <Select placeholder={placeholder || `Selecciona ${label}`}>
-                        {options?.map(opt =>
-                            typeof opt === "string" ? (
-                                <Option key={opt} value={opt}>{opt}</Option>
-                            ) : (
-                                <Option key={opt.value} value={opt.value}>{opt.label}</Option>
-                            )
-                        )}
+                        {options?.map(opt => (
+                            <Option key={opt.toString()} value={opt.toString()}>
+                                {opt.toString()}
+                            </Option>
+                        ))}
                     </Select>
+
                 );
             case "relation":
                 if (!relationConfig) {
