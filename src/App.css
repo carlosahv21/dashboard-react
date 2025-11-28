@@ -14,3 +14,7 @@ body, html, #root {
   margin-right: 4px;
   color: red; /* Cambia el color del asterisco a rojo */
 }
+
+.fc-timegrid-slot {
+    height: 40px !important;
+}

@@ -47,6 +47,12 @@ const Sidebar = ({ collapsed }) => {
       path: "/teachers",
       permissionRequired: "teachers:view",
     },
+    {
+      label: "Inscripciones",
+      icon: "UsergroupAdd",
+      path: "/registrations",
+      permissionRequired: "registrations:view",
+    },
   ];
 
   const buildMenuItems = (menuDefinition) =>

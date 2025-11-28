@@ -13,10 +13,12 @@ import Classes from "./views/Classes/Classes";
 import Students from "./views/Students/Students";
 import Teachers from "./views/Teachers/Teachers";
 import Plans from "./views/Plans/Plans";
+import Registrations from "./views/Registrations/Registrations";
 
 // Settings & Sub-rutas
 import SettingsLayout from "./views/Settings/SettingsLayouts";
 
+import "./App.css";
 
 const AppRoutes = () => {
     const { user, loading, hasPermission } = useContext(AuthContext);
@@ -49,6 +51,11 @@ const AppRoutes = () => {
                 {/* Profesores */}
                 {hasPermission('teachers:view') && (
                     <Route path="teachers" element={<Teachers />} />
+                )}
+
+                {/* Inscripciones */}
+                {hasPermission('registrations:view') && (
+                    <Route path="registrations" element={<Registrations />} />
                 )}
 
                 {hasPermission('settings:view') && (
