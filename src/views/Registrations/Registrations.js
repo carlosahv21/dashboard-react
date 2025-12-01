@@ -1,5 +1,6 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect, useContext, useMemo } from "react";
 import { Row, Col, Typography, message, Card, Input } from "antd";
+
 import useFetch from "../../hooks/useFetch";
 import { AuthContext } from "../../context/AuthContext";
 import AvailableClassesList from "../../components/Common/AvailableClassesList";
@@ -14,51 +15,38 @@ const Registration = () => {
     const { request, loading } = useFetch();
 
     // State
-    const [students, setStudents] = useState([]);
+    const [students, setStudents] = useState(null);
     const [selectedStudentId, setSelectedStudentId] = useState(null);
     const [availableClasses, setAvailableClasses] = useState([]);
     const [enrolledClasses, setEnrolledClasses] = useState([]);
-    const [searchQuery, setSearchQuery] = useState("");
+    const [classSearchQuery, setClassSearchQuery] = useState("");
+    const [studentSearchTerm, setStudentSearchTerm] = useState("");
 
     const isAdmin = hasPermission("registrations:create");
 
-    // Initial load
-    useEffect(() => {
-        fetchAvailableClasses();
-        if (isAdmin) {
-            fetchStudents();
-        } else if (user) {
-            // If student, set self as selected
-            setSelectedStudentId(user.id);
+    const fetchStudents = async (searchTerm) => {
+        if (!searchTerm || searchTerm.length < 3) {
+            setStudents([]);
+            return;
         }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [isAdmin, user]);
 
-    // Fetch enrollments when student changes
-    useEffect(() => {
-        if (selectedStudentId) {
-            fetchEnrollments(selectedStudentId);
-        } else {
-            setEnrolledClasses([]);
-        }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [selectedStudentId]);
-
-    const fetchAvailableClasses = async () => {
         try {
-            const data = await request("classes?limit=4", "GET");
-            setAvailableClasses(data.data || []);
-        } catch (error) {
-            message.error("Error al cargar clases disponibles");
-        }
-    };
+            let url = `students?role_id=2&limit=50&search=${searchTerm}`;
 
-    const fetchStudents = async () => {
-        try {
-            const data = await request("students", "GET");
+            const data = await request(url, "GET");
             setStudents(data.data || []);
         } catch (error) {
             message.error("Error al cargar estudiantes");
+            setStudents([]);
+        }
+    };
+
+    const fetchAvailableClasses = async () => {
+        try {
+            const data = await request("classes?limit=100", "GET");
+            setAvailableClasses(data.data || []);
+        } catch (error) {
+            message.error("Error al cargar clases disponibles");
         }
     };
 
@@ -70,6 +58,42 @@ const Registration = () => {
             message.error("Error al cargar inscripciones");
         }
     };
+
+    const debounce = (func, delay) => {
+        let timeoutId;
+        return (...args) => {
+            clearTimeout(timeoutId);
+            timeoutId = setTimeout(() => {
+                func.apply(this, args);
+            }, delay);
+        };
+    };
+
+    const debounceStudentSearch = useMemo(() => {
+        return debounce((searchTerm) => {
+            setStudentSearchTerm(searchTerm);
+            fetchStudents(searchTerm);
+        }, 300);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [request]);
+
+    useEffect(() => {
+        fetchAvailableClasses();
+        if (isAdmin) {
+        } else if (user) {
+            setSelectedStudentId(user.id);
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [isAdmin, user]); // Dependencias limpias
+
+    useEffect(() => {
+        if (selectedStudentId) {
+            fetchEnrollments(selectedStudentId);
+        } else {
+            setEnrolledClasses([]);
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [selectedStudentId]);
 
     const handleEnroll = async (classItem) => {
         if (!selectedStudentId) {
@@ -112,6 +136,8 @@ const Registration = () => {
                         selectedStudentId={selectedStudentId}
                         onStudentSelect={setSelectedStudentId}
                         loading={loading}
+                        onStudentSearch={debounceStudentSearch}
+                        searchTerm={studentSearchTerm}
                     />
                 </Card>
             )}
@@ -123,13 +149,14 @@ const Registration = () => {
                             <Title level={4} style={{ marginBottom: 30 }}>Clases Disponibles</Title>
                             <Input
                                 placeholder="Buscar clase"
-                                value={searchQuery}
-                                onChange={(e) => setSearchQuery(e.target.value)}
+                                value={classSearchQuery}
+                                onChange={(e) => setClassSearchQuery(e.target.value)}
                                 style={{ marginBottom: 24 }}
                                 suffix={<SearchOutlined />}
                             />
                             <div style={{ maxHeight: "800px", overflowY: "auto", overflowX: "hidden" }}>
                                 <AvailableClassesList
+                                    // Filtro local basado en searchQuery (deberías pasarlo al componente AvailableClassesList)
                                     classes={availableClasses}
                                     enrolledClassIds={enrolledClasses.map(c => c.class_id || c.id)}
                                     onClassSelect={handleEnroll}

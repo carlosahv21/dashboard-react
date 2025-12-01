@@ -21,7 +21,7 @@ const Students = () => {
     return (
         <BaseCrudView
             endpoint="students"
-            moduleFieldId={12}
+            moduleFieldId={13}
             columns={columns}
             titleSingular="Estudiante"
             titlePlural="Estudiantes"
