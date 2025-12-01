@@ -41,9 +41,30 @@ const Registration = () => {
         }
     };
 
-    const fetchAvailableClasses = async () => {
+    const fetchClasses = async (searchTerm) => {
+        if (!searchTerm || searchTerm.length === 0) {
+            fetchInitialClasses();
+            return;
+        }
+
+        if (searchTerm.length < 3) {
+            setAvailableClasses([]);
+            return;
+        }
+
         try {
-            const data = await request("classes?limit=100", "GET");
+            let url = `classes?limit=50&search=${searchTerm}`;
+            const data = await request(url, "GET");
+            setAvailableClasses(data.data || []);
+        } catch (error) {
+            message.error("Error al cargar clases");
+            setAvailableClasses([]);
+        }
+    };
+
+    const fetchInitialClasses = async () => {
+        try {
+            const data = await request("classes?limit=5", "GET");
             setAvailableClasses(data.data || []);
         } catch (error) {
             message.error("Error al cargar clases disponibles");
@@ -77,14 +98,22 @@ const Registration = () => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [request]);
 
+    const debounceClassSearch = useMemo(() => {
+        return debounce((searchTerm) => {
+            fetchClasses(searchTerm);
+        }, 300);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [request]);
+
     useEffect(() => {
-        fetchAvailableClasses();
+        fetchInitialClasses();
+
         if (isAdmin) {
         } else if (user) {
             setSelectedStudentId(user.id);
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [isAdmin, user]); // Dependencias limpias
+    }, [isAdmin, user]);
 
     useEffect(() => {
         if (selectedStudentId) {
@@ -150,16 +179,20 @@ const Registration = () => {
                             <Input
                                 placeholder="Buscar clase"
                                 value={classSearchQuery}
-                                onChange={(e) => setClassSearchQuery(e.target.value)}
+                                onChange={(e) => {
+                                    const term = e.target.value;
+                                    setClassSearchQuery(term);
+                                    debounceClassSearch(term);
+                                }}
                                 style={{ marginBottom: 24 }}
                                 suffix={<SearchOutlined />}
                             />
                             <div style={{ maxHeight: "800px", overflowY: "auto", overflowX: "hidden" }}>
                                 <AvailableClassesList
-                                    // Filtro local basado en searchQuery (deberías pasarlo al componente AvailableClassesList)
                                     classes={availableClasses}
                                     enrolledClassIds={enrolledClasses.map(c => c.class_id || c.id)}
                                     onClassSelect={handleEnroll}
+                                    searchTerm={classSearchQuery}
                                 />
                             </div>
                         </Card>

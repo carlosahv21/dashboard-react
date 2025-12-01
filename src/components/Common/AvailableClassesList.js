@@ -4,9 +4,50 @@ import { ClockCircleOutlined, CalendarOutlined, TeamOutlined, TrophyOutlined } f
 
 const { Text } = Typography;
 
-const AvailableClassesList = ({ classes, onClassSelect, enrolledClassIds = [] }) => {
+// Función auxiliar para resaltar el texto que coincide con la búsqueda
+const highlightMatch = (text, query) => {
+    // Si no hay término de búsqueda o es muy corto, devolvemos el texto normal.
+    if (!query || query.length < 3) {
+        return text;
+    }
+
+    const parts = [];
+    const lowerText = text.toLowerCase();
+    const lowerQuery = query.toLowerCase();
+    let lastIndex = 0;
+
+    // Buscamos todas las ocurrencias del query en el texto
+    for (let i = 0; i <= lowerText.length - lowerQuery.length; i++) {
+        if (lowerText.substring(i, i + lowerQuery.length) === lowerQuery) {
+            // 1. Añadir el texto antes de la coincidencia
+            if (i > lastIndex) {
+                parts.push(<span key={`pre-${lastIndex}`}>{text.substring(lastIndex, i)}</span>);
+            }
+            // 2. Añadir la coincidencia en negrita (<strong>)
+            parts.push(<strong key={`match-${i}`}>{text.substring(i, i + lowerQuery.length)}</strong>);
+            lastIndex = i + lowerQuery.length;
+            i += lowerQuery.length - 1; // Continuar la búsqueda después de la coincidencia
+        }
+    }
+
+    // 3. Añadir el texto restante
+    if (lastIndex < text.length) {
+        parts.push(<span key={`post-${lastIndex}`}>{text.substring(lastIndex)}</span>);
+    }
+
+    // Devolvemos un span con todas las partes
+    return <span>{parts}</span>;
+};
+
+
+const AvailableClassesList = ({ classes, onClassSelect, enrolledClassIds = [], searchTerm }) => {
     if (!classes || classes.length === 0) {
-        return <Empty description="No hay clases disponibles" />;
+        // Mejoramos el mensaje cuando se está buscando pero no hay resultados
+        const description = searchTerm && searchTerm.length >= 3
+            ? "No se encontraron clases que coincidan con la búsqueda."
+            : "No hay clases disponibles o escriba al menos 3 caracteres para buscar.";
+
+        return <Empty description={description} />;
     }
 
     return (
@@ -36,8 +77,8 @@ const AvailableClassesList = ({ classes, onClassSelect, enrolledClassIds = [] })
                             }}
                         >
                             <div style={{ marginBottom: 12 }}>
-                                <Text strong style={{ fontSize: 16 }}>
-                                    {classItem.name}
+                                <Text style={{ fontSize: 16 }}>
+                                    {highlightMatch(classItem.name, searchTerm)}
                                 </Text>
                                 {isEnrolled && (
                                     <Tag color="success" style={{ marginLeft: 8 }}>
@@ -57,13 +98,13 @@ const AvailableClassesList = ({ classes, onClassSelect, enrolledClassIds = [] })
                             >
                                 <div>
                                     <TrophyOutlined style={{ marginRight: 6, color: "#1890ff" }} />
-                                    <Text type="secondary">Nivel: {classItem.level}</Text>
+                                    <Text type="secondary">Nivel: {highlightMatch(classItem.level, searchTerm)}</Text>
                                 </div>
 
                                 {classItem.genre && (
                                     <div>
                                         <TeamOutlined style={{ marginRight: 6, color: "#722ed1" }} />
-                                        <Text type="secondary">{classItem.genre}</Text>
+                                        <Text type="secondary">{highlightMatch(classItem.genre, searchTerm)}</Text>
                                     </div>
                                 )}
                             </div>
@@ -78,12 +119,12 @@ const AvailableClassesList = ({ classes, onClassSelect, enrolledClassIds = [] })
                             >
                                 <div>
                                     <CalendarOutlined style={{ marginRight: 6, color: "#52c41a" }} />
-                                    <Text type="secondary">{classItem.date}</Text>
+                                    <Text type="secondary">{highlightMatch(classItem.date, searchTerm)}</Text>
                                 </div>
 
                                 <div>
                                     <ClockCircleOutlined style={{ marginRight: 6, color: "#fa8c16" }} />
-                                    <Text type="secondary">{classItem.hour}</Text>
+                                    <Text type="secondary">{highlightMatch(classItem.hour, searchTerm)}</Text>
                                 </div>
                             </div>
                         </Card>
