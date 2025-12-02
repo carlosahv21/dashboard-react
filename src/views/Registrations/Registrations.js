@@ -35,6 +35,7 @@ const Registration = () => {
 
             const data = await request(url, "GET");
             setStudents(data.data || []);
+
         } catch (error) {
             message.error("Error al cargar estudiantes");
             setStudents([]);
@@ -64,7 +65,7 @@ const Registration = () => {
 
     const fetchInitialClasses = async () => {
         try {
-            const data = await request("classes?limit=5", "GET");
+            const data = await request("classes?is_favorites=true", "GET");
             setAvailableClasses(data.data || []);
         } catch (error) {
             message.error("Error al cargar clases disponibles");
@@ -106,11 +107,10 @@ const Registration = () => {
     }, [request]);
 
     useEffect(() => {
-        fetchInitialClasses();
-
         if (isAdmin) {
         } else if (user) {
             setSelectedStudentId(user.id);
+            fetchInitialClasses();
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [isAdmin, user]);
@@ -118,6 +118,7 @@ const Registration = () => {
     useEffect(() => {
         if (selectedStudentId) {
             fetchEnrollments(selectedStudentId);
+            fetchInitialClasses();
         } else {
             setEnrolledClasses([]);
         }

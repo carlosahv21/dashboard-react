@@ -1,6 +1,6 @@
 import React from "react";
 import { List, Card, Tag, Typography, Empty } from "antd";
-import { ClockCircleOutlined, CalendarOutlined, TeamOutlined, TrophyOutlined } from "@ant-design/icons";
+import { ClockCircleOutlined, CalendarOutlined, TeamOutlined, TrophyOutlined, StarOutlined } from "@ant-design/icons";
 
 const { Text } = Typography;
 
@@ -64,6 +64,8 @@ const AvailableClassesList = ({ classes, onClassSelect, enrolledClassIds = [], s
             dataSource={classes}
             renderItem={(classItem) => {
                 const isEnrolled = enrolledClassIds.includes(classItem.id);
+                // 💡 SOLUCIÓN: Usamos !! para forzar a booleano y evitar que '0' se renderice
+                const isFavorite = !!classItem.is_favorites;
 
                 return (
                     <List.Item>
@@ -80,6 +82,13 @@ const AvailableClassesList = ({ classes, onClassSelect, enrolledClassIds = [], s
                                 <Text style={{ fontSize: 16 }}>
                                     {highlightMatch(classItem.name, searchTerm)}
                                 </Text>
+
+                                {isFavorite && (
+                                    <Tag color="warning" style={{ marginLeft: 8 }}>
+                                        <StarOutlined />
+                                    </Tag>
+                                )}
+
                                 {isEnrolled && (
                                     <Tag color="success" style={{ marginLeft: 8 }}>
                                         Inscrito
@@ -87,7 +96,6 @@ const AvailableClassesList = ({ classes, onClassSelect, enrolledClassIds = [], s
                                 )}
                             </div>
 
-                            {/* Nivel + Género */}
                             <div
                                 style={{
                                     display: "flex",
@@ -98,18 +106,21 @@ const AvailableClassesList = ({ classes, onClassSelect, enrolledClassIds = [], s
                             >
                                 <div>
                                     <TrophyOutlined style={{ marginRight: 6, color: "#1890ff" }} />
-                                    <Text type="secondary">Nivel: {highlightMatch(classItem.level, searchTerm)}</Text>
+                                    <Text type="secondary">
+                                        Nivel: {highlightMatch(classItem.level, searchTerm)}
+                                    </Text>
                                 </div>
 
                                 {classItem.genre && (
                                     <div>
                                         <TeamOutlined style={{ marginRight: 6, color: "#722ed1" }} />
-                                        <Text type="secondary">{highlightMatch(classItem.genre, searchTerm)}</Text>
+                                        <Text type="secondary">
+                                            Género: {highlightMatch(classItem.genre, searchTerm)}
+                                        </Text>
                                     </div>
                                 )}
                             </div>
 
-                            {/* Día + Hora */}
                             <div
                                 style={{
                                     display: "flex",
@@ -119,12 +130,16 @@ const AvailableClassesList = ({ classes, onClassSelect, enrolledClassIds = [], s
                             >
                                 <div>
                                     <CalendarOutlined style={{ marginRight: 6, color: "#52c41a" }} />
-                                    <Text type="secondary">{highlightMatch(classItem.date, searchTerm)}</Text>
+                                    <Text type="secondary">
+                                        Día: {highlightMatch(classItem.date, searchTerm)}
+                                    </Text>
                                 </div>
 
                                 <div>
                                     <ClockCircleOutlined style={{ marginRight: 6, color: "#fa8c16" }} />
-                                    <Text type="secondary">{highlightMatch(classItem.hour, searchTerm)}</Text>
+                                    <Text type="secondary">
+                                        Hora: {highlightMatch(classItem.hour, searchTerm)}
+                                    </Text>
                                 </div>
                             </div>
                         </Card>
