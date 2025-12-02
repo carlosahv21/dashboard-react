@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useMemo } from "react";
 import { Button, Layout, Dropdown, Avatar, Space, Badge } from "antd";
 import {
     MenuFoldOutlined,
@@ -15,6 +15,16 @@ import { AuthContext } from "../context/AuthContext";
 
 const { Header } = Layout;
 
+const isPlanVigent = (plan) => {
+    if (!plan || plan.plan_status !== 'active') return false;
+
+    const startDate = new Date(plan.plan_start_date);
+    const endDate = new Date(plan.plan_end_date);
+    const now = new Date();
+    return now >= startDate && now <= endDate;
+};
+
+
 const HeaderComponent = ({ collapsed, setCollapsed }) => {
     const navigate = useNavigate();
     const { logout, hasPermission, user } = useContext(AuthContext);
@@ -23,6 +33,25 @@ const HeaderComponent = ({ collapsed, setCollapsed }) => {
         localStorage.clear();
         logout();
     };
+
+    const { classesAvailable, isPlanActiveAndVigent } = useMemo(() => {
+        const plan = user?.plan;
+
+        let available = 0;
+        let activeAndVigent = false;
+
+        if (plan) {
+            activeAndVigent = isPlanVigent(plan);
+            console.log(activeAndVigent);
+
+            if (activeAndVigent) {
+                available = Math.max(0, plan.max_sessions - plan.plan_classes_used);
+            }
+        }
+
+        return { classesAvailable: available, isPlanActiveAndVigent: activeAndVigent };
+    }, [user?.plan]);
+
 
     const allMenuItems = [
         {
@@ -65,6 +94,31 @@ const HeaderComponent = ({ collapsed, setCollapsed }) => {
             />
 
             <Space style={{ marginRight: 20, fontSize: 18 }} size={24}>
+
+                {user?.plan && (
+                    <div
+                        title={isPlanActiveAndVigent ? `Te quedan ${classesAvailable} clases de tu plan.` : 'Tu plan ha expirado o está inactivo.'}
+                        style={{
+                            padding: '6px 12px',
+                            backgroundColor: isPlanActiveAndVigent ? '#e6f7ff' : '#fff1f0', 
+                            borderRadius: '4px',
+                            border: `1px solid ${isPlanActiveAndVigent ? '#91d5ff' : '#ffa39e'}`,
+                            fontSize: 14,
+                            fontWeight: 600,
+                            lineHeight: '20px',
+                            cursor: 'default',
+                        }}
+                    >
+                        Clases Disp:
+                        <span style={{
+                            marginLeft: 5,
+                            color: classesAvailable > 0 ? '#52c41a' : (isPlanActiveAndVigent ? '#faad14' : '#f5222d'), 
+                            fontSize: 16,
+                        }}>
+                            {classesAvailable}
+                        </span>
+                    </div>
+                )}
 
                 <Badge count={0} size="small">
                     <MessageOutlined style={{ fontSize: 20, cursor: "pointer" }} />

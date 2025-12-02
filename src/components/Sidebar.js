@@ -43,13 +43,13 @@ const Sidebar = ({ collapsed }) => {
     },
     {
       label: "Profesores",
-      icon: "UsergroupAdd",
+      icon: "IdcardOutlined",
       path: "/teachers",
       permissionRequired: "teachers:view",
     },
     {
       label: "Inscripciones",
-      icon: "UsergroupAdd",
+      icon: "UserAddOutlined",
       path: "/registrations",
       permissionRequired: "registrations:view",
     },
