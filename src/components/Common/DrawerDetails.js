@@ -6,9 +6,7 @@ import { UserOutlined, MailOutlined, InfoCircleOutlined, CalendarOutlined, Solut
 
 const getIconForLabel = (label) => {
     const lowerLabel = label.toLowerCase();
-    if (lowerLabel.includes("plan")) return <SolutionOutlined style={{ marginRight: 8, color: '#1890ff' }} />;
-    if (lowerLabel.includes("información") || lowerLabel.includes("básica")) return <InfoCircleOutlined style={{ marginRight: 8, color: '#1890ff' }} />;
-    if (lowerLabel.includes("clase") || lowerLabel.includes("curso")) return <CalendarOutlined style={{ marginRight: 8, color: '#40a9ff' }} />;
+    if (lowerLabel.includes("información")) return <SolutionOutlined style={{ marginRight: 8, color: '#1890ff' }} />;
     if (lowerLabel.includes("registro") || lowerLabel.includes("metadata")) return <CalendarOutlined style={{ marginRight: 8, color: '#40a9ff' }} />;
     return <InfoCircleOutlined style={{ marginRight: 8, color: '#40a9ff' }} />;
 };

@@ -155,7 +155,7 @@ const Registration = () => {
     };
 
     return (
-        <div style={{ padding: 24 }}>
+        <>
             <Title level={2}>Inscripción de Clases</Title>
 
             {isAdmin && (
@@ -217,7 +217,7 @@ const Registration = () => {
                     </Title>
                 </div>
             )}
-        </div>
+        </>
     );
 };
 

@@ -43,10 +43,9 @@ const DataTable = ({
                                 <Button
                                     type="link"
                                     icon={<EditOutlined />}
-                                    // MODIFICACIÓN 1: Usar e.stopPropagation()
                                     onClick={(e) => {
                                         e.stopPropagation();
-                                        !editDisabled && onEdit(record);
+                                        !editDisabled && onEdit(record.id);
                                     }}
                                     disabled={editDisabled}
                                 />
@@ -56,7 +55,6 @@ const DataTable = ({
                                     type="link"
                                     danger
                                     icon={<DeleteOutlined />}
-                                    // MODIFICACIÓN 2: Usar e.stopPropagation()
                                     onClick={(e) => {
                                         e.stopPropagation();
                                         !deleteDisabled && handleDeleteConfirm(record.id, record);
