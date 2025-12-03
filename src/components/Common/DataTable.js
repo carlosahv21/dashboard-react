@@ -12,7 +12,9 @@ const DataTable = ({
     onDelete,
     showActions = true,
     disableDelete,
-    disableEdit
+    disableEdit,
+    onRow,
+    selectedRowId
 }) => {
     const handleDeleteConfirm = (id, record) => {
         confirm({
@@ -41,7 +43,11 @@ const DataTable = ({
                                 <Button
                                     type="link"
                                     icon={<EditOutlined />}
-                                    onClick={() => !editDisabled && onEdit(record)}
+                                    // MODIFICACIÓN 1: Usar e.stopPropagation()
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        !editDisabled && onEdit(record);
+                                    }}
                                     disabled={editDisabled}
                                 />
                             )}
@@ -50,7 +56,11 @@ const DataTable = ({
                                     type="link"
                                     danger
                                     icon={<DeleteOutlined />}
-                                    onClick={() => !deleteDisabled && handleDeleteConfirm(record.id, record)}
+                                    // MODIFICACIÓN 2: Usar e.stopPropagation()
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        !deleteDisabled && handleDeleteConfirm(record.id, record);
+                                    }}
                                     disabled={deleteDisabled}
                                 />
                             )}
@@ -70,6 +80,8 @@ const DataTable = ({
             rowKey="id"
             bordered
             pagination={false}
+            onRow={onRow}
+            rowClassName={(record) => record.id === selectedRowId ? "ant-table-row-selected" : ""}
         />
     );
 };

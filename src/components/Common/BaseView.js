@@ -1,7 +1,7 @@
 // components/BaseCrudView.jsx
 import React, { useEffect, useState, useContext } from "react";
 
-import { message, Modal, Form, Breadcrumb, Select, Space } from "antd";
+import { message, Modal, Form, Breadcrumb, Select, Space, Spin } from "antd";
 
 import DataTable from "./DataTable";
 import PaginationControl from "./PaginationControl";
@@ -9,6 +9,7 @@ import SearchFilter from "./SearchFilter";
 import FormSection from "./FormSection";
 import FormFooter from "./FormFooter";
 import FormHeader from "./FormHeader";
+import DrawerDetails from "./DrawerDetails";
 
 import useFetch from "../../hooks/useFetch";
 import { AuthContext } from "../../context/AuthContext";
@@ -36,6 +37,11 @@ const BaseCrudView = ({
     const [modalVisible, setModalVisible] = useState(false);
     const [editingId, setEditingId] = useState(null);
     const [moduleData, setModuleData] = useState(null);
+
+    const [drawerVisible, setDrawerVisible] = useState(false);
+    const [selectedRecordId, setSelectedRecordId] = useState(null);
+    const [drawerData, setDrawerData] = useState(null); // Nuevo estado para los datos estructurados
+    const [drawerLoading, setDrawerLoading] = useState(false); // Nuevo estado para el loading del drawer
 
     const { request } = useFetch();
     const [form] = Form.useForm();
@@ -67,6 +73,40 @@ const BaseCrudView = ({
         } finally {
             setLoading(false);
         }
+    };
+
+    const fetchDetailForDrawer = async (id) => {
+        if (!id) return;
+        
+        // 1. Mostrar spinner y limpiar datos anteriores
+        setDrawerLoading(true);
+        setDrawerData(null);
+        setDrawerVisible(true);
+        
+        try {
+            // El backend ya devuelve el objeto estructurado (View Model: {title, sections, ...})
+            const detailData = await request(`${endpoint}/${id}`, "GET");
+            setDrawerData(detailData);
+        } catch (error) {
+            console.error("Error fetching detail:", error);
+            message.error(`Error al cargar los detalles de ${titleSingular}`);
+            setDrawerVisible(false); // Cierra si hay error
+        } finally {
+            setDrawerLoading(false);
+        }
+    };
+    // --------------------------------------------------
+
+    // --- Lógica del Drawer ---
+    const handleRowClick = (record) => {
+        setSelectedRecordId(record.id);
+        fetchDetailForDrawer(record.id); // Lanza el fetch y abre el drawer
+    };
+
+    const handleDrawerClose = () => {
+        setDrawerVisible(false);
+        setDrawerData(null);
+        setSelectedRecordId(null);
     };
 
     useEffect(() => {
@@ -207,6 +247,14 @@ const BaseCrudView = ({
                 onDelete={hasPermission(`${endpoint}:delete`) ? (id) => handleDelete(id) : undefined}
                 disableEdit={(record) => ["admin"].includes(record.role_name?.toLowerCase())}
                 disableDelete={(record) => ["admin"].includes(record.role_name?.toLowerCase())}
+                onRow={(record) => ({
+                    onClick: () => {
+                        setSelectedRecordId(record.id);
+                        handleRowClick(record);
+                    },
+                    style: { cursor: 'pointer' }
+                })}
+                selectedRowId={selectedRecordId}
             />
 
             <PaginationControl
@@ -262,6 +310,18 @@ const BaseCrudView = ({
                     <div style={{ textAlign: "center", padding: 50 }}>Cargando...</div>
                 )}
             </Modal>
+
+            <DrawerDetails
+                visible={drawerVisible}
+                onClose={handleDrawerClose}
+                data={drawerLoading ? null : drawerData}
+            >
+                {drawerLoading && (
+                    <div style={{ textAlign: "center", padding: "50px" }}>
+                        <Spin size="large" />
+                    </div>
+                )}
+            </DrawerDetails>
 
         </div>
     );
