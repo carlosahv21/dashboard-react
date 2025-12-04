@@ -14,6 +14,7 @@ import Students from "./views/Students/Students";
 import Teachers from "./views/Teachers/Teachers";
 import Plans from "./views/Plans/Plans";
 import Registrations from "./views/Registrations/Registrations";
+import Attendances from "./views/Attendances/Attendances";
 
 // Settings & Sub-rutas
 import SettingsLayout from "./views/Settings/SettingsLayouts";
@@ -56,6 +57,11 @@ const AppRoutes = () => {
                 {/* Inscripciones */}
                 {hasPermission('registrations:view') && (
                     <Route path="registrations" element={<Registrations />} />
+                )}
+
+                {/* Asistencia */}
+                {hasPermission('attendances:view') && (
+                    <Route path="attendances" element={<Attendances />} />
                 )}
 
                 {hasPermission('settings:view') && (

@@ -53,6 +53,12 @@ const Sidebar = ({ collapsed }) => {
       path: "/registrations",
       permissionRequired: "registrations:view",
     },
+    {
+      label: "Asistencias",
+      icon: "CalendarOutlined",
+      path: "/attendances",
+      permissionRequired: "attendances:view",
+    },
   ];
 
   const buildMenuItems = (menuDefinition) =>

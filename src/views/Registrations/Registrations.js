@@ -156,7 +156,7 @@ const Registration = () => {
 
     return (
         <>
-            <Title level={2}>Inscripción de Clases</Title>
+            <Title level={2} style={{ marginBottom: 16, marginTop: 0 }}>Inscripción de Clases</Title>
 
             {isAdmin && (
                 <Card style={{ marginBottom: 24 }}>
