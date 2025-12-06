@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useCallback } from "react";
+import { useState, useEffect, useMemo, useCallback, useRef } from "react";
 import { message } from "antd";
 import useFetch from "./useFetch";
 import dayjs from "dayjs";
@@ -100,6 +100,21 @@ const useAttendanceData = () => {
     }, [request, pagination.current, pagination.pageSize]);
 
     // 2. Fetch de Estudiantes y Asistencias cuando cambia la clase seleccionada o la paginación de estudiantes
+
+    // 3. Debounce de SearchText
+    const [debouncedSearchText, setDebouncedSearchText] = useState(searchText);
+
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            setDebouncedSearchText(searchText);
+        }, 500);
+        return () => clearTimeout(timer);
+    }, [searchText]);
+
+    // Ref para rastrear la clase anterior y limpiar estados
+    const prevClassIdRef = useRef(selectedClass?.id);
+
+    // 2. Fetch de Estudiantes y Asistencias
     useEffect(() => {
         if (!selectedClass) {
             setStudents([]);
@@ -113,8 +128,15 @@ const useAttendanceData = () => {
                 setLoadingStudents(true);
                 const { current, pageSize } = studentPagination;
 
-                // --- 2.1. Fetch de Estudiantes (Registrations) ---
-                const studentsResponse = await request(`registrations?class_id=${selectedClass.id}&page=${current}&limit=${pageSize}`, "GET");
+                // Detectar si cambió la clase para reiniciar la asistencia local
+                const classChanged = prevClassIdRef.current !== selectedClass.id;
+                if (classChanged) {
+                    prevClassIdRef.current = selectedClass.id;
+                }
+
+                // --- 2.1. Fetch de Estudiantes (Registrations) con BÚSQUEDA ---
+                const searchParam = debouncedSearchText ? `&search=${encodeURIComponent(debouncedSearchText)}` : "";
+                const studentsResponse = await request(`registrations?class_id=${selectedClass.id}&page=${current}&limit=${pageSize}${searchParam}`, "GET");
 
                 const studentsList = studentsResponse.data?.map(reg => ({
                     user_id: reg.user_id,
@@ -129,21 +151,20 @@ const useAttendanceData = () => {
                     total: studentsResponse.total || 0
                 }));
 
-                // 3. Fusionar datos existentes
-                const pageAttendance = {};
-
-                // Primero poblar con valores por defecto (false) para todos en la lista
-                studentsList.forEach(s => {
-                    pageAttendance[String(s.user_id)] = false;
-                });
-
                 // --- 2.2. Fetch de Asistencia Existente ---
-                // Necesitamos saber si ya se tomó lista hoy para esta clase
                 const todayDate = getCurrentDate();
                 const attendanceResponse = await request(`attendance?class_id=${selectedClass.id}&date=${todayDate}`, "GET");
                 const existingAttendance = attendanceResponse.data || [];
 
-                // Luego actualizar con la DB
+                // 3. Fusionar datos existentes
+                const pageAttendance = {};
+
+                // Inicializar con false
+                studentsList.forEach(s => {
+                    pageAttendance[String(s.user_id)] = false;
+                });
+
+                // Actualizar con DB
                 existingAttendance.forEach(record => {
                     const isPresent = record.status?.toLowerCase() === "present";
                     const studentIdStr = String(record.student_id);
@@ -152,20 +173,20 @@ const useAttendanceData = () => {
                     }
                 });
 
-                // 4. Actualizar el estado de asistencia fusionando con lo anterior
-                // PRIORIDAD: Si ya existe un valor en el estado local (prev), lo mantenemos (cambios no guardados).
-                // Si no existe, usamos el valor que viene de la DB/inicialización de esta página.
+                // 4. Actualizar el estado de asistencia
                 setAttendanceData(prev => {
-                    const merged = { ...prev };
+                    // Si cambió la clase, NO fusionamos con el anterior (reinicio)
+                    if (classChanged) {
+                        return pageAttendance;
+                    }
 
+                    // Si NO cambió la clase, fusionamos para mantener estados de otras páginas
+                    const merged = { ...prev };
                     Object.keys(pageAttendance).forEach(studentId => {
-                        // Solo asignamos si NO tenemos ya un valor local para este estudiante.
-                        // Esto mantiene las selecciones si navegamos lejos y volvemos.
                         if (!merged.hasOwnProperty(studentId)) {
                             merged[studentId] = pageAttendance[studentId];
                         }
                     });
-
                     return merged;
                 });
 
@@ -176,18 +197,19 @@ const useAttendanceData = () => {
                 setLoadingStudents(false);
             }
         };
+
         fetchStudentsAndAttendance();
-    }, [selectedClass, request, studentPagination.current, studentPagination.pageSize]);
+    }, [selectedClass, request, studentPagination.current, studentPagination.pageSize, debouncedSearchText]);
+
+    // Al cambiar el texto de búsqueda, reseteamos a la página 1 para evitar estar en pág 10 con 1 resultado
+    useEffect(() => {
+        setStudentPagination(prev => ({ ...prev, current: 1 }));
+    }, [debouncedSearchText]);
 
 
-    // 3. Lógica de Filtrado de Estudiantes (useMemo para optimización)
-    const filteredStudents = useMemo(() => {
-        if (!searchText) {
-            return students;
-        }
-        const lower = searchText.toLowerCase();
-        return students.filter(s => s.name.toLowerCase().includes(lower));
-    }, [searchText, students]);
+    // 3. Lógica de Filtrado (Ahora es passthrough ya que el backend filtra)
+    // Mantenemos el nombre 'filteredStudents' y la estructura para no romper la vista
+    const filteredStudents = students;
 
     // 4. Handlers de Asistencia (Optimizadas con useCallback)
     const handleToggleAttendance = useCallback((studentId) => {
@@ -199,18 +221,18 @@ const useAttendanceData = () => {
 
     const handleSelectAll = useCallback((checked) => {
         const newData = { ...attendanceData };
-        // Solo afecta a los estudiantes que están actualmente filtrados/visibles
+        // Solo afecta a los estudiantes visibles (filteredStudents = students de la página actual)
         filteredStudents.forEach(s => {
             newData[s.user_id] = checked;
         });
         setAttendanceData(newData);
     }, [attendanceData, filteredStudents]);
 
-    // Comprueba si todos los estudiantes filtrados están marcados para el checkbox "Marcar Todos"
+    // Comprueba si todos los estudiantes visibles están marcados
     const areAllFilteredPresent = filteredStudents.length > 0 &&
         filteredStudents.every(s => attendanceData[s.user_id]);
 
-    // Comprueba si ALGUNOS (pero no todos) los estudiantes filtrados están marcados
+    // Comprueba si ALGUNOS (pero no todos) los estudiantes visibles están marcados
     const isIndeterminate = filteredStudents.some(s => attendanceData[s.user_id]) &&
         !areAllFilteredPresent;
 
@@ -218,12 +240,6 @@ const useAttendanceData = () => {
     // 5. Función de Guardado (Optimizada con useCallback)
     const saveAttendance = useCallback(async () => {
         if (!selectedClass) return;
-
-        // Enviamos SOLO los datos de los estudiantes visibles/cargados O todos los que tenemos en attendanceData?
-        // Si paginamos, attendanceData puede tener claves de estudiantes de otras páginas.
-        // Lo ideal es enviar TODO lo que tengamos en attendanceData para esta clase.
-        // Pero attendanceData puede tener basura de otras clases si no limpiamos bien.
-        // (Limpiamos en useEffect cuando cambia selectedClass).
 
         // Enviamos todo lo que hay en attendanceData.
         const attendanceArray = Object.keys(attendanceData).map(studentId => ({
@@ -259,7 +275,7 @@ const useAttendanceData = () => {
         currentDaySpanish,
 
         // Estudiantes
-        filteredStudents,
+        filteredStudents, // Esto ahora viene filtrado del backend
         loadingStudents,
         attendanceData,
         searchText,
