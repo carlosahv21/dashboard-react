@@ -1,7 +1,9 @@
 // ClassList.js
 import React from 'react';
-import { Card, List, Spin, Empty, Typography, Space, Avatar, Pagination } from "antd"; // 💡 Importar Pagination
+import { Card, List, Spin, Empty, Typography, Space, Avatar } from "antd"; // 💡 Importar Pagination
 import { ClockCircleOutlined, BookOutlined } from "@ant-design/icons";
+
+import PaginationControl from "./PaginationControl";
 
 const { Title, Text } = Typography;
 
@@ -103,14 +105,11 @@ const ClassList = ({
             {/* --- Paginación --- */}
             {classes.length > 0 && pagination.total > pagination.pageSize && (
                 <div style={{ marginTop: 'auto', display: 'flex', justifyContent: 'center', padding: '16px 0 0' }}>
-                    <Pagination
+                    <PaginationControl
+                        page={pagination.current}
                         total={pagination.total}
                         pageSize={pagination.pageSize}
-                        current={pagination.current}
-                        onChange={onPageChange} // Llama a la función del hook
-                        disabled={loadingClasses}
-                        size="small"
-                        showSizeChanger={false} // Usualmente desactivado para listas internas
+                        onChange={onPageChange}
                     />
                 </div>
             )}

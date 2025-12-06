@@ -32,6 +32,8 @@ const Attendances = () => {
         pagination,
         setPagination,
 
+        studentPagination,
+        setStudentPagination,
         areAllFilteredPresent,
         isIndeterminate,
         hasStudents
@@ -39,6 +41,10 @@ const Attendances = () => {
 
     const handlePageChange = (page, pageSize) => {
         setPagination(page, pageSize);
+    };
+
+    const handleStudentPageChange = (page, pageSize) => {
+        setStudentPagination(page, pageSize);
     };
 
     return (
@@ -75,6 +81,8 @@ const Attendances = () => {
                         areAllFilteredPresent={areAllFilteredPresent}
                         isIndeterminate={isIndeterminate}
                         hasStudents={hasStudents}
+                        pagination={studentPagination}
+                        onPageChange={handleStudentPageChange}
                     />
                 </Col>
             </Row>

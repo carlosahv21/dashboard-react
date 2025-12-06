@@ -3,24 +3,28 @@ import React from 'react';
 import { Card, List, Spin, Empty, Typography, Input, Checkbox, Button, Avatar, Tag } from "antd";
 import { UserOutlined, SearchOutlined } from "@ant-design/icons";
 
+import PaginationControl from "./PaginationControl";
+
 const { Title, Text } = Typography;
 
-const StudentList = ({ 
-    selectedClass, 
-    filteredStudents, 
-    loadingStudents, 
-    searchText, 
-    setSearchText, 
-    attendanceData, 
-    handleToggleAttendance, 
-    handleSelectAll, 
-    saveAttendance, 
+const StudentList = ({
+    selectedClass,
+    filteredStudents,
+    loadingStudents,
+    searchText,
+    setSearchText,
+    attendanceData,
+    handleToggleAttendance,
+    handleSelectAll,
+    saveAttendance,
     isSaving,
     areAllFilteredPresent,
     isIndeterminate,
-    hasStudents 
+    hasStudents,
+    pagination,
+    onPageChange
 }) => {
-    
+
     if (!selectedClass) {
         return (
             <Card style={{ height: "100%", display: "flex", justifyContent: "center", alignItems: "center" }}>
@@ -44,9 +48,7 @@ const StudentList = ({
             />
 
             <div style={{ flex: 1, overflowY: "auto" }}>
-                {loadingStudents ? (
-                    <div style={{ textAlign: "center", marginTop: 50 }}><Spin /></div>
-                ) : filteredStudents.length === 0 && hasStudents ? (
+                {filteredStudents.length === 0 && hasStudents ? (
                     <Empty description={`No se encontraron alumnos para "${searchText}"`} image={Empty.PRESENTED_IMAGE_SIMPLE} />
                 ) : (
                     <List
@@ -86,6 +88,15 @@ const StudentList = ({
                     />
                 )}
             </div>
+
+            {pagination && (
+                <PaginationControl
+                    page={pagination.current}
+                    total={pagination.total}
+                    pageSize={pagination.pageSize}
+                    onChange={onPageChange}
+                />
+            )}
 
             <div style={{ marginTop: 16, borderTop: "1px solid #f0f0f0", paddingTop: 16, textAlign: "right" }}>
                 <Button

@@ -1,7 +1,7 @@
 // components/SearchFilter.jsx (Con Alineación Vertical y Botón de Exportar)
 import React from "react";
 import { Input, Button, Space, Select, Typography } from "antd";
-import { UploadOutlined, SearchOutlined } from "@ant-design/icons";
+import { UploadOutlined, SearchOutlined, PlusOutlined } from "@ant-design/icons";
 
 const { Title } = Typography;
 
@@ -63,7 +63,7 @@ const SearchFilter = ({
                 )}
 
                 {canCreate && (
-                    <Button type="primary" onClick={onCreate}>
+                    <Button type="primary" onClick={onCreate} icon={<PlusOutlined />}>
                         Crear {title}
                     </Button>
                 )}
