@@ -71,7 +71,7 @@ const useAttendanceData = () => {
                 const today = getCurrentDayEnglish();
 
                 // Agregar parámetros de paginación a la URL
-                const url = `classes?date=${today}&page=${current}&limit=${pageSize}`;
+                const url = `classes?date=${today}&page=${current}&limit=${pageSize}&order_by=hour&order_direction=asc`;
                 const response = await request(url, "GET");
 
                 const allClasses = response.data || [];
@@ -87,7 +87,14 @@ const useAttendanceData = () => {
 
                 // Seleccionar la primera clase si la lista no está vacía y no hay una clase ya seleccionada
                 if (allClasses.length > 0 && !selectedClass) {
-                    setSelectedClass(allClasses[0]);
+                    // Seleccionar la clase mas cerca a la hora actual
+                    const now = dayjs();
+                    const closestClass = allClasses.reduce((prev, current) => {
+                        const prevDiff = dayjs(prev.hour).diff(now, "minutes");
+                        const currentDiff = dayjs(current.hour).diff(now, "minutes");
+                        return Math.abs(prevDiff) < Math.abs(currentDiff) ? prev : current;
+                    });
+                    setSelectedClass(closestClass);
                 }
             } catch (error) {
                 console.error(error);
@@ -140,7 +147,7 @@ const useAttendanceData = () => {
 
                 // --- 2.1. Fetch de Estudiantes (Registrations) con BÚSQUEDA ---
                 const searchParam = debouncedSearchText ? `&search=${encodeURIComponent(debouncedSearchText)}` : "";
-                const studentsResponse = await request(`registrations?class_id=${selectedClass.id}&page=${validCurrent}&limit=${pageSize}${searchParam}`, "GET");
+                const studentsResponse = await request(`registrations?class_id=${selectedClass.id}&page=${validCurrent}&limit=${pageSize}${searchParam}&order_by=u.first_name&order_direction=asc`, "GET");
 
                 const studentsList = studentsResponse.data?.map(reg => ({
                     user_id: reg.user_id,
@@ -275,7 +282,7 @@ const useAttendanceData = () => {
 
         } catch (error) {
             console.error("Error al guardar asistencia:", error);
-            message.error("Error al guardar asistencia");
+            message.error(error.message);
         } finally {
             setIsSaving(false);
         }

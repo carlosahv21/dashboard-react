@@ -31,7 +31,7 @@ const Registration = () => {
         }
 
         try {
-            let url = `students?role_id=2&limit=50&search=${searchTerm}`;
+            let url = `students?role_id=2&limit=50&search=${searchTerm}&order_by=first_name&order_direction=asc`;
 
             const data = await request(url, "GET");
             setStudents(data.data || []);
@@ -54,7 +54,7 @@ const Registration = () => {
         }
 
         try {
-            let url = `classes?limit=50&search=${searchTerm}`;
+            let url = `classes?limit=50&search=${searchTerm}&order_by=name&order_direction=asc`;
             const data = await request(url, "GET");
             setAvailableClasses(data.data || []);
         } catch (error) {
@@ -65,7 +65,7 @@ const Registration = () => {
 
     const fetchInitialClasses = async () => {
         try {
-            const data = await request("classes?is_favorites=true", "GET");
+            const data = await request("classes?is_favorites=true&order_by=name&order_direction=asc", "GET");
             setAvailableClasses(data.data || []);
         } catch (error) {
             message.error("Error al cargar clases disponibles");

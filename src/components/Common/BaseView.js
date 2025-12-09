@@ -28,10 +28,17 @@ const BaseView = ({
     const { hasPermission } = useContext(AuthContext);
     const [form] = Form.useForm();
 
+    const initialSort = columns.reduce((acc, col) => {
+        if (col.defaultSortOrder) {
+            return { field: col.dataIndex || col.key, order: col.defaultSortOrder };
+        }
+        return acc;
+    }, { field: null, order: null });
+
     const {
         items, loading, search, setSearch, pagination, fetchItems,
-        handlePageChange, handlePageSizeChange, setItems, setPagination, request
-    } = useCrud(endpoint, titlePlural, filters);
+        handlePageChange, handlePageSizeChange, setItems, setPagination, request, handleTableChange
+    } = useCrud(endpoint, titlePlural, filters, initialSort);
 
     const {
         modalVisible, editingId, moduleData,
@@ -92,6 +99,7 @@ const BaseView = ({
                     style: { cursor: 'pointer' }
                 })}
                 selectedRowId={selectedRecordId}
+                onChange={handleTableChange}
             />
 
             <PaginationControl

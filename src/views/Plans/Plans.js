@@ -7,11 +7,14 @@ const Plans = () => {
             title: "Nombre",
             dataIndex: "name",
             key: "name",
+            sorter: true,
+            defaultSortOrder: "ascend"
         },
         { 
             title: "Descripción", 
             dataIndex: "description", 
-            key: "description" 
+            key: "description",
+            sorter: true, 
         }
     ];
 

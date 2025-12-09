@@ -14,7 +14,8 @@ const DataTable = ({
     disableDelete,
     disableEdit,
     onRow,
-    selectedRowId
+    selectedRowId,
+    onChange
 }) => {
     const handleDeleteConfirm = (id, record) => {
         confirm({
@@ -79,6 +80,7 @@ const DataTable = ({
             bordered
             pagination={false}
             onRow={onRow}
+            onChange={onChange}
             rowClassName={(record) => record.id === selectedRowId ? "ant-table-row-selected" : ""}
         />
     );

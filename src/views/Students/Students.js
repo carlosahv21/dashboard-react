@@ -5,10 +5,13 @@ const Students = () => {
     const columns = [
         {
             title: "Nombre",
+            dataIndex: "first_name",
             key: "full_name",
             render: (_, record) => `${record.first_name} ${record.last_name}`,
+            sorter: true,
+            defaultSortOrder: "ascend"
         },
-        { title: "Email", dataIndex: "email", key: "email" },
+        { title: "Email", dataIndex: "email", key: "email", sorter: true },
         {
             title: "Rol",
             dataIndex: "role_name",

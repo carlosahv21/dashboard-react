@@ -4,8 +4,8 @@ import FormHeader from "../../../components/Common/FormHeader";
 
 const Roles = () => {
     const columns = [
-        { title: "Nombre", dataIndex: "name", key: "name" },
-        { title: "Descripción", dataIndex: "description", key: "description" },
+        { title: "Nombre", dataIndex: "name", key: "name", sorter: true, defaultSortOrder: "ascend" },
+        { title: "Descripción", dataIndex: "description", key: "description", sorter: true },
     ];
 
     return (
