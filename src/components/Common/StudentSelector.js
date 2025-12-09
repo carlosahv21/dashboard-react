@@ -66,7 +66,7 @@ const StudentSelector = ({
                 loading={loading}
                 filterOption={false}
                 notFoundContent={loading ? <Spin size="small" /> : notFoundText}
-
+                allowClear
                 options={options}
                 suffixIcon={<UserOutlined />}
             />

@@ -1,6 +1,6 @@
 // StudentList.js
 import React from 'react';
-import { Card, List, Spin, Empty, Typography, Input, Checkbox, Button, Avatar, Tag } from "antd";
+import { Card, List, Empty, Typography, Input, Checkbox, Button, Avatar, Tag } from "antd";
 import { UserOutlined, SearchOutlined } from "@ant-design/icons";
 
 import PaginationControl from "./PaginationControl";
@@ -45,6 +45,7 @@ const StudentList = ({
                 value={searchText}
                 onChange={e => setSearchText(e.target.value)}
                 style={{ marginBottom: 16, padding: "8px 12px" }}
+                allowClear
             />
 
             <div style={{ flex: 1, overflowY: "auto" }}>

@@ -185,6 +185,7 @@ const Registration = () => {
                                     setClassSearchQuery(term);
                                     debounceClassSearch(term);
                                 }}
+                                allowClear
                                 style={{ marginBottom: 24 }}
                                 suffix={<SearchOutlined />}
                             />

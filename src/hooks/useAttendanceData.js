@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useCallback, useRef } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { message } from "antd";
 import useFetch from "./useFetch";
 import dayjs from "dayjs";
@@ -128,15 +128,19 @@ const useAttendanceData = () => {
                 setLoadingStudents(true);
                 const { current, pageSize } = studentPagination;
 
-                // Detectar si cambió la clase para reiniciar la asistencia local
+                // Detectar si cambió la clase para reiniciar la asistencia local y Paginación
                 const classChanged = prevClassIdRef.current !== selectedClass.id;
+                let validCurrent = current;
+
                 if (classChanged) {
                     prevClassIdRef.current = selectedClass.id;
+                    validCurrent = 1;
+                    setStudentPagination(prev => ({ ...prev, current: 1 }));
                 }
 
                 // --- 2.1. Fetch de Estudiantes (Registrations) con BÚSQUEDA ---
                 const searchParam = debouncedSearchText ? `&search=${encodeURIComponent(debouncedSearchText)}` : "";
-                const studentsResponse = await request(`registrations?class_id=${selectedClass.id}&page=${current}&limit=${pageSize}${searchParam}`, "GET");
+                const studentsResponse = await request(`registrations?class_id=${selectedClass.id}&page=${validCurrent}&limit=${pageSize}${searchParam}`, "GET");
 
                 const studentsList = studentsResponse.data?.map(reg => ({
                     user_id: reg.user_id,
@@ -153,7 +157,7 @@ const useAttendanceData = () => {
 
                 // --- 2.2. Fetch de Asistencia Existente ---
                 const todayDate = getCurrentDate();
-                const attendanceResponse = await request(`attendance?class_id=${selectedClass.id}&date=${todayDate}`, "GET");
+                const attendanceResponse = await request(`attendance?class_id=${selectedClass.id}&date=${todayDate}&limit=1000`, "GET");
                 const existingAttendance = attendanceResponse.data || [];
 
                 // 3. Fusionar datos existentes
@@ -168,9 +172,7 @@ const useAttendanceData = () => {
                 existingAttendance.forEach(record => {
                     const isPresent = record.status?.toLowerCase() === "present";
                     const studentIdStr = String(record.student_id);
-                    if (pageAttendance.hasOwnProperty(studentIdStr)) {
-                        pageAttendance[studentIdStr] = isPresent;
-                    }
+                    pageAttendance[studentIdStr] = isPresent;
                 });
 
                 // 4. Actualizar el estado de asistencia
@@ -236,28 +238,41 @@ const useAttendanceData = () => {
     const isIndeterminate = filteredStudents.some(s => attendanceData[s.user_id]) &&
         !areAllFilteredPresent;
 
-
     // 5. Función de Guardado (Optimizada con useCallback)
     const saveAttendance = useCallback(async () => {
         if (!selectedClass) return;
 
-        // Enviamos todo lo que hay en attendanceData.
-        const attendanceArray = Object.keys(attendanceData).map(studentId => ({
-            class_id: selectedClass.id,
-            student_id: parseInt(studentId, 10),
-            date: dayjs().format("YYYY-MM-DD"),
-            status: attendanceData[studentId] ? "Present" : "Absent"
-        }));
-
-        if (attendanceArray.length === 0) {
-            message.warning("No hay registros de asistencia para enviar.");
-            return;
-        }
-
         try {
             setIsSaving(true);
+
+            const allStudentsResponse = await request(`registrations?class_id=${selectedClass.id}&limit=1000`, "GET");
+            const allStudents = allStudentsResponse.data || [];
+
+            if (allStudents.length === 0) {
+                message.warning("No se encontraron estudiantes para esta clase.");
+                return;
+            }
+
+            const attendanceArray = allStudents.map(student => {
+                const studentId = String(student.user_id);
+                const isPresent = attendanceData.hasOwnProperty(studentId) ? attendanceData[studentId] : false;
+
+                return {
+                    class_id: selectedClass.id,
+                    student_id: student.user_id,
+                    date: dayjs().format("YYYY-MM-DD"),
+                    status: isPresent ? "Present" : "Absent"
+                };
+            });
+
+            if (attendanceArray.length === 0) {
+                message.warning("No hay registros de asistencia para enviar.");
+                return;
+            }
+
             await request("attendance", "POST", attendanceArray);
             message.success("Asistencia guardada correctamente");
+
         } catch (error) {
             console.error("Error al guardar asistencia:", error);
             message.error("Error al guardar asistencia");
