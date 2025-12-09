@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from "react";
-import { Divider, Form, Select, Card, message, Row, Col, Button, Modal, Checkbox, Input, Skeleton, Empty, Space, Tooltip } from "antd";
+import { Divider, Form, Select, Card, message, Row, Col, Button, Modal, Checkbox, Input, Skeleton, Empty, Space, Tooltip, theme } from "antd";
 import { EditOutlined, PlusOutlined, DeleteOutlined } from "@ant-design/icons";
 import useFetch from "../../../hooks/useFetch";
 import FormHeader from "../../../components/Common/FormHeader";
@@ -12,6 +12,7 @@ import { AuthContext } from "../../../context/AuthContext"; // <--- IMPORTANTE
 const FieldCard = ({ block, onEdit, onAddField, onDeleteField, onDeleteBlock }) => {
 
     const { hasPermission } = useContext(AuthContext);
+    const { token } = theme.useToken();
 
     const canCreateField = hasPermission("fields:create");
     const canDeleteBlock = hasPermission("blocks:delete");
@@ -22,7 +23,7 @@ const FieldCard = ({ block, onEdit, onAddField, onDeleteField, onDeleteBlock }) 
 
     return (
         <Card
-            style={{ marginBottom: "10px" }}
+            style={{ marginBottom: "10px", backgroundColor: token.colorBgContainer }}
             type="inner"
             title={
                 <Space style={{ display: "flex", justifyContent: "space-between", width: "100%" }}>
@@ -68,12 +69,13 @@ const FieldCard = ({ block, onEdit, onAddField, onDeleteField, onDeleteBlock }) 
                         style={{
                             marginTop: "10px",
                             marginBottom: "10px",
-                            backgroundColor: "#f5f5f5",
-                            padding: "10px"
+                            backgroundColor: token.colorFillAlter, // Use 'colorFillAlter' or similar for light gray replacement
+                            padding: "10px",
+                            borderRadius: "4px"
                         }}
                     >
                         <Space>
-                            <span>
+                            <span style={{ color: token.colorText }}>
                                 {field.label}
                                 {field.required === 1 && <span style={{ color: "red" }}> *</span>}
                             </span>

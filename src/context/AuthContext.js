@@ -33,7 +33,7 @@ export const AuthProvider = ({ children }) => {
             const data = await request(`auth/me`, "GET", null, {
                 Authorization: `Bearer ${storedToken}`,
             });
-            
+
             setUser(data.user);
             setSettings(data.settings);
 
@@ -42,7 +42,7 @@ export const AuthProvider = ({ children }) => {
             }
         } catch (err) {
             console.log(err);
-            
+
             if (err.message === "Invalid or expired token" && !modalShownRef.current) {
                 modalShownRef.current = true;
                 Modal.confirm({
@@ -60,15 +60,35 @@ export const AuthProvider = ({ children }) => {
         }
     };
 
+    const toggleTheme = () => {
+        setSettings(prev => {
+            const newTheme = prev?.theme === 'dark' ? 'light' : 'dark';
+            const newSettings = { ...prev, theme: newTheme };
+
+            // Persistir setting localmente por si acaso, aunque idealmente debería ir al backend
+            localStorage.setItem("theme", newTheme);
+
+            // TODO: Aquí deberíamos llamar a un endpoint para guardar la preferencia del usuario
+            // request('users/settings', 'POST', { theme: newTheme });
+
+            return newSettings;
+        });
+    };
+
     useEffect(() => {
         if (token) {
             if (!user) {
                 setLoading(true);
-                fetchUserData(token);
+                fetchUserData(token).then(() => {
+                    // Si el backend no devuelve settings, inicializamos desde localStorage
+                    setSettings(prev => prev || { theme: localStorage.getItem("theme") || 'light' });
+                });
             } else {
                 setLoading(false);
             }
         } else {
+            // Si no hay token, intentamos recuperar tema de localStorage para login screen
+            setSettings({ theme: localStorage.getItem("theme") || 'light' });
             setLoading(false);
         }
     }, [token]);
@@ -80,7 +100,7 @@ export const AuthProvider = ({ children }) => {
             value={{
                 user, setUser, settings, setSettings,
                 permissions, hasPermission, token, setToken,
-                logout, login,
+                logout, login, toggleTheme,
                 loading
             }}
         >

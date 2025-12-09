@@ -1,5 +1,5 @@
 import React from "react";
-import { Drawer, Descriptions, Avatar, Divider } from "antd";
+import { Drawer, Descriptions, Avatar, Divider, theme } from "antd";
 import { UserOutlined, MailOutlined, InfoCircleOutlined, CalendarOutlined, SolutionOutlined } from "@ant-design/icons";
 
 // --- Componente Auxiliar: Renderiza una sección ---
@@ -14,14 +14,15 @@ const getIconForLabel = (label) => {
 
 // Componente que renderiza un bloque de detalles (etiqueta: valor)
 const DetailSection = ({ label, items }) => {
+    const { token } = theme.useToken();
     if (!items || items.length === 0) return null;
 
     // Estilo para asegurar que todas las etiquetas Descriptions.Item tengan el mismo ancho
-    const labelStyle = { fontWeight: 600, width: 105 };
+    const labelStyle = { fontWeight: 600, width: 105, color: token.colorTextSecondary };
 
     return (
-        <div style={{ background: '#fff', padding: '16px 24px', marginBottom: 8, borderBottom: '1px solid #f0f0f0' }}>
-            <p style={{ fontWeight: 'bold', margin: '0 0 16px 0', fontSize: '14px' }}>
+        <div style={{ background: token.colorBgContainer, padding: '16px 24px', marginBottom: 8, borderBottom: `1px solid ${token.colorBorderSecondary}` }}>
+            <p style={{ fontWeight: 'bold', margin: '0 0 16px 0', fontSize: '14px', color: token.colorText }}>
                 {getIconForLabel(label)}
                 {label}
             </p>
@@ -48,6 +49,8 @@ const DetailSection = ({ label, items }) => {
 // --- Componente principal: DrawerDetails ---
 
 const DrawerDetails = ({ visible, onClose, data }) => {
+    const { token } = theme.useToken();
+
     if (!data) {
         return (
             <Drawer
@@ -58,7 +61,7 @@ const DrawerDetails = ({ visible, onClose, data }) => {
                 width={400}
                 styles={{ body: { padding: 0 } }}
             >
-                <div style={{ textAlign: "center", padding: "20px" }}>
+                <div style={{ textAlign: "center", padding: "20px", color: token.colorText }}>
                     Cargando o no hay datos.
                 </div>
             </Drawer>
@@ -85,12 +88,12 @@ const DrawerDetails = ({ visible, onClose, data }) => {
             width={400}
             styles={{ body: { padding: 0 } }}
         >
-            <div style={{ height: '100%', overflowY: 'auto', background: '#f5f5f5' }}>
+            <div style={{ height: '100%', overflowY: 'auto', background: token.colorBgLayout }}>
 
                 {/* Encabezado del Perfil */}
                 <div style={{
                     padding: "24px",
-                    background: "#fff",
+                    background: token.colorBgContainer,
                     display: "flex",
                     flexDirection: "column",
                     alignItems: "center",
@@ -104,14 +107,14 @@ const DrawerDetails = ({ visible, onClose, data }) => {
                     >
                         {avatarChar}
                     </Avatar>
-                    <h2 style={{ margin: 0, fontWeight: 600, fontSize: '20px' }}>
+                    <h2 style={{ margin: 0, fontWeight: 600, fontSize: '20px', color: token.colorText }}>
                         {title || "Detalle"}
                     </h2>
-                    <p style={{ color: "#888", margin: '4px 0 8px 0', fontSize: '14px' }}>
+                    <p style={{ color: token.colorTextSecondary, margin: '4px 0 8px 0', fontSize: '14px' }}>
                         {subtitle}
                     </p>
                     {email && (
-                        <div style={{ display: 'flex', alignItems: 'center', color: '#595959' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', color: token.colorTextSecondary }}>
                             <MailOutlined style={{ marginRight: 5 }} />
                             {email}
                         </div>

@@ -1,5 +1,5 @@
 import React, { useContext, useMemo } from "react";
-import { Row, Col, Menu } from "antd";
+import { Row, Col, Menu, theme } from "antd";
 import { Link, useLocation, Routes, Route, Navigate } from "react-router-dom";
 import { AuthContext } from "../../context/AuthContext";
 import { SettingOutlined, UserOutlined, DollarOutlined, AppstoreAddOutlined } from "@ant-design/icons";
@@ -50,6 +50,7 @@ const menuGroups = [
 const SettingsLayout = () => {
     const { hasPermission } = useContext(AuthContext);
     const location = useLocation();
+    const { token } = theme.useToken();
 
     const settingsRoutes = useMemo(() => {
         return staticSettingsSections.filter(r => hasPermission(r.permission));
@@ -91,6 +92,7 @@ const SettingsLayout = () => {
                         height: "100%",
                         borderRadius: "8px",
                         boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
+                        backgroundColor: token.colorBgContainer,
                     }}
                     items={menuItems}
                 />
@@ -99,7 +101,7 @@ const SettingsLayout = () => {
                 <div
                     style={{
                         padding: "24px",
-                        backgroundColor: "#fff",
+                        backgroundColor: token.colorBgContainer, // Usar token
                         borderRadius: "8px",
                         boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
                     }}

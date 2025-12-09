@@ -72,7 +72,7 @@ const ActiveModules = () => {
     ];
 
     return (
-        <div style={{ backgroundColor: "#fff", borderRadius: "8px" }}>
+        <div style={{ borderRadius: "8px" }}>
             <FormHeader
                 title={"Active Modules"}
                 subtitle="Manage the modules that are currently active in your application."

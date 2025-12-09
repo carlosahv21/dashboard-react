@@ -82,7 +82,6 @@ const GeneralInformation = () => {
                 onFinish={handleSubmit}
                 style={{
                     padding: "0 10px",
-                    backgroundColor: "#fff",
                     borderRadius: 8,
                 }}
             >

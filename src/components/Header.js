@@ -1,5 +1,5 @@
 import React, { useContext, useMemo } from "react";
-import { Button, Layout, Dropdown, Avatar, Space, Badge } from "antd";
+import { Button, Layout, Dropdown, Avatar, Space, Badge, Switch } from "antd";
 import {
     MenuFoldOutlined,
     MenuUnfoldOutlined,
@@ -8,7 +8,9 @@ import {
     DownOutlined,
     UserOutlined,
     SettingOutlined,
-    LogoutOutlined
+    LogoutOutlined,
+    MoonOutlined,
+    SunOutlined,
 } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
@@ -27,7 +29,9 @@ const isPlanVigent = (plan) => {
 
 const HeaderComponent = ({ collapsed, setCollapsed }) => {
     const navigate = useNavigate();
-    const { logout, hasPermission, user } = useContext(AuthContext);
+    const { logout, hasPermission, user, settings, toggleTheme } = useContext(AuthContext);
+
+    const isDarkMode = settings?.theme === 'dark';
 
     const handleLogout = () => {
         localStorage.clear();
@@ -42,7 +46,6 @@ const HeaderComponent = ({ collapsed, setCollapsed }) => {
 
         if (plan) {
             activeAndVigent = isPlanVigent(plan);
-            console.log(activeAndVigent);
 
             if (activeAndVigent) {
                 available = Math.max(0, plan.max_sessions - plan.plan_classes_used);
@@ -79,7 +82,7 @@ const HeaderComponent = ({ collapsed, setCollapsed }) => {
         <Header
             style={{
                 padding: "0",
-                backgroundColor: "#fff",
+                backgroundColor: isDarkMode ? "#1E1E1E" : "#fff",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "space-between",
@@ -90,29 +93,37 @@ const HeaderComponent = ({ collapsed, setCollapsed }) => {
                 type="text"
                 icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
                 onClick={() => setCollapsed(!collapsed)}
-                style={{ fontSize: 18, width: 64, height: 64 }}
+                style={{ fontSize: 18, width: 64, height: 64, color: isDarkMode ? "#fff" : "inherit" }}
             />
 
             <Space style={{ marginRight: 20, fontSize: 18 }} size={24}>
+
+                <Switch
+                    checked={isDarkMode}
+                    onChange={toggleTheme}
+                    checkedChildren={<MoonOutlined />}
+                    unCheckedChildren={<SunOutlined />}
+                />
 
                 {user?.plan && (
                     <div
                         title={isPlanActiveAndVigent ? `Te quedan ${classesAvailable} clases de tu plan.` : 'Tu plan ha expirado o está inactivo.'}
                         style={{
                             padding: '6px 12px',
-                            backgroundColor: isPlanActiveAndVigent ? '#e6f7ff' : '#fff1f0', 
+                            backgroundColor: isPlanActiveAndVigent ? (isDarkMode ? '#0A2540' : '#e6f7ff') : (isDarkMode ? '#2D0F12' : '#fff1f0'),
                             borderRadius: '4px',
                             border: `1px solid ${isPlanActiveAndVigent ? '#91d5ff' : '#ffa39e'}`,
                             fontSize: 14,
                             fontWeight: 600,
                             lineHeight: '20px',
                             cursor: 'default',
+                            color: isDarkMode ? "rgba(255, 255, 255, 0.85)" : "inherit"
                         }}
                     >
                         Clases Disp:
                         <span style={{
                             marginLeft: 5,
-                            color: classesAvailable > 0 ? '#52c41a' : (isPlanActiveAndVigent ? '#faad14' : '#f5222d'), 
+                            color: classesAvailable > 0 ? '#52c41a' : (isPlanActiveAndVigent ? '#faad14' : '#f5222d'),
                             fontSize: 16,
                         }}>
                             {classesAvailable}

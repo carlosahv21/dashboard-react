@@ -2,7 +2,7 @@ import React, { useMemo } from "react";
 import FullCalendar from "@fullcalendar/react";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction";
-import { Popconfirm, Typography } from "antd";
+import { Popconfirm, Typography, theme } from "antd";
 import { DeleteOutlined } from "@ant-design/icons";
 
 const { Text } = Typography;
@@ -70,6 +70,8 @@ const getColorByLevel = (level) => {
 };
 
 const RegistrationsCalendar = ({ enrolledClasses, onRemoveClass }) => {
+    const { token } = theme.useToken();
+
     const events = useMemo(() => {
         return enrolledClasses.map(classItem =>
             classToEvent(classItem, onRemoveClass)
@@ -127,7 +129,7 @@ const RegistrationsCalendar = ({ enrolledClasses, onRemoveClass }) => {
     };
 
     return (
-        <div style={{ backgroundColor: "white", padding: 16, borderRadius: 8 }}>
+        <div style={{ backgroundColor: token.colorBgContainer, padding: 16, borderRadius: 8 }}>
             <FullCalendar
                 plugins={[timeGridPlugin, interactionPlugin]}
                 initialView="timeGridWeek"
@@ -161,10 +163,53 @@ const RegistrationsCalendar = ({ enrolledClasses, onRemoveClass }) => {
                     const ampm = hours >= 12 ? "pm" : "am";
                     hours = hours % 12;
                     if (hours === 0) hours = 12;
-                    return `${hours.toString().padStart(2, "0")}:${minutes} ${ampm}`;
+                    return (
+                        <span style={{ color: token.colorText }}>
+                            {`${hours.toString().padStart(2, "0")}:${minutes} ${ampm}`}
+                        </span>
+                    );
                 }}
             />
-
+            {/* Inject minimal CSS overrides for calendar text color in dark mode */}
+            <style>
+                {`
+                .fc-col-header-cell-cushion, 
+                .fc-timegrid-slot-label-cushion {
+                    color: ${token.colorText} !important;
+                }
+                .fc-theme-standard td, .fc-theme-standard th {
+                    border-color: ${token.colorBorderSecondary} !important;
+                }
+                /* Header background to match theme */
+                .fc-scrollgrid-section-header > td {
+                    background-color: ${token.colorBgContainer} !important;
+                }
+                /* Navigation icons (arrows) */
+                .fc-icon {
+                    color: ${token.colorText} !important;
+                }
+                /* Toolbar title */
+                .fc-toolbar-title {
+                    color: ${token.colorText} !important;
+                }
+                /* More link for overflow events */
+                .fc-more-link {
+                    color: ${token.colorPrimary} !important;
+                }
+                /* Popover for overflow events */
+                .fc-popover {
+                    background-color: ${token.colorBgElevated} !important;
+                    border-color: ${token.colorBorder} !important;
+                }
+                .fc-popover-header {
+                    background-color: ${token.colorBgElevated} !important;
+                    color: ${token.colorText} !important;
+                }
+                .fc-popover-body {
+                    background-color: ${token.colorBgElevated} !important;
+                }
+                `}
+            </style>
 
         </div>
     );

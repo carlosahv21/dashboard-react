@@ -1,5 +1,6 @@
 import React, { useContext } from "react";
 import ReactDOM from "react-dom/client";
+import { ConfigProvider, theme } from "antd";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider, AuthContext } from "./context/AuthContext";
 
@@ -76,11 +77,60 @@ const AppRoutes = () => {
     );
 };
 
+const AppContent = () => {
+    const { settings } = useContext(AuthContext);
+    const { defaultAlgorithm, darkAlgorithm } = theme;
+
+    const isDarkMode = settings?.theme === 'dark';
+
+    React.useEffect(() => {
+        document.body.style.backgroundColor = isDarkMode ? "#121212" : "#f0f2f5";
+    }, [isDarkMode]);
+
+    const darkThemeConfig = {
+        algorithm: darkAlgorithm,
+        token: {
+            colorBgBase: "#121212", // Fondo Principal
+            colorBgContainer: "#1E1E1E", // Superficie Principal (Header, Sidebar, Content containers if not overridden)
+            colorText: "#E0E0E0", // Texto Primario
+            colorTextSecondary: "#A0A0A0", // Texto Secundario
+            colorPrimary: "#0A84FF", // Color de Acento
+        },
+        components: {
+            Layout: {
+                bodyBg: "#121212",
+                headerBg: "#1E1E1E",
+                siderBg: "#1E1E1E",
+            },
+            Card: {
+                colorBgContainer: "#2D2D2D", // Superficie Secundaria
+            },
+            Table: {
+                colorBgContainer: "#2D2D2D", // Superficie Secundaria
+                headerBg: "#2D2D2D",
+            },
+            Menu: {
+                darkItemBg: "#1E1E1E",
+                itemSelectedBg: "rgba(10, 132, 255, 0.1)", // Menú Activo
+                itemBg: "#1E1E1E"
+            }
+        }
+    };
+
+    return (
+        <ConfigProvider
+            theme={isDarkMode ? darkThemeConfig : { algorithm: defaultAlgorithm }}
+        >
+            <BrowserRouter>
+                <AppRoutes />
+            </BrowserRouter>
+        </ConfigProvider>
+    );
+};
+
 const App = () => (
     <AuthProvider>
-        <BrowserRouter>
-            <AppRoutes />
-        </BrowserRouter>
+        <AppContent />
     </AuthProvider>
 );
 
