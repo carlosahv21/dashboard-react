@@ -1,8 +1,6 @@
 import React from "react";
-import { Table, Space, Button, Modal } from "antd";
+import { Table, Space, Button, App } from "antd";
 import { EditOutlined, DeleteOutlined } from "@ant-design/icons";
-
-const { confirm } = Modal;
 
 const DataTable = ({
     columns,
@@ -18,8 +16,10 @@ const DataTable = ({
     onChange,
     rowSelection
 }) => {
+    const { modal } = App.useApp();
+
     const handleDeleteConfirm = (id, record) => {
-        confirm({
+        modal.confirm({
             title: "¿Eliminar?",
             content: "Esta acción no se puede deshacer.",
             okText: "Sí",

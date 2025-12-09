@@ -1,6 +1,6 @@
 import React, { useContext } from "react";
 import ReactDOM from "react-dom/client";
-import { ConfigProvider, theme } from "antd";
+import { ConfigProvider, theme, App as AntdApp } from "antd";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider, AuthContext } from "./context/AuthContext";
 
@@ -121,18 +121,20 @@ const AppContent = () => {
         <ConfigProvider
             theme={isDarkMode ? darkThemeConfig : { algorithm: defaultAlgorithm }}
         >
-            <BrowserRouter>
-                <AppRoutes />
-            </BrowserRouter>
+            <AntdApp>
+                <BrowserRouter>
+                    <AppRoutes />
+                </BrowserRouter>
+            </AntdApp>
         </ConfigProvider>
     );
 };
 
-const App = () => (
+const MainApp = () => (
     <AuthProvider>
         <AppContent />
     </AuthProvider>
 );
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
-root.render(<App />);
+root.render(<MainApp />);

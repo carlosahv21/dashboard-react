@@ -1,6 +1,6 @@
 // components/BaseView.js
 import React, { useContext } from "react";
-import { message, Modal, Form, Spin } from "antd";
+import { Form, Spin, App, Modal } from "antd";
 import { utils, writeFileXLSX } from "xlsx";
 
 import { useCrud } from "../../hooks/useCrud";
@@ -27,6 +27,7 @@ const BaseView = ({
     hiddenFields,
 }) => {
     const { hasPermission } = useContext(AuthContext);
+    const { message, modal } = App.useApp(); 
     const [form] = Form.useForm();
 
     const initialSort = columns.reduce((acc, col) => {
@@ -69,7 +70,7 @@ const BaseView = ({
             return;
         }
 
-        Modal.confirm({
+        modal.confirm({
             title: `¿Eliminar ${isAllSelected ? "todos los" : selectedKeys.length} registros?`,
             content: `Esta acción no se puede deshacer. Se eliminán ${isAllSelected ? pagination.total : selectedKeys.length} registros.`,
             okText: "Sí, eliminar",

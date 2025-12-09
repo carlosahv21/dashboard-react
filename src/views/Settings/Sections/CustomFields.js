@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from "react";
-import { Divider, Form, Select, Card, message, Row, Col, Button, Modal, Checkbox, Input, Skeleton, Empty, Space, Tooltip, theme } from "antd";
+import { Divider, Form, Select, Card, Row, Col, Button, Modal, Checkbox, Input, Skeleton, Empty, Space, Tooltip, theme, App } from "antd";
 import { EditOutlined, PlusOutlined, DeleteOutlined } from "@ant-design/icons";
 import useFetch from "../../../hooks/useFetch";
 import FormHeader from "../../../components/Common/FormHeader";
@@ -135,7 +135,7 @@ const CustomFields = () => {
     const [currentBlockId, setCurrentBlockId] = useState(null);
     const [fieldType, setFieldType] = useState(null);
 
-    const { confirm } = Modal;
+    const { message, modal } = App.useApp();
 
     useEffect(() => {
         const fetchFields = async () => {
@@ -203,7 +203,7 @@ const CustomFields = () => {
     };
 
     const handleConfirmDeleteBlock = async (blockId) => {
-        confirm({
+        modal.confirm({
             title: "¿Eliminar bloque?",
             content: "Esta acción no se puede deshacer.",
             okText: "Sí",
@@ -268,7 +268,7 @@ const CustomFields = () => {
     };
 
     const handleConfirmDeleteField = async (fieldId) => {
-        confirm({
+        modal.confirm({
             title: "¿Eliminar campo?",
             content: "Esta acción no se puede deshacer.",
             okText: "Sí",
