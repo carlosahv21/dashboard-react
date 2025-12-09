@@ -10,6 +10,8 @@ export const useCrud = (endpoint, titlePlural, filters, initialSort = { field: n
     const [search, setSearch] = useState("");
     const [pagination, setPagination] = useState({ current: 1, pageSize: 10, total: 0 });
     const [sort, setSort] = useState(initialSort);
+    const [selectedKeys, setSelectedKeys] = useState([]);
+    const [isAllSelected, setIsAllSelected] = useState(false);
 
     const fetchItems = async (page = pagination.current, limit = pagination.pageSize, currentSort = sort) => {
         try {
@@ -46,6 +48,17 @@ export const useCrud = (endpoint, titlePlural, filters, initialSort = { field: n
         return () => clearTimeout(delay);
     }, [search]);
 
+    useEffect(() => {
+        if (isAllSelected) {
+            const newIds = items.map(i => i.id);
+            setSelectedKeys(prev => {
+                const unique = new Set([...prev, ...newIds]);
+                if (unique.size !== prev.length) return [...unique];
+                return prev;
+            });
+        }
+    }, [items, isAllSelected]);
+
     const handleTableChange = (newPagination, filters, sorter) => {
         const newSort = {
             field: sorter.field,
@@ -63,6 +76,48 @@ export const useCrud = (endpoint, titlePlural, filters, initialSort = { field: n
         fetchItems(1, newSize);
     };
 
+    const getAllItems = async () => {
+        try {
+            const params = {
+                page: 1,
+                limit: 10000,
+                search: search.length >= 3 ? search : undefined,
+                order_by: sort.field,
+                order_direction: sort.order === "ascend" ? "asc" : sort.order === "descend" ? "desc" : undefined,
+                ...filters,
+            };
+            const queryParams = new URLSearchParams(
+                Object.entries(params).filter(([_, v]) => v !== undefined && v !== "" && v !== null)
+            ).toString();
+
+            const data = await request(`${endpoint}/?${queryParams}`, "GET");
+            return data.data || [];
+        } catch (error) {
+            console.error(error);
+            message.error(`Error al exportar ${titlePlural}`);
+            return [];
+        }
+    };
+
+    const handleSelectRow = (id, checked) => {
+        if (checked) {
+            setSelectedKeys(prev => [...prev, id]);
+        } else {
+            setSelectedKeys(prev => prev.filter(k => k !== id));
+            if (isAllSelected) setIsAllSelected(false);
+        }
+    };
+
+    const handleSelectAll = (checked) => {
+        setIsAllSelected(checked);
+        if (checked) {
+            const allIdsOnPage = items.map(i => i.id);
+            setSelectedKeys(prev => [...new Set([...prev, ...allIdsOnPage])]);
+        } else {
+            setSelectedKeys([]);
+        }
+    };
+
     return {
         items,
         loading,
@@ -76,6 +131,14 @@ export const useCrud = (endpoint, titlePlural, filters, initialSort = { field: n
         sort,
         setItems,
         setPagination,
-        request
+        request,
+        getAllItems,
+        // Selection
+        selectedKeys,
+        setSelectedKeys,
+        isAllSelected,
+        setIsAllSelected,
+        handleSelectRow,
+        handleSelectAll
     };
 };

@@ -1,6 +1,7 @@
 // components/BaseView.js
 import React, { useContext } from "react";
 import { message, Modal, Form, Spin } from "antd";
+import { utils, writeFileXLSX } from "xlsx";
 
 import { useCrud } from "../../hooks/useCrud";
 import { useFormModal } from "../../hooks/useFormModal";
@@ -37,7 +38,8 @@ const BaseView = ({
 
     const {
         items, loading, search, setSearch, pagination, fetchItems,
-        handlePageChange, handlePageSizeChange, setItems, setPagination, request, handleTableChange
+        handlePageChange, handlePageSizeChange, setItems, setPagination, request, handleTableChange, getAllItems,
+        selectedKeys, setSelectedKeys, isAllSelected, handleSelectAll, setIsAllSelected
     } = useCrud(endpoint, titlePlural, filters, initialSort);
 
     const {
@@ -61,6 +63,46 @@ const BaseView = ({
         }
     };
 
+    const handleBulkDelete = () => {
+        if (selectedKeys.length === 0) {
+            message.warning(`Debe seleccionar al menos un registro para eliminar`);
+            return;
+        }
+
+        Modal.confirm({
+            title: `¿Eliminar ${isAllSelected ? "todos los" : selectedKeys.length} registros?`,
+            content: `Esta acción no se puede deshacer. Se eliminán ${isAllSelected ? pagination.total : selectedKeys.length} registros.`,
+            okText: "Sí, eliminar",
+            okType: "danger",
+            cancelText: "Cancelar",
+            onOk: async () => {
+                const hide = message.loading("Eliminando registros...", 0);
+                try {
+                    let idsToDelete = selectedKeys;
+                    if (isAllSelected) {
+                        const allItems = await getAllItems();
+                        idsToDelete = allItems.map(i => i.id);
+                    }
+
+                    for (let i = 0; i < idsToDelete.length; i += 5) {
+                        const chunk = idsToDelete.slice(i, i + 5);
+                        await Promise.all(chunk.map(id => request(`${endpoint}/${id}`, "DELETE")));
+                    }
+
+                    message.success("Registros eliminados correctamente");
+                    fetchItems();
+                    setSelectedKeys([]);
+                    handleSelectAll(false);
+                } catch (error) {
+                    console.error(error);
+                    message.error("Error al eliminar registros masivamente");
+                } finally {
+                    hide();
+                }
+            }
+        });
+    };
+
     const handleFormSubmit = async (values) => {
         const shouldRefetch = await handleSubmit(values);
         if (shouldRefetch) {
@@ -73,17 +115,54 @@ const BaseView = ({
         fetchItems();
     };
 
+    const handleExport = async () => {
+        if (selectedKeys.length === 0) {
+            message.warning(`Debe seleccionar al menos un registro para exportar`);
+            return;
+        }
+
+        const allData = await getAllItems();
+        let dataToExport = allData;
+
+        if (!isAllSelected && selectedKeys.length > 0) {
+            dataToExport = allData.filter(item => selectedKeys.includes(item.id));
+        }
+
+        exportToExcel(dataToExport, titlePlural);
+    };
+
+    const exportToExcel = (data, title) => {
+        const ws = utils.json_to_sheet(data);
+        const wb = utils.book_new();
+        utils.book_append_sheet(wb, ws, title);
+        writeFileXLSX(wb, `${title}.xlsx`);
+    };
+
+    const rowSelection = {
+        selectedRowKeys: selectedKeys,
+        onChange: (keys) => setSelectedKeys(keys),
+        onSelectAll: (selected) => handleSelectAll(selected),
+        onSelect: (record, selected) => {
+            if (!selected && isAllSelected) {
+                setIsAllSelected(false);
+            }
+        },
+    };
+
     return (
         <>
             <SearchFilter
                 search={search}
                 setSearch={setSearch}
                 canCreate={hasPermission(`${endpoint}:create`)}
+                canDelete={hasPermission(`${endpoint}:delete`)}
                 onCreate={() => openModal()}
                 title={titleSingular}
                 titlePlural={titlePlural}
                 pageSize={pagination.pageSize}
                 onPageSizeChange={handlePageSizeChange}
+                onExport={handleExport}
+                onBulkDelete={handleBulkDelete}
             />
 
             <DataTable
@@ -100,6 +179,7 @@ const BaseView = ({
                 })}
                 selectedRowId={selectedRecordId}
                 onChange={handleTableChange}
+                rowSelection={rowSelection}
             />
 
             <PaginationControl

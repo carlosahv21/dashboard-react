@@ -1,7 +1,7 @@
 // components/SearchFilter.jsx (Con Alineación Vertical y Botón de Exportar)
 import React from "react";
-import { Input, Button, Space, Select, Typography } from "antd";
-import { UploadOutlined, SearchOutlined, PlusOutlined } from "@ant-design/icons";
+import { Input, Button, Space, Select, Typography, Dropdown } from "antd";
+import { SearchOutlined, PlusOutlined, FileExcelOutlined, DeleteOutlined, DownOutlined } from "@ant-design/icons";
 
 const { Title } = Typography;
 
@@ -9,14 +9,31 @@ const SearchFilter = ({
     search,
     setSearch,
     onCreate,
+    canDelete,
     title,
     titlePlural,
     canCreate,
     pageSize,
     onPageSizeChange,
     onExport,
-    canExport = true,
+    onBulkDelete
 }) => {
+
+    const masiveActions = [
+        {
+            value: 'export',
+            label: 'Exportar a Excel',
+            onClick: () => onExport(),
+            icon: <FileExcelOutlined />
+        },
+        canDelete && {
+            value: 'delete',
+            label: 'Eliminar',
+            onClick: () => onBulkDelete(),
+            icon: <DeleteOutlined />,
+            danger: true,
+        }
+    ];
     return (
         <div style={{
             display: 'flex',
@@ -56,11 +73,15 @@ const SearchFilter = ({
                     suffix={<SearchOutlined />}
                 />
 
-                {canExport && (
-                    <Button onClick={onExport} icon={<UploadOutlined />}>
-                        Exportar
+                <Dropdown
+                    menu={{ items: masiveActions }}
+                    placement="bottomRight"
+                    trigger={['click']}
+                >
+                    <Button>
+                        Acciones masivas <DownOutlined />
                     </Button>
-                )}
+                </Dropdown>
 
                 {canCreate && (
                     <Button type="primary" onClick={onCreate} icon={<PlusOutlined />}>
