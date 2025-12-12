@@ -3,6 +3,7 @@ import useFetch from "./useFetch";
 import useKpisData from '../reports/useKpisData';
 import { useUserDistributionReport } from '../reports/useUserDistributionReport';
 import { useClassOccupancyReport } from '../reports/useClassOccupancyReport';
+import { useTeachersParticipation } from '../reports/useTeachersParticipation';
 
 
 export const useDashboardData = () => {
@@ -20,11 +21,15 @@ export const useDashboardData = () => {
         onOccupancyChartReady
     } = useClassOccupancyReport(request);
 
+    const { teachersParticipationLoading, teachersParticipationData, teachersParticipationColumns } = useTeachersParticipation(request);
 
     const overallLoading = kpiLoading || userDistributionLoading || classOccupancyLoading;
 
     return {
         loading: overallLoading,
+        kpiLoading,
+        userDistributionLoading,
+        classOccupancyLoading,
         kpiData,
         charts: {
             userDistribution: userDistributionOption,
@@ -34,5 +39,8 @@ export const useDashboardData = () => {
         availableGenres,
         selectedGenre,
         setSelectedGenre,
+        teachersParticipationLoading,
+        teachersParticipationData,
+        teachersParticipationColumns,
     };
 };

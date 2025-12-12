@@ -33,7 +33,6 @@ export const useUserDistributionReport = (request) => {
         }));
 
         return {
-            title: { text: 'Distribución de Usuarios por Plan', left: 'center', top: 0 },
             tooltip: { trigger: 'item', formatter: '{b}: {c} Alumnos ({d}%)' },
             backgroundColor: 'transparent',
             legend: {

@@ -86,19 +86,14 @@ export const useClassOccupancyReport = (request) => {
                 name: item.name,
                 classId: classId,
                 itemStyle: {
-                    // color rojo si es mayor a 100%, verde si es menor a 100% y mayor a 50%, amarillo si es menor a 50%
-                    color: item.occupancy_rate > 100 ? '#ff4d4f' : item.occupancy_rate > 50 ? '#52c41a' : '#faad14'
+                    // color amarillo si es mayor 95% para avisarle al usuario que esta cerca de agotarse el limite, verde si es menor a 95 y mayor a 30%, rojo si es menor a 30%. La idea es saber si la clase tiene un problema de ocupación
+                    color: item.occupancy_rate > 95 ? '#faad14' : item.occupancy_rate > 30 ? '#52c41a' : '#ff4d4f'
                 }
             };
         }).sort((a, b) => b.value - a.value); // Ordenar por ocupación descendente
 
         // Configuración del gráfico principal
         const option = {
-            title: {
-                text: `Tasa de Ocupación - ${selectedGenre}`,
-                left: 'center',
-                top: '2%'
-            },
             tooltip: {
                 trigger: 'axis',
                 axisPointer: { type: 'shadow' },

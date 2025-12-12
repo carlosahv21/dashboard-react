@@ -1,7 +1,7 @@
 // Reports/useKpisData.js
 
 import { useState, useEffect } from 'react';
-import { message } from 'antd'; // Asegúrate de tener esta importación
+import { message } from 'antd';
 
 const initialKpiData = {
     activeStudents: 0,
