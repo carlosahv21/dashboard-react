@@ -10,10 +10,6 @@ const Roles = () => {
 
     return (
         <>
-            <FormHeader
-                title="Roles"
-                subtitle="Gestiona los roles del sistema"
-            />
             <BaseCrudView
                 breadcrumb={false}
                 endpoint="roles"

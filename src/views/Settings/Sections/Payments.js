@@ -1,12 +1,35 @@
 import React from "react";
+import BaseCrudView from "../../../components/Common/BaseView";
+import FormHeader from "../../../components/Common/FormHeader";
 
-const Payments = () => {
+const Users = () => {
+    const columns = [
+        {
+            title: "Estudiante",
+            dataIndex: "user_id",
+            key: "user_id"
+        },
+        { title: "Fecha de pago", dataIndex: "payment_date", key: "payment_date" },
+        { title: "Monto", dataIndex: "amount", key: "amount" },
+        {
+            title: "Estado",
+            dataIndex: "status",
+            key: "status",
+        },
+    ];
+
     return (
-        <div>
-            <h2>Payments</h2>
-            <p>Payment settings (future implementation).</p>
-        </div>
+        <>
+            <BaseCrudView
+                breadcrumb={false}
+                endpoint="payments"
+                moduleFieldId={13}
+                columns={columns}
+                titleSingular="Pago"
+                titlePlural="Pagos"
+            />
+        </>
     );
 };
 
-export default Payments;
+export default Users;

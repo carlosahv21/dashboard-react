@@ -34,7 +34,6 @@ export const useFormModal = (request, endpoint, moduleFieldId, titleSingular, fi
 
                 if (itemData.hour) {
                     itemData.hour = dayjs(itemData.hour, "HH:mm");
-                    itemData.hour = dayjs(itemData.hour, "HH:mm");
                 }
 
                 form.setFieldsValue(itemData);
@@ -68,6 +67,10 @@ export const useFormModal = (request, endpoint, moduleFieldId, titleSingular, fi
 
         if ('hour' in values && values.hour) {
             transformedValues.hour = dayjs(values.hour).format("HH:mm");
+        }
+
+        if ('payment_date' in values && values.payment_date) {
+            transformedValues.payment_date = dayjs(values.payment_date).format("YYYY-MM-DD");
         }
 
         if ('password' in transformedValues && !transformedValues.password) {

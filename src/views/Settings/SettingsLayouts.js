@@ -29,7 +29,7 @@ const staticSettingsSections = [
     { path: "permissions", label: "Permisos", name: "settings.permissions", permission: "permissions:view", group: "userManagement" },
     { path: "users", label: "Usuarios", name: "settings.users", permission: "users:view", group: "userManagement" },
     { path: "customFields", label: "Campos Personalizados", name: "settings.customFields", permission: "fields:view", group: "customization" },
-    { path: "payments", label: "Pagos", name: "settings.payments", permission: "settings:view", group: "finance" },
+    { path: "payments", label: "Historial de Pagos", name: "settings.payments", permission: "settings:view", group: "finance" },
 ];
 
 const iconMap = {

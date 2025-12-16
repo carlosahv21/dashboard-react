@@ -24,10 +24,6 @@ const Users = () => {
 
     return (
         <>
-            <FormHeader
-                title="Users"
-                subtitle="Gestiona los usuarios del sistema"
-            />
             <BaseCrudView
                 breadcrumb={false}
                 endpoint="users"

@@ -114,7 +114,6 @@ const Sidebar = ({ collapsed }) => {
 					</a>
 				)}
 			</div>
-
 			<Menu theme={settings?.theme || "light"} mode="inline" items={items} />
 		</Sider>
 	);
