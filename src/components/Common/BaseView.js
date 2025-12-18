@@ -1,6 +1,6 @@
 // components/BaseView.js
 import React, { useContext } from "react";
-import { Form, Spin, App, Modal } from "antd";
+import { Form, Spin, App, Modal, Row, Col, Empty } from "antd";
 import { utils, writeFileXLSX } from "xlsx";
 
 import { useCrud } from "../../hooks/useCrud";
@@ -25,9 +25,11 @@ const BaseView = ({
     filters,
     fixedValues,
     hiddenFields,
+    viewOptions,
+    cardComponent: CardComponent
 }) => {
     const { hasPermission } = useContext(AuthContext);
-    const { message, modal } = App.useApp(); 
+    const { message, modal } = App.useApp();
     const [form] = Form.useForm();
 
     const initialSort = columns.reduce((acc, col) => {
@@ -139,6 +141,12 @@ const BaseView = ({
         writeFileXLSX(wb, `${title}.xlsx`);
     };
 
+    const [currentView, setCurrentView] = React.useState(viewOptions?.[0] || 'table');
+
+    const handleViewChange = (view) => {
+        setCurrentView(view);
+    };
+
     const rowSelection = {
         selectedRowKeys: selectedKeys,
         onChange: (keys) => setSelectedKeys(keys),
@@ -164,24 +172,57 @@ const BaseView = ({
                 onPageSizeChange={handlePageSizeChange}
                 onExport={handleExport}
                 onBulkDelete={handleBulkDelete}
+                viewOptions={viewOptions}
+                currentView={currentView}
+                onViewChange={handleViewChange}
             />
 
-            <DataTable
-                columns={columns}
-                data={items}
-                loading={loading}
-                onEdit={hasPermission(`${endpoint}:edit`) ? openModal : undefined}
-                onDelete={hasPermission(`${endpoint}:delete`) ? handleDelete : undefined}
-                disableEdit={(record) => ["admin"].includes(record.role_name?.toLowerCase())}
-                disableDelete={(record) => ["admin"].includes(record.role_name?.toLowerCase())}
-                onRow={(record) => ({
-                    onClick: () => handleRowClick(record),
-                    style: { cursor: 'pointer' }
-                })}
-                selectedRowId={selectedRecordId}
-                onChange={handleTableChange}
-                rowSelection={rowSelection}
-            />
+            {currentView === 'table' ? (
+                <DataTable
+                    columns={columns}
+                    data={items}
+                    loading={loading}
+                    onEdit={hasPermission(`${endpoint}:edit`) ? openModal : undefined}
+                    onDelete={hasPermission(`${endpoint}:delete`) ? handleDelete : undefined}
+                    disableEdit={(record) => ["admin"].includes(record.role_name?.toLowerCase())}
+                    disableDelete={(record) => ["admin"].includes(record.role_name?.toLowerCase())}
+                    onRow={(record) => ({
+                        onClick: () => handleRowClick(record),
+                        style: { cursor: 'pointer' }
+                    })}
+                    selectedRowId={selectedRecordId}
+                    onChange={handleTableChange}
+                    rowSelection={rowSelection}
+                />
+            ) : (
+                CardComponent ? (
+                    loading ? (
+                        <div style={{ textAlign: "center", padding: "50px" }}>
+                            <Spin size="large" />
+                        </div>
+                    ) : (
+                        <Row gutter={[16, 16]}>
+                            {items.length === 0 && (
+                                <Col xs={24}>
+                                    <Empty />
+                                </Col>
+                            )}
+                            {items.map(item => (
+                                <Col xs={24} sm={12} md={8} lg={6} xl={6} key={item.id}>
+                                    <CardComponent
+                                        record={item}
+                                        onEdit={openModal}
+                                        onDelete={handleDelete}
+                                        onRowClick={handleRowClick}
+                                        canEdit={hasPermission(`${endpoint}:edit`)}
+                                        canDelete={hasPermission(`${endpoint}:delete`)}
+                                    />
+                                </Col>
+                            ))}
+                        </Row>
+                    )
+                ) : null
+            )}
 
             <PaginationControl
                 page={pagination.current}

@@ -1,7 +1,7 @@
 // components/SearchFilter.jsx (Con Alineación Vertical y Botón de Exportar)
 import React from "react";
 import { Input, Button, Space, Select, Typography, Dropdown } from "antd";
-import { SearchOutlined, PlusOutlined, FileExcelOutlined, DeleteOutlined, DownOutlined } from "@ant-design/icons";
+import { SearchOutlined, PlusOutlined, FileExcelOutlined, DeleteOutlined, DownOutlined, AppstoreOutlined, TableOutlined } from "@ant-design/icons";
 
 const { Title } = Typography;
 
@@ -16,7 +16,10 @@ const SearchFilter = ({
     pageSize,
     onPageSizeChange,
     onExport,
-    onBulkDelete
+    onBulkDelete,
+    viewOptions,
+    currentView,
+    onViewChange
 }) => {
 
     const masiveActions = [
@@ -82,6 +85,27 @@ const SearchFilter = ({
                         Acciones masivas <DownOutlined />
                     </Button>
                 </Dropdown>
+
+                {viewOptions && viewOptions.length > 1 && (
+                    <>
+                        <Space>
+                            {viewOptions.includes('table') && (
+                                <Button
+                                    type={currentView === 'table' ? 'primary' : 'default'}
+                                    icon={<TableOutlined />}
+                                    onClick={() => onViewChange('table')}
+                                />
+                            )}
+                            {viewOptions.includes('card') && (
+                                <Button
+                                    type={currentView === 'card' ? 'primary' : 'default'}
+                                    icon={<AppstoreOutlined />}
+                                    onClick={() => onViewChange('card')}
+                                />
+                            )}
+                        </Space>
+                    </>
+                )}
 
                 {canCreate && (
                     <Button type="primary" onClick={onCreate} icon={<PlusOutlined />}>
