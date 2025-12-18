@@ -102,8 +102,8 @@ const DrawerDetails = ({ visible, onClose, data }) => {
                     <Avatar
                         size={80}
                         icon={<UserOutlined />}
-                        src={avatar} // Soporte para URL de avatar
-                        style={{ backgroundColor: '#1890ff', marginBottom: 8 }}
+                        src={"avatar_female.png"} // Soporte para URL de avatar
+                        style={{ marginBottom: 8 }}
                     >
                         {avatarChar}
                     </Avatar>
