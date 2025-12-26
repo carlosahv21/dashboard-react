@@ -1,16 +1,19 @@
 import React from 'react';
 import { Card, Avatar } from 'antd';
 import { EditOutlined, EyeOutlined, DeleteOutlined, UserOutlined, HistoryOutlined } from "@ant-design/icons";
+import { useNavigate } from 'react-router-dom';
 
 const { Meta } = Card;
 
 const StudentCard = ({ record, onEdit, onDelete, onRowClick, canEdit, canDelete }) => {
+    const navigate = useNavigate();
+
     return (
         <Card
             title={`${record.first_name} ${record.last_name}`}
             extra={<EyeOutlined key="view" style={{ color: "#1668dc" }} onClick={() => onRowClick(record)} />}
             actions={[
-                <HistoryOutlined key="history" style={{ color: "#bfbfbf" }} onClick={() => console.log("Redirect to payment history")} />,
+                <HistoryOutlined key="history" style={{ color: "#bfbfbf" }} onClick={() => navigate(`/students/${record.id}/history`)} />,
                 canEdit && <EditOutlined key="edit" style={{ color: "#13a8a8" }} onClick={() => onEdit(record.id)} />,
                 canDelete && <DeleteOutlined key="delete" style={{ color: "#d32029" }} onClick={() => onDelete(record.id)} />,
             ].filter(Boolean)}

@@ -12,6 +12,7 @@ import DashboardLayout from "./views/Dashboard/Dashboard";
 import DashboardView from "./views/Dashboard/DashboardView";
 import Classes from "./views/Classes/Classes";
 import Students from "./views/Students/Students";
+import StudentHistory from "./views/Students/StudentHistory";
 import Teachers from "./views/Teachers/Teachers";
 import Plans from "./views/Plans/Plans";
 import Registrations from "./views/Registrations/Registrations";
@@ -47,7 +48,10 @@ const AppRoutes = () => {
 
                 {/* Estudiantes */}
                 {hasPermission('students:view') && (
-                    <Route path="students" element={<Students />} />
+                    <>
+                        <Route path="students" element={<Students />} />
+                        <Route path="students/:id/history" element={<StudentHistory />} />
+                    </>
                 )}
 
                 {/* Profesores */}
