@@ -28,13 +28,15 @@ export const useCrud = (endpoint, titlePlural, filters, initialSort = { field: n
                 Object.entries(params).filter(([_, v]) => v !== undefined && v !== "" && v !== null)
             ).toString();
 
-            const data = await request(`${endpoint}/?${queryParams}`, "GET");
+            const response = await request(`${endpoint}/?${queryParams}`, "GET");
+            const items = response.data;
+            const pagination = response.pagination;
 
-            setItems(data.data || []);
-            const total = data.total || 0;
+            setItems(items || []);
+            const total = pagination.total || 0;
             const lastPage = Math.max(1, Math.ceil(total / limit));
             const current = page > lastPage ? lastPage : page;
-            setPagination(prev => ({ ...prev, total, current }));
+            setPagination(prev => ({ ...prev, total, current, pageSize: limit }));
         } catch (error) {
             console.error(error);
             message.error(`Error al cargar ${titlePlural}`);
@@ -90,8 +92,8 @@ export const useCrud = (endpoint, titlePlural, filters, initialSort = { field: n
                 Object.entries(params).filter(([_, v]) => v !== undefined && v !== "" && v !== null)
             ).toString();
 
-            const data = await request(`${endpoint}/?${queryParams}`, "GET");
-            return data.data || [];
+            const response = await request(`${endpoint}/?${queryParams}`, "GET");
+            return response.data || [];
         } catch (error) {
             console.error(error);
             message.error(`Error al exportar ${titlePlural}`);

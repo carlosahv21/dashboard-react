@@ -63,15 +63,15 @@ const useAttendanceData = () => {
     }, []);
 
     // 1. Fetch de Clases (Depende de la paginación)
+    const { current: currentClassPage, pageSize: currentClassPageSize } = pagination;
     useEffect(() => {
         const fetchClasses = async () => {
             try {
                 setLoadingClasses(true);
-                const { current, pageSize } = pagination;
                 const today = getCurrentDayEnglish();
 
                 // Agregar parámetros de paginación a la URL
-                const url = `classes?date=${today}&page=${current}&limit=${pageSize}&order_by=hour&order_direction=asc`;
+                const url = `classes?date=${today}&page=${currentClassPage}&limit=${currentClassPageSize}&order_by=hour&order_direction=asc`;
                 const response = await request(url, "GET");
 
                 const allClasses = response.data || [];
@@ -82,20 +82,36 @@ const useAttendanceData = () => {
                 setPagination(prev => ({
                     ...prev,
                     total,
-                    current: allClasses.length === 0 && current > 1 ? current - 1 : current
+                    current: allClasses.length === 0 && currentClassPage > 1 ? currentClassPage - 1 : currentClassPage
                 }));
 
                 // Seleccionar la primera clase si la lista no está vacía y no hay una clase ya seleccionada
-                if (allClasses.length > 0 && !selectedClass) {
-                    // Seleccionar la clase mas cerca a la hora actual
-                    const now = dayjs();
-                    const closestClass = allClasses.reduce((prev, current) => {
-                        const prevDiff = dayjs(prev.hour).diff(now, "minutes");
-                        const currentDiff = dayjs(current.hour).diff(now, "minutes");
-                        return Math.abs(prevDiff) < Math.abs(currentDiff) ? prev : current;
+                // NOTA: envolvemos esto en una condición más estricta para evitar loop si selectedClass cambia
+                // Sin embargo, como selectedClass no es dependencia aquí, está bien.
+                if (allClasses.length > 0) {
+                    setClasses(prevClasses => {
+                        // Verificamos si ya tenemos una clase seleccionada que coincida con las nuevas?
+                        // La lógica original solo seleccionaba si !selectedClass. 
+                        // Pero selectedClass no está en deps.
+                        // Para evitar warning de selectedClass faltante, usamos funcional update o ref.
+                        // Aquí, simplemente volvemos a reimplementar la lógica de selección inicial fuera del effect o con un effect separado si es necesario.
+                        // Pero dado el código original, intentaremos preservar la intención.
+                        return allClasses;
                     });
-                    setSelectedClass(closestClass);
+
+                    setSelectedClass(prevSelected => {
+                        if (prevSelected) return prevSelected;
+
+                        const now = dayjs();
+                        return allClasses.reduce((prev, current) => {
+                            const prevDiff = dayjs(prev.hour).diff(now, "minutes");
+                            const currentDiff = dayjs(current.hour).diff(now, "minutes");
+                            return Math.abs(prevDiff) < Math.abs(currentDiff) ? prev : current;
+                        });
+                    });
                 }
+
+
             } catch (error) {
                 console.error(error);
                 message.error("Error al cargar las clases");
@@ -104,7 +120,7 @@ const useAttendanceData = () => {
             }
         };
         fetchClasses();
-    }, [request, pagination.current, pagination.pageSize]);
+    }, [request, currentClassPage, currentClassPageSize]);
 
     // 2. Fetch de Estudiantes y Asistencias cuando cambia la clase seleccionada o la paginación de estudiantes
 
@@ -122,6 +138,7 @@ const useAttendanceData = () => {
     const prevClassIdRef = useRef(selectedClass?.id);
 
     // 2. Fetch de Estudiantes y Asistencias
+    const { current: currentStudentPage, pageSize: currentStudentPageSize } = studentPagination;
     useEffect(() => {
         if (!selectedClass) {
             setStudents([]);
@@ -133,11 +150,10 @@ const useAttendanceData = () => {
         const fetchStudentsAndAttendance = async () => {
             try {
                 setLoadingStudents(true);
-                const { current, pageSize } = studentPagination;
 
                 // Detectar si cambió la clase para reiniciar la asistencia local y Paginación
                 const classChanged = prevClassIdRef.current !== selectedClass.id;
-                let validCurrent = current;
+                let validCurrent = currentStudentPage;
 
                 if (classChanged) {
                     prevClassIdRef.current = selectedClass.id;
@@ -147,7 +163,7 @@ const useAttendanceData = () => {
 
                 // --- 2.1. Fetch de Estudiantes (Registrations) con BÚSQUEDA ---
                 const searchParam = debouncedSearchText ? `&search=${encodeURIComponent(debouncedSearchText)}` : "";
-                const studentsResponse = await request(`registrations?class_id=${selectedClass.id}&page=${validCurrent}&limit=${pageSize}${searchParam}&order_by=u.first_name&order_direction=asc`, "GET");
+                const studentsResponse = await request(`registrations?class_id=${selectedClass.id}&page=${validCurrent}&limit=${currentStudentPageSize}${searchParam}&order_by=u.first_name&order_direction=asc`, "GET");
 
                 const studentsList = studentsResponse.data?.map(reg => ({
                     user_id: reg.user_id,
@@ -208,7 +224,7 @@ const useAttendanceData = () => {
         };
 
         fetchStudentsAndAttendance();
-    }, [selectedClass, request, studentPagination.current, studentPagination.pageSize, debouncedSearchText]);
+    }, [selectedClass, request, currentStudentPage, currentStudentPageSize, debouncedSearchText]);
 
     // Al cambiar el texto de búsqueda, reseteamos a la página 1 para evitar estar en pág 10 con 1 resultado
     useEffect(() => {

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { message, Checkbox, Select, Button } from "antd";
 import useFetch from "../../../hooks/useFetch";
 import FormHeader from "../../../components/Common/FormHeader";
@@ -20,10 +20,11 @@ const RolePermissions = () => {
 
     const { request } = useFetch();
 
-    const fetchRolePermissions = async () => {
+    const fetchRolePermissions = useCallback(async () => {
         try {
             setLoading(true);
-            const data = await request("rolePermissions", "GET");
+            const response = await request("rolePermissions", "GET");
+            const data = response.data;
 
             const allPermissions = [];
             const allRolePermissions = [];
@@ -55,11 +56,11 @@ const RolePermissions = () => {
         } finally {
             setLoading(false);
         }
-    };
+    }, [request, selectedRole]);
 
     useEffect(() => {
         fetchRolePermissions();
-    }, []);
+    }, [fetchRolePermissions]);
 
     // Cargar permisos locales cuando cambia el rol
     useEffect(() => {

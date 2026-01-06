@@ -70,7 +70,6 @@ const DrawerDetails = ({ visible, onClose, data }) => {
 
     // Extracción de datos para el encabezado
     const {
-        avatar,
         title,
         subtitle,
         email,
@@ -85,7 +84,7 @@ const DrawerDetails = ({ visible, onClose, data }) => {
             placement="right"
             onClose={onClose}
             open={visible}
-            width={400}
+            size={400}
             styles={{ body: { padding: 0 } }}
         >
             <div style={{ height: '100%', overflowY: 'auto', background: token.colorBgLayout }}>

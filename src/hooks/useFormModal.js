@@ -24,11 +24,12 @@ export const useFormModal = (request, endpoint, moduleFieldId, titleSingular, fi
         form.resetFields();
 
         try {
-            const moduleRes = await request(`fields/module/${moduleFieldId}`, 'GET');
-            setModuleData(moduleRes?.module || { blocks: [] });
+            const responseFields = await request(`fields/module/${moduleFieldId}`, 'GET');
+            setModuleData(responseFields?.data || { blocks: [] });
 
             if (id) {
-                const itemData = await request(`${endpoint}/${id}`, 'GET');
+                const responseItem = await request(`${endpoint}/${id}`, 'GET');
+                const itemData = responseItem.data;
 
                 if ('password' in itemData) itemData.password = "";
 

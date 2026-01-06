@@ -1,4 +1,4 @@
-import React, { createContext, useState, useEffect, useRef } from "react";
+import React, { createContext, useState, useEffect, useRef, useCallback } from "react";
 import { Modal } from "antd";
 import useFetch from "../hooks/useFetch";
 
@@ -28,17 +28,17 @@ export const AuthProvider = ({ children }) => {
         setToken(newToken);
     };
 
-    const fetchUserData = async (storedToken) => {
+    const fetchUserData = useCallback(async (storedToken) => {
         try {
-            const data = await request(`auth/me`, "GET", null, {
+            const response = await request(`auth/me`, "GET", null, {
                 Authorization: `Bearer ${storedToken}`,
             });
 
-            setUser(data.user);
-            setSettings(data.settings);
+            setUser(response.data.user);
+            setSettings(response.data.settings);
 
-            if (data.permissions) {
-                setPermissions(data.permissions);
+            if (response.data.permissions) {
+                setPermissions(response.data.permissions);
             }
         } catch (err) {
             console.log(err);
@@ -58,7 +58,7 @@ export const AuthProvider = ({ children }) => {
         } finally {
             setLoading(false);
         }
-    };
+    }, [request]);
 
     const toggleTheme = () => {
         setSettings(prev => {
@@ -91,7 +91,7 @@ export const AuthProvider = ({ children }) => {
             setSettings({ theme: localStorage.getItem("theme") || 'light' });
             setLoading(false);
         }
-    }, [token]);
+    }, [token, fetchUserData]);
 
     const hasPermission = (permName) => permissions.includes(permName);
 

@@ -1,11 +1,11 @@
 import React, { useContext } from "react";
-import { Card, Row, Col, DatePicker, Statistic, Spin, Select, Table } from "antd";
+import { Card, Row, Col, Statistic, Spin, Select, Table } from "antd";
 import { UserOutlined, BookOutlined, DollarOutlined, CheckCircleOutlined } from "@ant-design/icons";
 import ReactECharts from 'echarts-for-react';
 import { AuthContext } from "../../context/AuthContext";
 import { useDashboardData } from "../../hooks/useDashboardData";
 
-const { RangePicker } = DatePicker;
+
 
 const DashboardView = () => {
     const { settings } = useContext(AuthContext);

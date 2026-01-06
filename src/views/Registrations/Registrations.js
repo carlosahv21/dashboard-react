@@ -33,8 +33,8 @@ const Registration = () => {
         try {
             let url = `students?role_id=2&limit=50&search=${searchTerm}&order_by=first_name&order_direction=asc`;
 
-            const data = await request(url, "GET");
-            setStudents(data.data || []);
+            const response = await request(url, "GET");
+            setStudents(response.data || []);
 
         } catch (error) {
             message.error("Error al cargar estudiantes");
@@ -55,8 +55,8 @@ const Registration = () => {
 
         try {
             let url = `classes?limit=50&search=${searchTerm}&order_by=name&order_direction=asc`;
-            const data = await request(url, "GET");
-            setAvailableClasses(data.data || []);
+            const response = await request(url, "GET");
+            setAvailableClasses(response.data || []);
         } catch (error) {
             message.error("Error al cargar clases");
             setAvailableClasses([]);
@@ -65,8 +65,8 @@ const Registration = () => {
 
     const fetchInitialClasses = async () => {
         try {
-            const data = await request("classes?is_favorites=true&order_by=name&order_direction=asc", "GET");
-            setAvailableClasses(data.data || []);
+            const response = await request("classes?is_favorites=true&order_by=name&order_direction=asc", "GET");
+            setAvailableClasses(response.data || []);
         } catch (error) {
             message.error("Error al cargar clases disponibles");
         }
@@ -74,8 +74,8 @@ const Registration = () => {
 
     const fetchEnrollments = async (studentId) => {
         try {
-            const data = await request(`registrations?user_id=${studentId}`, "GET");
-            setEnrolledClasses(data.data || []);
+            const response = await request(`registrations?user_id=${studentId}`, "GET");
+            setEnrolledClasses(response.data || []);
         } catch (error) {
             message.error("Error al cargar inscripciones");
         }

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect, useContext, useCallback } from "react";
 import { Divider, Form, Select, Card, Row, Col, Button, Modal, Checkbox, Input, Skeleton, Empty, Space, Tooltip, theme, App } from "antd";
 import { EditOutlined, PlusOutlined, DeleteOutlined } from "@ant-design/icons";
 import useFetch from "../../../hooks/useFetch";
@@ -137,6 +137,19 @@ const CustomFields = () => {
 
     const { message, modal } = App.useApp();
 
+    const changeModule = useCallback(async (value) => {
+        setSelectedModule(value);
+        setLoading(true);
+        try {
+            const dataFields = await request(`fields/module/${value}`, "GET");
+            setBlocks(dataFields?.data?.blocks || []);
+        } catch (err) {
+            message.error(err.message || "Error al cargar campos.");
+        } finally {
+            setLoading(false);
+        }
+    }, [request, message]);
+
     useEffect(() => {
         const fetchFields = async () => {
             setLoading(true);
@@ -156,20 +169,9 @@ const CustomFields = () => {
         };
 
         fetchFields();
-    }, [request]);
+    }, [request, changeModule]);
 
-    const changeModule = async (value) => {
-        setSelectedModule(value);
-        setLoading(true);
-        try {
-            const dataFields = await request(`fields/module/${value}`, "GET");
-            setBlocks(dataFields?.module?.blocks || []);
-        } catch (err) {
-            message.error(err.message || "Error al cargar campos.");
-        } finally {
-            setLoading(false);
-        }
-    };
+
 
     // Edit field
     const showModal = (field) => {

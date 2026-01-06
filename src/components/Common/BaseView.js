@@ -237,7 +237,7 @@ const BaseView = ({
                 footer={null}
                 width={800}
                 onCancel={handleCloseModal}
-                destroyOnClose
+                destroyOnHidden
             >
                 {moduleData ? (
                     moduleData.blocks?.length > 0 ? (

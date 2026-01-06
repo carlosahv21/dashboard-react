@@ -16,9 +16,8 @@ export const useDrawerDetail = (request, endpoint, titleSingular) => {
         setDrawerVisible(true);
         
         try {
-            const detailData = await request(`${endpoint}/details/${id}`, "GET");
-            
-            setDrawerData(detailData);
+            const response = await request(`${endpoint}/details/${id}`, "GET");
+            setDrawerData(response.data);
         } catch (error) {
             console.error("Error fetching detail:", error);
             message.error(`Error al cargar los detalles de ${titleSingular}`);

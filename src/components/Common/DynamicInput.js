@@ -134,8 +134,8 @@ const DynamicInput = ({
                     search: term,
                 };
 
-                const data = await request(`fields/relation`, "POST", payload);
-                setRelationOptions(data.options);
+                const response = await request(`fields/relation`, "POST", payload);
+                setRelationOptions(response.data);
             } catch (error) {
                 message.error("Error al cargar opciones de relación.");
                 console.error("Error fetching relation options:", error);

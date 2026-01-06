@@ -20,12 +20,12 @@ const Login = () => {
     const handleLogin = async (values) => {
         setError("");
         try {
-            const data = await request("auth/login", "POST", values);
-            if (!data.token) {
+            const response = await request("auth/login", "POST", values);
+            if (!response.data.token) {
                 setError("Credenciales inválidas. Intenta de nuevo.");
                 return;
             }
-            login(data.token);
+            login(response.data.token);
             navigate("/");
         } catch (err) {
             setError(err.message || "Ocurrió un error. Intenta de nuevo.");

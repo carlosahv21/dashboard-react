@@ -10,7 +10,7 @@ const { Title, Text } = Typography;
 const StudentHistory = () => {
     const { id } = useParams();
     const navigate = useNavigate();
-    const { request, loading } = useFetch();
+    const { request } = useFetch();
 
     const [student, setStudent] = useState(null);
     const [attendances, setAttendances] = useState([]);
@@ -21,21 +21,21 @@ const StudentHistory = () => {
         const fetchData = async () => {
             try {
                 // Fetch Student Data
-                const studentData = await request(`students/${id}`);
-                setStudent(studentData);
+                const response = await request(`students/${id}`);
+                setStudent(response.data);
 
                 // Fetch Plan Data
-                const planData = await request(`plans/student/${id}`);
-                setActivePlan(planData);
+                const planResponse = await request(`plans/student/${id}`);
+                setActivePlan(planResponse.data);
 
                 // Fetch Attendance
                 // Use a query parameter for filtering by student
-                const attData = await request(`attendance?student_id=${id}`);
-                setAttendances(attData.data || []);
+                const attResponse = await request(`attendance?student_id=${id}`);
+                setAttendances(attResponse.data || []);
 
                 // Fetch Payments (placeholder for now as strict endpoint distinctness is unverified, but ready to use)
-                const payData = await request(`payments?user_id=${id}`);
-                setPayments(payData.data || []);
+                const payResponse = await request(`payments?user_id=${id}`);
+                setPayments(payResponse.data || []);
 
             } catch (error) {
                 console.error("Error fetching history:", error);
@@ -82,17 +82,17 @@ const StudentHistory = () => {
         {
             key: '1',
             label: 'Historial de Pagos',
-            children: <Table columns={paymentColumns} dataSource={payments} rowKey="id" size="small" pagination={{ pageSize: 5, placement: ['bottomCenter'] }} style={{ padding: 16 }} />,
+            children: <Table columns={paymentColumns} dataSource={payments} rowKey="id" size="small" pagination={{ pageSize: 5, placement: ['bottomCenter'] }} />,
         },
         {
             key: '2',
             label: 'Asistencias',
-            children: <Table columns={attendanceColumns} dataSource={attendances} rowKey="id" size="small" pagination={{ pageSize: 5, placement: ['bottomCenter'] }} style={{ padding: 16 }} />,
+            children: <Table columns={attendanceColumns} dataSource={attendances} rowKey="id" size="small" pagination={{ pageSize: 5, placement: ['bottomCenter'] }} />,
         },
     ];
 
     return (
-        <div style={{ padding: 24 }}>
+        <>
             <div style={{ marginBottom: 16, display: 'flex', alignItems: 'center' }}>
                 <Button
                     type="text"
@@ -121,7 +121,7 @@ const StudentHistory = () => {
                         <Col span={24}>
                             <Card
                                 title="Plan Actual"
-                                extra={ activePlan ? (activePlan.status === 'active' ? <Tag color="green">Activo</Tag> : <Tag color="red">Inactivo</Tag>) : <Tag color="red">Inactivo</Tag>}
+                                extra={activePlan ? (activePlan.status === 'active' ? <Tag color="green">Activo</Tag> : <Tag color="red">Inactivo</Tag>) : <Tag color="red">Inactivo</Tag>}
                                 actions={[
                                     <Button type="primary" icon={<CreditCardOutlined />} className='align-self-end'>Renovar Plan</Button>
                                 ]}
@@ -129,15 +129,15 @@ const StudentHistory = () => {
                                 {activePlan ? (
                                     <>
                                         <div style={{ textAlign: 'center', marginBottom: 20 }}>
-                                            <Title level={4}>{activePlan.name || "Plan Desconocido"}</Title>
-                                            <Typography.Text>
+                                            <Title level={4} style={{ margin: 0 }}>{activePlan.name || "Plan Desconocido"}</Title>
+                                            <Typography.Text >
                                                 Tipo: {activePlan.type || "Tipo Desconocido"}.  <br />
                                                 Inicio: {dayjs(activePlan.start_date).format('DD MMM YYYY')} - Vence: {dayjs(activePlan.end_date).format('DD MMM YYYY')}
                                             </Typography.Text>
                                         </div>
                                         <Row gutter={16}>
                                             <Col span={12} style={{ textAlign: 'center' }}>
-                                                {activePlan.max_classes == 0     ? (
+                                                {activePlan.max_classes === 0 ? (
                                                     <Statistic title="Clases Restantes" value="Ilimitado" prefix={<ClockCircleOutlined />} style={{ fontSize: 16 }} />
                                                 ) : (
                                                     <Statistic title="Clases Restantes" value={`${activePlan.classes_remaining || 0}/${activePlan.max_classes || 0}`} prefix={<ClockCircleOutlined />} style={{ fontSize: 16 }} />
@@ -160,14 +160,13 @@ const StudentHistory = () => {
                                 <Tabs
                                     defaultActiveKey="1"
                                     items={items}
-                                    tabBarStyle={{ padding: '0 16px' }}
                                 />
                             </Card>
                         </Col>
                     </Row>
                 </Col>
             </Row>
-        </div>
+        </>
     );
 };
 
