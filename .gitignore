@@ -1,3 +1,14 @@
 node_modules
 .env
 .DS_Store
+
+# Producción
+/build
+/dist
+
+# Logs y Sistema
+*.log
+Thumbs.db
+
+# Dependencias (asegurar)
+package-lock.json
