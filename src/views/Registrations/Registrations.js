@@ -96,14 +96,12 @@ const Registration = () => {
             setStudentSearchTerm(searchTerm);
             fetchStudents(searchTerm);
         }, 300);
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [request]);
 
     const debounceClassSearch = useMemo(() => {
         return debounce((searchTerm) => {
             fetchClasses(searchTerm);
         }, 300);
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [request]);
 
     useEffect(() => {
@@ -112,7 +110,6 @@ const Registration = () => {
             setSelectedStudentId(user.id);
             fetchInitialClasses();
         }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [isAdmin, user]);
 
     useEffect(() => {
@@ -122,7 +119,6 @@ const Registration = () => {
         } else {
             setEnrolledClasses([]);
         }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [selectedStudentId]);
 
     const handleEnroll = async (classItem) => {
@@ -189,7 +185,7 @@ const Registration = () => {
                                 style={{ marginBottom: 24 }}
                                 suffix={<SearchOutlined />}
                             />
-                            <div style={{ maxHeight: "800px", overflowY: "auto", overflowX: "hidden" }}>
+                            <div className="custom-scroll" style={{ maxHeight: "800px", overflowY: "auto", overflowX: "hidden", paddingRight: "12px" }}>
                                 <AvailableClassesList
                                     classes={availableClasses}
                                     enrolledClassIds={enrolledClasses.map(c => c.class_id || c.id)}

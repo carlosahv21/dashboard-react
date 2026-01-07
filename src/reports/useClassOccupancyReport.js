@@ -50,7 +50,7 @@ export const useClassOccupancyReport = (request) => {
             }
         };
         fetchData();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
+
     }, [request]); // Solo ejecutar cuando request cambia (una vez al montar)
 
     // Resetear drilldown cuando cambia el género (sin recargar datos)

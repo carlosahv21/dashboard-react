@@ -62,9 +62,9 @@ const classToEvent = (classItem, onRemove) => {
 // Color coding by level
 const getColorByLevel = (level) => {
     const colors = {
-        "Basic": "#fa8c16",
-        "Intermediate": "#1890ff",
-        "Advanced": "#722ed1"
+        "Basico": "#fa8c16",
+        "Intermedio": "#1890ff",
+        "Avanzado": "#722ed1"
     };
     return colors[level] || "#1890ff";
 };
@@ -207,6 +207,18 @@ const RegistrationsCalendar = ({ enrolledClasses, onRemoveClass }) => {
                 }
                 .fc-popover-body {
                     background-color: ${token.colorBgElevated} !important;
+                }
+                .fc-timegrid-event-harness-inset .fc-timegrid-event, .fc-timegrid-event.fc-event-mirror, .fc-timegrid-more-link {
+                    box-shadow: none !important;
+                }
+                .fc-direction-ltr .fc-timegrid-col-events {
+                    margin: 0 !important;
+                }
+                .fc-timegrid-axis, .fc-scrollgrid-sync-inner {
+                    background-color: ${token.colorBgElevated} !important;
+                }
+                .fc-theme-standard .fc-scrollgrid {
+                    border-color: ${token.colorBorderSecondary} !important;
                 }
                 `}
             </style>

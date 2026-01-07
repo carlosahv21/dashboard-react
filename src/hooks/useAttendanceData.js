@@ -8,7 +8,8 @@ import "dayjs/locale/en";
 dayjs.locale("es");
 
 // Función auxiliar para obtener el día actual en inglés (para el filtro de API/DB)
-const getCurrentDayEnglish = () => dayjs().locale("en").format("dddd").toLowerCase();
+const getCurrentDayEnglish = () =>
+    dayjs().locale("en").format("dddd").toLowerCase();
 
 // Función auxiliar para obtener la fecha actual en formato YYYY-MM-DD (para la asistencia diaria)
 const getCurrentDate = () => dayjs().format("YYYY-MM-DD");
@@ -46,7 +47,7 @@ const useAttendanceData = () => {
 
     // Función para manejar el cambio de página/tamaño (Clases)
     const handleTableChange = useCallback((page, pageSize) => {
-        setPagination(prev => ({
+        setPagination((prev) => ({
             ...prev,
             current: page,
             pageSize: pageSize,
@@ -55,7 +56,7 @@ const useAttendanceData = () => {
 
     // Función para manejar el cambio de página/tamaño (Estudiantes)
     const handleStudentPageChange = useCallback((page, pageSize) => {
-        setStudentPagination(prev => ({
+        setStudentPagination((prev) => ({
             ...prev,
             current: page,
             pageSize: pageSize,
@@ -63,7 +64,8 @@ const useAttendanceData = () => {
     }, []);
 
     // 1. Fetch de Clases (Depende de la paginación)
-    const { current: currentClassPage, pageSize: currentClassPageSize } = pagination;
+    const { current: currentClassPage, pageSize: currentClassPageSize } =
+        pagination;
     useEffect(() => {
         const fetchClasses = async () => {
             try {
@@ -79,39 +81,39 @@ const useAttendanceData = () => {
 
                 setClasses(allClasses);
 
-                setPagination(prev => ({
+                setPagination((prev) => ({
                     ...prev,
                     total,
-                    current: allClasses.length === 0 && currentClassPage > 1 ? currentClassPage - 1 : currentClassPage
+                    current:
+                        allClasses.length === 0 && currentClassPage > 1
+                            ? currentClassPage - 1
+                            : currentClassPage,
                 }));
 
-                // Seleccionar la primera clase si la lista no está vacía y no hay una clase ya seleccionada
-                // NOTA: envolvemos esto en una condición más estricta para evitar loop si selectedClass cambia
-                // Sin embargo, como selectedClass no es dependencia aquí, está bien.
                 if (allClasses.length > 0) {
-                    setClasses(prevClasses => {
-                        // Verificamos si ya tenemos una clase seleccionada que coincida con las nuevas?
-                        // La lógica original solo seleccionaba si !selectedClass. 
-                        // Pero selectedClass no está en deps.
-                        // Para evitar warning de selectedClass faltante, usamos funcional update o ref.
-                        // Aquí, simplemente volvemos a reimplementar la lógica de selección inicial fuera del effect o con un effect separado si es necesario.
-                        // Pero dado el código original, intentaremos preservar la intención.
+                    setClasses((prevClasses) => {
                         return allClasses;
                     });
 
-                    setSelectedClass(prevSelected => {
+                    setSelectedClass((prevSelected) => {
                         if (prevSelected) return prevSelected;
 
                         const now = dayjs();
                         return allClasses.reduce((prev, current) => {
-                            const prevDiff = dayjs(prev.hour).diff(now, "minutes");
-                            const currentDiff = dayjs(current.hour).diff(now, "minutes");
-                            return Math.abs(prevDiff) < Math.abs(currentDiff) ? prev : current;
+                            // "hour" is likely "HH:mm:ss" or "HH:mm". We need to attach proper date.
+                            const [prevH, prevM] = (prev.hour || "00:00").split(":");
+                            const [currH, currM] = (current.hour || "00:00").split(":");
+
+                            const prevDate = dayjs().hour(prevH).minute(prevM);
+                            const currDate = dayjs().hour(currH).minute(currM);
+
+                            const prevDiff = Math.abs(prevDate.diff(now));
+                            const currDiff = Math.abs(currDate.diff(now));
+
+                            return prevDiff < currDiff ? prev : current;
                         });
                     });
                 }
-
-
             } catch (error) {
                 console.error(error);
                 message.error("Error al cargar las clases");
@@ -122,9 +124,6 @@ const useAttendanceData = () => {
         fetchClasses();
     }, [request, currentClassPage, currentClassPageSize]);
 
-    // 2. Fetch de Estudiantes y Asistencias cuando cambia la clase seleccionada o la paginación de estudiantes
-
-    // 3. Debounce de SearchText
     const [debouncedSearchText, setDebouncedSearchText] = useState(searchText);
 
     useEffect(() => {
@@ -134,16 +133,15 @@ const useAttendanceData = () => {
         return () => clearTimeout(timer);
     }, [searchText]);
 
-    // Ref para rastrear la clase anterior y limpiar estados
     const prevClassIdRef = useRef(selectedClass?.id);
 
-    // 2. Fetch de Estudiantes y Asistencias
-    const { current: currentStudentPage, pageSize: currentStudentPageSize } = studentPagination;
+    const { current: currentStudentPage, pageSize: currentStudentPageSize } =
+        studentPagination;
     useEffect(() => {
         if (!selectedClass) {
             setStudents([]);
             setAttendanceData({});
-            setStudentPagination(prev => ({ ...prev, total: 0, current: 1 }));
+            setStudentPagination((prev) => ({ ...prev, total: 0, current: 1 }));
             return;
         }
 
@@ -151,70 +149,69 @@ const useAttendanceData = () => {
             try {
                 setLoadingStudents(true);
 
-                // Detectar si cambió la clase para reiniciar la asistencia local y Paginación
                 const classChanged = prevClassIdRef.current !== selectedClass.id;
                 let validCurrent = currentStudentPage;
 
                 if (classChanged) {
                     prevClassIdRef.current = selectedClass.id;
                     validCurrent = 1;
-                    setStudentPagination(prev => ({ ...prev, current: 1 }));
+                    setStudentPagination((prev) => ({ ...prev, current: 1 }));
                 }
 
-                // --- 2.1. Fetch de Estudiantes (Registrations) con BÚSQUEDA ---
-                const searchParam = debouncedSearchText ? `&search=${encodeURIComponent(debouncedSearchText)}` : "";
-                const studentsResponse = await request(`registrations?class_id=${selectedClass.id}&page=${validCurrent}&limit=${currentStudentPageSize}${searchParam}&order_by=u.first_name&order_direction=asc`, "GET");
+                const searchParam = debouncedSearchText
+                    ? `&search=${encodeURIComponent(debouncedSearchText)}`
+                    : "";
+                const studentsResponse = await request(
+                    `registrations?class_id=${selectedClass.id}&page=${validCurrent}&limit=${currentStudentPageSize}${searchParam}&order_by=u.first_name&order_direction=asc`,
+                    "GET"
+                );
 
-                const studentsList = studentsResponse.data?.map(reg => ({
-                    user_id: reg.user_id,
-                    name: `${reg.user_first_name} ${reg.user_last_name}` || "Estudiante",
-                    avatar: reg.user_avatar,
-                    ...reg
-                })) || [];
+                const studentsList =
+                    studentsResponse.data?.map((reg) => ({
+                        user_id: reg.user_id,
+                        name:
+                            `${reg.user_first_name} ${reg.user_last_name}` || "Estudiante",
+                        avatar: reg.user_avatar,
+                        ...reg,
+                    })) || [];
 
                 setStudents(studentsList);
-                setStudentPagination(prev => ({
+                setStudentPagination((prev) => ({
                     ...prev,
-                    total: studentsResponse.total || 0
+                    total: studentsResponse.total || 0,
                 }));
 
-                // --- 2.2. Fetch de Asistencia Existente ---
                 const todayDate = getCurrentDate();
-                const attendanceResponse = await request(`attendance?class_id=${selectedClass.id}&date=${todayDate}&limit=1000`, "GET");
+                const attendanceResponse = await request(
+                    `attendance?class_id=${selectedClass.id}&date=${todayDate}&limit=1000`,
+                    "GET"
+                );
                 const existingAttendance = attendanceResponse.data || [];
-
-                // 3. Fusionar datos existentes
                 const pageAttendance = {};
 
-                // Inicializar con false
-                studentsList.forEach(s => {
+                studentsList.forEach((s) => {
                     pageAttendance[String(s.user_id)] = false;
                 });
 
-                // Actualizar con DB
-                existingAttendance.forEach(record => {
+                existingAttendance.forEach((record) => {
                     const isPresent = record.status?.toLowerCase() === "present";
                     const studentIdStr = String(record.student_id);
                     pageAttendance[studentIdStr] = isPresent;
                 });
 
-                // 4. Actualizar el estado de asistencia
-                setAttendanceData(prev => {
-                    // Si cambió la clase, NO fusionamos con el anterior (reinicio)
+                setAttendanceData((prev) => {
                     if (classChanged) {
                         return pageAttendance;
                     }
 
-                    // Si NO cambió la clase, fusionamos para mantener estados de otras páginas
                     const merged = { ...prev };
-                    Object.keys(pageAttendance).forEach(studentId => {
+                    Object.keys(pageAttendance).forEach((studentId) => {
                         if (!merged.hasOwnProperty(studentId)) {
                             merged[studentId] = pageAttendance[studentId];
                         }
                     });
                     return merged;
                 });
-
             } catch (error) {
                 console.error("Error al cargar estudiantes y/o asistencias:", error);
                 message.error("Error al cargar estudiantes o asistencias");
@@ -224,51 +221,56 @@ const useAttendanceData = () => {
         };
 
         fetchStudentsAndAttendance();
-    }, [selectedClass, request, currentStudentPage, currentStudentPageSize, debouncedSearchText]);
+    }, [
+        selectedClass,
+        request,
+        currentStudentPage,
+        currentStudentPageSize,
+        debouncedSearchText,
+    ]);
 
-    // Al cambiar el texto de búsqueda, reseteamos a la página 1 para evitar estar en pág 10 con 1 resultado
     useEffect(() => {
-        setStudentPagination(prev => ({ ...prev, current: 1 }));
+        setStudentPagination((prev) => ({ ...prev, current: 1 }));
     }, [debouncedSearchText]);
 
-
-    // 3. Lógica de Filtrado (Ahora es passthrough ya que el backend filtra)
-    // Mantenemos el nombre 'filteredStudents' y la estructura para no romper la vista
     const filteredStudents = students;
 
-    // 4. Handlers de Asistencia (Optimizadas con useCallback)
     const handleToggleAttendance = useCallback((studentId) => {
-        setAttendanceData(prev => ({
+        setAttendanceData((prev) => ({
             ...prev,
-            [studentId]: !prev[studentId]
+            [studentId]: !prev[studentId],
         }));
     }, []);
 
-    const handleSelectAll = useCallback((checked) => {
-        const newData = { ...attendanceData };
-        // Solo afecta a los estudiantes visibles (filteredStudents = students de la página actual)
-        filteredStudents.forEach(s => {
-            newData[s.user_id] = checked;
-        });
-        setAttendanceData(newData);
-    }, [attendanceData, filteredStudents]);
+    const handleSelectAll = useCallback(
+        (checked) => {
+            const newData = { ...attendanceData };
+            filteredStudents.forEach((s) => {
+                newData[s.user_id] = checked;
+            });
+            setAttendanceData(newData);
+        },
+        [attendanceData, filteredStudents]
+    );
 
-    // Comprueba si todos los estudiantes visibles están marcados
-    const areAllFilteredPresent = filteredStudents.length > 0 &&
-        filteredStudents.every(s => attendanceData[s.user_id]);
+    const areAllFilteredPresent =
+        filteredStudents.length > 0 &&
+        filteredStudents.every((s) => attendanceData[s.user_id]);
 
-    // Comprueba si ALGUNOS (pero no todos) los estudiantes visibles están marcados
-    const isIndeterminate = filteredStudents.some(s => attendanceData[s.user_id]) &&
+    const isIndeterminate =
+        filteredStudents.some((s) => attendanceData[s.user_id]) &&
         !areAllFilteredPresent;
 
-    // 5. Función de Guardado (Optimizada con useCallback)
     const saveAttendance = useCallback(async () => {
         if (!selectedClass) return;
 
         try {
             setIsSaving(true);
 
-            const allStudentsResponse = await request(`registrations?class_id=${selectedClass.id}&limit=1000`, "GET");
+            const allStudentsResponse = await request(
+                `registrations?class_id=${selectedClass.id}&limit=1000`,
+                "GET"
+            );
             const allStudents = allStudentsResponse.data || [];
 
             if (allStudents.length === 0) {
@@ -276,15 +278,17 @@ const useAttendanceData = () => {
                 return;
             }
 
-            const attendanceArray = allStudents.map(student => {
+            const attendanceArray = allStudents.map((student) => {
                 const studentId = String(student.user_id);
-                const isPresent = attendanceData.hasOwnProperty(studentId) ? attendanceData[studentId] : false;
+                const isPresent = attendanceData.hasOwnProperty(studentId)
+                    ? attendanceData[studentId]
+                    : false;
 
                 return {
                     class_id: selectedClass.id,
                     student_id: student.user_id,
                     date: dayjs().format("YYYY-MM-DD"),
-                    status: isPresent ? "Present" : "Absent"
+                    status: isPresent ? "Present" : "Absent",
                 };
             });
 
@@ -295,7 +299,6 @@ const useAttendanceData = () => {
 
             await request("attendance", "POST", attendanceArray);
             message.success("Asistencia guardada correctamente");
-
         } catch (error) {
             console.error("Error al guardar asistencia:", error);
             message.error(error.message);
