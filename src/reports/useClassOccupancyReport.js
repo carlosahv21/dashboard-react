@@ -94,6 +94,7 @@ export const useClassOccupancyReport = (request) => {
 
         // Configuración del gráfico principal
         const option = {
+            backgroundColor: "transparent",
             tooltip: {
                 trigger: 'axis',
                 axisPointer: { type: 'shadow' },

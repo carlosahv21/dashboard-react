@@ -1,0 +1,193 @@
+import { useState, useEffect, useMemo } from "react";
+
+export const useRetentionChurnReport = (request) => {
+    const [loading, setLoading] = useState(true);
+    const [data, setData] = useState({ cohortAnalysis: [], churnRate: [] });
+
+    useEffect(() => {
+        const fetchData = async () => {
+            setLoading(true);
+            try {
+                const response = await request("reports/retention-churn", "GET");
+                if (response?.success) {
+                    setData(response.data);
+                } else {
+                    setData({ cohortAnalysis: [], churnRate: [] });
+                }
+            } catch (error) {
+                console.error("Error al cargar análisis de retención y churn:", error);
+                setData({ cohortAnalysis: [], churnRate: [] });
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchData();
+    }, [request]);
+
+    const heatmapOption = useMemo(() => {
+        const { cohortAnalysis } = data;
+        if (!cohortAnalysis.length) return null;
+
+        // Extract unique months and plans
+        const months = [...new Set(cohortAnalysis.map((item) => item.cohort_month))]
+            .sort()
+            .reverse();
+        const plans = [
+            ...new Set(cohortAnalysis.map((item) => item.plan_name)),
+        ].sort();
+
+        // Map data to [planIndex, monthIndex, value]
+        const chartData = cohortAnalysis.map((item) => {
+            const planIdx = plans.indexOf(item.plan_name);
+            const monthIdx = months.indexOf(item.cohort_month);
+            return [planIdx, monthIdx, parseFloat(item.retention_rate)];
+        });
+
+        return {
+            backgroundColor: "transparent",
+            tooltip: {
+                position: "top",
+                formatter: (params) => {
+                    const plan = plans[params.data[0]];
+                    const month = months[params.data[1]];
+                    const rate = params.data[2];
+                    return `<b>${plan}</b><br/>Mes: ${month}<br/>Retención: ${rate}%`;
+                },
+            },
+            grid: {
+                height: "65%",
+                top: "10%",
+                right: "5%",
+                left: "15%",
+                bottom: "20%",
+            },
+            xAxis: {
+                type: "category",
+                data: plans,
+                splitArea: { show: true },
+                axisLabel: {
+                    interval: 0,
+                    rotate: 15, // Slight rotation for long plan names
+                    fontSize: 10,
+                },
+            },
+            yAxis: {
+                type: "category",
+                data: months,
+                splitArea: { show: true },
+            },
+            visualMap: {
+                min: 0,
+                max: 100,
+                calculable: true,
+                orient: "horizontal",
+                left: "center",
+                bottom: "0%",
+                inRange: {
+                    color: ["#FF4D4D", "#FFC53D", "#2ECC71"],
+                },
+            },
+            series: [
+                {
+                    name: "Retención",
+                    type: "heatmap",
+                    data: chartData,
+                    label: {
+                        show: true,
+                        formatter: (params) => `${params.data[2]}%`,
+                    },
+                    emphasis: {
+                        itemStyle: {
+                            shadowBlur: 10,
+                            shadowColor: "rgba(0, 0, 0, 0.5)",
+                        },
+                    },
+                },
+            ],
+        };
+    }, [data]);
+
+    const churnGaugeOption = useMemo(() => {
+        const { churnRate } = data;
+        const latestChurn =
+            churnRate.length > 0 ? parseFloat(churnRate[0].churn_rate) : 0;
+
+        return {
+            backgroundColor: "transparent",
+            series: [
+                {
+                    type: "gauge",
+                    startAngle: 180,
+                    endAngle: 0,
+                    min: 0,
+                    max: 100,
+                    radius: "100%",
+                    center: ["50%", "75%"],
+                    progress: {
+                        show: true,
+                        width: 18,
+                    },
+                    pointer: {
+                        icon: "path://M12.8,0.7l12,40.1H0.7L12.8,0.7z",
+                        length: "12%",
+                        width: 20,
+                        offsetCenter: [0, "-60%"],
+                        itemStyle: {
+                            color: "auto",
+                        },
+                    },
+                    axisLine: {
+                        lineStyle: {
+                            width: 18,
+                        },
+                    },
+                    axisTick: {
+                        show: false,
+                    },
+                    splitLine: {
+                        length: 15,
+                        lineStyle: {
+                            width: 2,
+                            color: "#999",
+                        },
+                    },
+                    axisLabel: {
+                        distance: 25,
+                        color: "#999",
+                        fontSize: 12,
+                    },
+                    anchor: {
+                        show: true,
+                        showAbove: true,
+                        size: 25,
+                        itemStyle: {
+                            borderWidth: 10,
+                        },
+                    },
+                    title: {
+                        show: false,
+                    },
+                    detail: {
+                        valueAnimation: true,
+                        fontSize: 35, // Slightly larger
+                        offsetCenter: [0, "-35%"], // Moved higher up
+                        formatter: "{value}%",
+                        color: "inherit",
+                    },
+                    data: [
+                        {
+                            value: latestChurn,
+                            name: "Churn Rate",
+                        },
+                    ],
+                },
+            ],
+        };
+    }, [data]);
+
+    return {
+        retentionChurnLoading: loading,
+        heatmapOption,
+        churnGaugeOption,
+    };
+};
