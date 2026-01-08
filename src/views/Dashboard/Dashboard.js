@@ -1,4 +1,4 @@
-import React, { useState, useContext } from "react";
+import React, { useContext } from "react";
 import { Layout } from "antd";
 import Sidebar from "../../components/Sidebar";
 import HeaderComponent from "../../components/Header";
@@ -9,24 +9,24 @@ import { AuthContext } from "../../context/AuthContext";
 const { Content } = Layout;
 
 const Dashboard = () => {
-    const [collapsed, setCollapsed] = useState(false);
     const { routes } = useContext(AuthContext);
 
     return (
         <Layout style={{ minHeight: "100vh" }}>
-            {/* Sidebar */}
-            <Sidebar collapsed={collapsed} routes={routes} />
+            {/* Fixed Sidebar */}
+            <Sidebar routes={routes} />
 
-            {/* Layout principal */}
-            <Layout>
+            {/* Layout principal with left margin for sidebar */}
+            <Layout style={{ marginLeft: 64 }}>
                 {/* Header */}
-                <HeaderComponent collapsed={collapsed} setCollapsed={setCollapsed} />
+                <HeaderComponent />
 
                 {/* Contenido de las rutas hijas */}
                 <Content
                     style={{
-                        padding: 24,
-                        minHeight: 280
+                        minHeight: "calc(100vh - 64px)",
+                        overflowY: "auto",
+                        padding: "24px"
                     }}
                 >
                     <Outlet />

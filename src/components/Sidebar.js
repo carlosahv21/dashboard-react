@@ -1,18 +1,23 @@
 import React, { useContext } from "react";
-import { Layout, Menu } from "antd";
+import { Layout, Menu, Tooltip, Switch } from "antd";
 import { AuthContext } from "../context/AuthContext";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import * as Icons from "@ant-design/icons";
+import { MoonOutlined, SunOutlined } from "@ant-design/icons";
 
 const { Sider } = Layout;
 
-const Sidebar = ({ collapsed }) => {
-	const { settings, hasPermission } = useContext(AuthContext);
+const Sidebar = () => {
+	const { settings, hasPermission, toggleTheme } = useContext(AuthContext);
 	const navigate = useNavigate();
+	const location = useLocation();
+
+	const isDarkMode = settings?.theme === "dark";
 
 	const getIcon = (iconName) => {
 		if (!iconName) return <Icons.QuestionOutlined />;
-		const IconComponent = Icons[`${iconName}Outlined`] || Icons[iconName] || Icons.QuestionOutlined;
+		const IconComponent =
+			Icons[`${iconName}Outlined`] || Icons[iconName] || Icons.QuestionOutlined;
 		return <IconComponent />;
 	};
 
@@ -63,7 +68,7 @@ const Sidebar = ({ collapsed }) => {
 
 	const buildMenuItems = (menuDefinition) =>
 		menuDefinition
-			.filter(item => hasPermission(item.permissionRequired))
+			.filter((item) => hasPermission(item.permissionRequired))
 			.map((item) => {
 				const hasChildren = item.children && item.children.length > 0;
 
@@ -71,28 +76,42 @@ const Sidebar = ({ collapsed }) => {
 					key: item.path,
 					icon: getIcon(item.icon),
 					label: item.label,
-					children: hasChildren
-						? buildMenuItems(item.children)
-						: undefined,
+					children: hasChildren ? buildMenuItems(item.children) : undefined,
 					onClick: () => {
 						if (!hasChildren) navigate(item.path);
 					},
 				};
 			})
-			.filter(item => !item.children || (item.children && item.children.length > 0));
-
+			.filter(
+				(item) => !item.children || (item.children && item.children.length > 0)
+			);
 
 	const items = buildMenuItems(staticMenuDefinition);
 
 	const logo = settings?.logo_url;
 
 	return (
-		<Sider theme={settings?.theme || "light"} trigger={null} collapsible collapsed={collapsed}>
+		<Sider
+			theme={settings?.theme || "light"}
+			trigger={null}
+			collapsible
+			collapsed={true}
+			width={64}
+			collapsedWidth={64}
+			style={{
+				overflow: "hidden",
+				height: "100vh",
+				position: "fixed",
+				left: 0,
+				top: 0,
+				bottom: 0,
+			}}
+		>
 			<div
 				className="logo"
 				style={{
-					height: collapsed ? 40 : "auto",
-					margin: collapsed ? 8 : 16,
+					height: 64,
+					margin: 8,
 					display: "flex",
 					justifyContent: "center",
 					alignItems: "center",
@@ -105,16 +124,58 @@ const Sidebar = ({ collapsed }) => {
 							src={logo}
 							alt="Logo"
 							style={{
-								width: collapsed ? "40px" : "120px",
+								width: "40px",
 								height: "auto",
 								transition: "width 0.2s ease",
 							}}
-							onError={(e) => { e.target.onerror = null; e.target.src = "https://placehold.co/120x40/cccccc/333333?text=Logo"; }}
+							onError={(e) => {
+								e.target.onerror = null;
+								e.target.src =
+									"https://placehold.co/40x40/0A84FF/ffffff?text=L";
+							}}
 						/>
 					</a>
 				)}
 			</div>
-			<Menu theme={settings?.theme || "light"} mode="inline" items={items} />
+
+			<Menu
+				theme={settings?.theme || "light"}
+				mode="inline"
+				items={items}
+				inlineCollapsed={true}
+				selectedKeys={[location.pathname]}
+				style={{
+					height: "calc(100vh - 128px)",
+					borderRight: 0,
+					overflowY: "auto",
+				}}
+			/>
+
+			{/* Theme Toggle at Bottom */}
+			<div
+				style={{
+					position: "absolute",
+					bottom: 0,
+					width: "100%",
+					padding: "16px 0",
+					display: "flex",
+					justifyContent: "center",
+					alignItems: "center",
+					borderTop: `1px solid ${isDarkMode ? "#2D2D2D" : "#E0E0E0"}`,
+				}}
+			>
+				<Tooltip
+					title={isDarkMode ? "Modo Claro" : "Modo Oscuro"}
+					placement="right"
+				>
+					<Switch
+						checked={isDarkMode}
+						onChange={toggleTheme}
+						checkedChildren={<MoonOutlined />}
+						unCheckedChildren={<SunOutlined />}
+					/>
+				</Tooltip>
+			</div>
 		</Sider>
 	);
 };

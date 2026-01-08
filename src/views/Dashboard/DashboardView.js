@@ -59,7 +59,7 @@ const DashboardView = () => {
     const chartTheme = isDarkMode ? "dark" : "light";
 
     return (
-        <div style={{ padding: 24 }}>
+        <>
             {/* KPIs Row */}
             <Row gutter={[24, 24]} style={{ marginBottom: 24 }}>
                 <Col xs={24} sm={6}>
@@ -508,7 +508,7 @@ const DashboardView = () => {
                     />
                 )}
             </Card>
-        </div>
+        </>
     );
 };
 

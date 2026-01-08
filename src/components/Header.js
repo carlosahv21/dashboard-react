@@ -1,16 +1,13 @@
-import React, { useContext, useMemo } from "react";
-import { Button, Layout, Dropdown, Avatar, Space, Badge, Switch } from "antd";
+import React, { useContext, useMemo, useState, useEffect } from "react";
+import { Layout, Dropdown, Avatar, Space, Badge, Input } from "antd";
 import {
-    MenuFoldOutlined,
-    MenuUnfoldOutlined,
     BellOutlined,
     MessageOutlined,
     DownOutlined,
     UserOutlined,
     SettingOutlined,
     LogoutOutlined,
-    MoonOutlined,
-    SunOutlined,
+    SearchOutlined,
 } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
@@ -18,7 +15,7 @@ import { AuthContext } from "../context/AuthContext";
 const { Header } = Layout;
 
 const isPlanVigent = (plan) => {
-    if (!plan || plan.plan_status !== 'active') return false;
+    if (!plan || plan.plan_status !== "active") return false;
 
     const startDate = new Date(plan.plan_start_date);
     const endDate = new Date(plan.plan_end_date);
@@ -26,12 +23,23 @@ const isPlanVigent = (plan) => {
     return now >= startDate && now <= endDate;
 };
 
-
-const HeaderComponent = ({ collapsed, setCollapsed }) => {
+const HeaderComponent = () => {
     const navigate = useNavigate();
-    const { logout, hasPermission, user, settings, toggleTheme } = useContext(AuthContext);
+    const { logout, hasPermission, user, settings } = useContext(AuthContext);
+    const [scrolled, setScrolled] = useState(false);
 
-    const isDarkMode = settings?.theme === 'dark';
+    const isDarkMode = settings?.theme === "dark";
+
+    // Scroll effect listener
+    useEffect(() => {
+        const handleScroll = () => {
+            const offset = window.scrollY;
+            setScrolled(offset > 10);
+        };
+
+        window.addEventListener("scroll", handleScroll);
+        return () => window.removeEventListener("scroll", handleScroll);
+    }, []);
 
     const handleLogout = () => {
         localStorage.clear();
@@ -52,9 +60,11 @@ const HeaderComponent = ({ collapsed, setCollapsed }) => {
             }
         }
 
-        return { classesAvailable: available, isPlanActiveAndVigent: activeAndVigent };
+        return {
+            classesAvailable: available,
+            isPlanActiveAndVigent: activeAndVigent,
+        };
     }, [user?.plan]);
-
 
     const allMenuItems = [
         {
@@ -73,7 +83,7 @@ const HeaderComponent = ({ collapsed, setCollapsed }) => {
         },
     ];
 
-    const menuItems = allMenuItems.filter(item => {
+    const menuItems = allMenuItems.filter((item) => {
         if (!item.permission) return true;
         return hasPermission(item.permission);
     });
@@ -81,62 +91,80 @@ const HeaderComponent = ({ collapsed, setCollapsed }) => {
     return (
         <Header
             style={{
-                padding: "0",
+                padding: "0 24px",
                 backgroundColor: isDarkMode ? "#1E1E1E" : "#fff",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "space-between",
-                boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
+                position: "sticky",
+                top: 0,
+                zIndex: 10,
+                backdropFilter: scrolled ? "blur(8px)" : "none",
+                borderBottom: `1px solid ${isDarkMode ? "#2D2D2D" : "#E0E0E0"}`,
             }}
         >
-            <Button
-                type="text"
-                icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
-                onClick={() => setCollapsed(!collapsed)}
-                style={{ fontSize: 18, width: 64, height: 64, color: isDarkMode ? "#fff" : "inherit" }}
+            {/* Search Bar */}
+            <Input
+                placeholder="Buscar estudiantes, clases, profesores..."
+                suffix={<SearchOutlined />}
+                allowClear
+                style={{
+                    width: 400,
+                    borderRadius: 8,
+                }}
             />
 
-            <Space style={{ marginRight: 20, fontSize: 18 }} size={24}>
-
-                <Switch
-                    checked={isDarkMode}
-                    onChange={toggleTheme}
-                    checkedChildren={<MoonOutlined />}
-                    unCheckedChildren={<SunOutlined />}
-                />
-
+            <Space style={{ marginRight: 0, fontSize: 18 }} size={24}>
                 {user?.plan && (
                     <div
-                        title={isPlanActiveAndVigent ? `Te quedan ${classesAvailable} clases de tu plan.` : 'Tu plan ha expirado o está inactivo.'}
+                        title={
+                            isPlanActiveAndVigent
+                                ? `Te quedan ${classesAvailable} clases de tu plan.`
+                                : "Tu plan ha expirado o está inactivo."
+                        }
                         style={{
-                            padding: '6px 12px',
-                            backgroundColor: isPlanActiveAndVigent ? (isDarkMode ? '#0A2540' : '#e6f7ff') : (isDarkMode ? '#2D0F12' : '#fff1f0'),
-                            borderRadius: '4px',
-                            border: `1px solid ${isPlanActiveAndVigent ? '#91d5ff' : '#ffa39e'}`,
+                            padding: "6px 12px",
+                            backgroundColor: isPlanActiveAndVigent
+                                ? isDarkMode
+                                    ? "#0A2540"
+                                    : "#e6f7ff"
+                                : isDarkMode
+                                    ? "#2D0F12"
+                                    : "#fff1f0",
+                            borderRadius: "4px",
+                            border: `1px solid ${isPlanActiveAndVigent ? "#91d5ff" : "#ffa39e"
+                                }`,
                             fontSize: 14,
                             fontWeight: 600,
-                            lineHeight: '20px',
-                            cursor: 'default',
-                            color: isDarkMode ? "rgba(255, 255, 255, 0.85)" : "inherit"
+                            lineHeight: "20px",
+                            cursor: "default",
+                            color: isDarkMode ? "rgba(255, 255, 255, 0.85)" : "inherit",
                         }}
                     >
                         Clases Disp:
-                        <span style={{
-                            marginLeft: 5,
-                            color: classesAvailable > 0 ? '#52c41a' : (isPlanActiveAndVigent ? '#faad14' : '#f5222d'),
-                            fontSize: 16,
-                        }}>
+                        <span
+                            style={{
+                                marginLeft: 5,
+                                color:
+                                    classesAvailable > 0
+                                        ? "#52c41a"
+                                        : isPlanActiveAndVigent
+                                            ? "#faad14"
+                                            : "#f5222d",
+                                fontSize: 16,
+                            }}
+                        >
                             {classesAvailable}
                         </span>
                     </div>
                 )}
 
                 <Badge count={0} size="small">
-                    <MessageOutlined style={{ fontSize: 20, cursor: "pointer" }} />
+                    <MessageOutlined style={{ fontSize: 18, cursor: "pointer" }} />
                 </Badge>
 
                 <Badge count={3} size="small">
-                    <BellOutlined style={{ fontSize: 20, cursor: "pointer" }} />
+                    <BellOutlined style={{ fontSize: 18, cursor: "pointer" }} />
                 </Badge>
 
                 <Dropdown
@@ -147,13 +175,17 @@ const HeaderComponent = ({ collapsed, setCollapsed }) => {
                     <Space style={{ cursor: "pointer" }}>
                         <Avatar size="large" icon={<UserOutlined />} />
 
-                        <div style={{ display: "flex", flexDirection: "column", lineHeight: "1.1" }}>
+                        <div
+                            style={{
+                                display: "flex",
+                                flexDirection: "column",
+                                lineHeight: "1.1",
+                            }}
+                        >
                             <span style={{ fontWeight: 600, fontSize: 14 }}>
                                 {user?.name || "Usuario"}
                             </span>
-                            <span style={{ fontSize: 12, color: "#888" }}>
-                                {user?.email}
-                            </span>
+                            <span style={{ fontSize: 12, color: "#888" }}>{user?.email}</span>
                         </div>
 
                         <DownOutlined style={{ fontSize: 12 }} />
