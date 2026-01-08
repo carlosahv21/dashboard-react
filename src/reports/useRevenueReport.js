@@ -52,6 +52,12 @@ export const useRevenueReport = (request) => {
                     type: "pie",
                     radius: ["40%", "70%"],
                     avoidLabelOverlap: false,
+                    color: [
+                        "#0A84FF",
+                        "rgba(10, 132, 255, 0.7)",
+                        "rgba(10, 132, 255, 0.5)",
+                        "rgba(10, 132, 255, 0.3)",
+                    ],
                     itemStyle: {
                         borderRadius: 10,
                         borderColor: "#fff",
@@ -79,20 +85,38 @@ export const useRevenueReport = (request) => {
                 data: paymentMethodAnalysis.map((i) => i.payment_method),
             },
             yAxis: [
-                { type: "value", name: "Cantidad" },
-                { type: "value", name: "USD", axisLabel: { formatter: "${value}" } },
+                {
+                    type: "value",
+                    name: "Cantidad",
+                    splitLine: {
+                        lineStyle: {
+                            color: "rgba(0, 0, 0, 0.06)",
+                            type: "dashed",
+                        },
+                    },
+                },
+                {
+                    type: "value",
+                    name: "USD",
+                    axisLabel: { formatter: "${value}" },
+                    splitLine: {
+                        show: false,
+                    },
+                },
             ],
             series: [
                 {
                     name: "Transacciones",
                     type: "bar",
                     data: paymentMethodAnalysis.map((i) => i.transaction_count),
+                    itemStyle: { color: "#0A84FF" },
                 },
                 {
                     name: "Promedio ($)",
                     type: "bar",
                     yAxisIndex: 1,
                     data: paymentMethodAnalysis.map((i) => parseFloat(i.avg_transaction)),
+                    itemStyle: { color: "rgba(10, 132, 255, 0.6)" },
                 },
             ],
         };

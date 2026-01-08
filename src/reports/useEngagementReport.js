@@ -37,15 +37,33 @@ export const useEngagementReport = (request) => {
                 },
             },
             backgroundColor: "transparent",
-            xAxis: { name: "Capacidad Plan", type: "value" },
-            yAxis: { name: "Clases Usadas", type: "value" },
+            xAxis: {
+                name: "Capacidad Plan",
+                type: "value",
+                splitLine: {
+                    lineStyle: {
+                        color: "rgba(0, 0, 0, 0.06)",
+                        type: "dashed",
+                    },
+                },
+            },
+            yAxis: {
+                name: "Clases Usadas",
+                type: "value",
+                splitLine: {
+                    lineStyle: {
+                        color: "rgba(0, 0, 0, 0.06)",
+                        type: "dashed",
+                    },
+                },
+            },
             series: [
                 {
                     symbolSize: 20,
                     data: chartData,
                     type: "scatter",
                     itemStyle: {
-                        color: "#1890ff",
+                        color: "#0A84FF",
                         opacity: 0.6,
                     },
                 },

@@ -84,7 +84,11 @@ export const useRetentionChurnReport = (request) => {
                 left: "center",
                 bottom: "0%",
                 inRange: {
-                    color: ["#FF4D4D", "#FFC53D", "#2ECC71"],
+                    color: [
+                        "rgba(10, 132, 255, 0.2)",
+                        "rgba(10, 132, 255, 0.6)",
+                        "#0A84FF",
+                    ],
                 },
             },
             series: [
@@ -139,6 +143,11 @@ export const useRetentionChurnReport = (request) => {
                     axisLine: {
                         lineStyle: {
                             width: 18,
+                            color: [
+                                [0.3, "rgba(10, 132, 255, 0.3)"],
+                                [0.7, "rgba(10, 132, 255, 0.6)"],
+                                [1, "#0A84FF"],
+                            ],
                         },
                     },
                     axisTick: {

@@ -1,5 +1,5 @@
 // Reports/useUserDistributionReport.js
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo } from "react";
 
 export const useUserDistributionReport = (request) => {
     const [loading, setLoading] = useState(true);
@@ -27,33 +27,47 @@ export const useUserDistributionReport = (request) => {
 
     // Mapeo y Opciones del Gráfico (useMemo para rendimiento)
     const chartOption = useMemo(() => {
-        const mappedData = data.map(item => ({
+        const mappedData = data.map((item) => ({
             value: item.user_count,
-            name: item.plan_name
+            name: item.plan_name,
         }));
 
         return {
-            tooltip: { trigger: 'item', formatter: '{b}: {c} Alumnos ({d}%)' },
-            backgroundColor: 'transparent',
+            tooltip: { trigger: "item", formatter: "{b}: {c} Alumnos ({d}%)" },
+            backgroundColor: "transparent",
             legend: {
-                orient: 'horizontal',
-                left: 'center',
+                orient: "horizontal",
+                left: "center",
                 bottom: 0,
-                data: mappedData.map(item => item.name)
+                data: mappedData.map((item) => item.name),
             },
-            series: [{
-                name: 'Alumnos',
-                type: 'pie',
-                radius: ['30%', '55%'],
-                center: ['50%', '45%'],
-                data: mappedData,
-                label: {
-                    show: true,
-                    formatter: '{b}: {d}%',
-                    position: 'outside'
+            series: [
+                {
+                    name: "Alumnos",
+                    type: "pie",
+                    radius: ["30%", "55%"],
+                    center: ["50%", "45%"],
+                    data: mappedData,
+                    color: [
+                        "#0A84FF",
+                        "rgba(10, 132, 255, 0.7)",
+                        "rgba(10, 132, 255, 0.5)",
+                        "rgba(10, 132, 255, 0.3)",
+                    ],
+                    label: {
+                        show: true,
+                        formatter: "{b}: {d}%",
+                        position: "outside",
+                    },
+                    emphasis: {
+                        itemStyle: {
+                            shadowBlur: 10,
+                            shadowOffsetX: 0,
+                            shadowColor: "rgba(0, 0, 0, 0.5)",
+                        },
+                    },
                 },
-                emphasis: { itemStyle: { shadowBlur: 10, shadowOffsetX: 0, shadowColor: 'rgba(0, 0, 0, 0.5)' } }
-            }]
+            ],
         };
     }, [data]);
 

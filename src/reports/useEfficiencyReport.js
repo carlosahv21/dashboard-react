@@ -33,19 +33,26 @@ export const useEfficiencyReport = (request) => {
             tooltip: { trigger: "axis", axisPointer: { type: "shadow" } },
             backgroundColor: "transparent",
             grid: { left: "3%", right: "4%", bottom: "3%", containLabel: true },
-            xAxis: { type: "value", max: 100, axisLabel: { formatter: "{value}%" } },
+            xAxis: {
+                type: "value",
+                max: 100,
+                axisLabel: { formatter: "{value}%" },
+                splitLine: {
+                    lineStyle: {
+                        color: "rgba(0, 0, 0, 0.06)",
+                        type: "dashed",
+                    },
+                },
+            },
             yAxis: { type: "category", data: sortedData.map((i) => i.name) },
             series: [
                 {
                     name: "Tasa de Llenado",
                     type: "bar",
-                    data: sortedData.map((i) => {
-                        const val = parseFloat(i.fill_rate);
-                        let color = "#52c41a"; // Verde > 70
-                        if (val < 20) color = "#f5222d"; // Rojo < 20
-                        else if (val <= 70) color = "#faad14"; // Amarillo 20-70
-                        return { value: val, itemStyle: { color } };
-                    }),
+                    data: sortedData.map((i) => ({
+                        value: parseFloat(i.fill_rate),
+                        itemStyle: { color: "#0A84FF" },
+                    })),
                 },
             ],
         };
@@ -83,6 +90,15 @@ export const useEfficiencyReport = (request) => {
                 {
                     name: "Eficiencia Docente",
                     type: "radar",
+                    itemStyle: {
+                        color: "#0A84FF",
+                    },
+                    lineStyle: {
+                        color: "#0A84FF",
+                    },
+                    areaStyle: {
+                        color: "rgba(10, 132, 255, 0.2)",
+                    },
                     data: teacherEfficiency.map((i) => ({
                         value: [
                             i.classes_taught,

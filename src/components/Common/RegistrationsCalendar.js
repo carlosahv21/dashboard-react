@@ -62,11 +62,11 @@ const classToEvent = (classItem, onRemove) => {
 // Color coding by level
 const getColorByLevel = (level) => {
     const colors = {
-        "Basico": "#fa8c16",
-        "Intermedio": "#1890ff",
-        "Avanzado": "#722ed1"
+        "Básico": "#0A84FF",
+        "Intermedio": "#016fddff",
+        "Avanzado": "#005fbe",
     };
-    return colors[level] || "#1890ff";
+    return colors[level] || "#0A84FF";
 };
 
 const RegistrationsCalendar = ({ enrolledClasses, onRemoveClass }) => {

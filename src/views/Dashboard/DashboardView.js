@@ -58,14 +58,6 @@ const DashboardView = () => {
     const isDarkMode = settings?.theme === "dark";
     const chartTheme = isDarkMode ? "dark" : "light";
 
-    // KPI Card Style Helper
-    const kpiCardStyle = {
-        borderRadius: "10px",
-        color: "#fff",
-        border: "none",
-        overflow: "hidden",
-    };
-
     return (
         <div style={{ padding: 24 }}>
             {/* KPIs Row */}
@@ -73,16 +65,16 @@ const DashboardView = () => {
                 <Col xs={24} sm={6}>
                     <Card
                         style={{
-                            ...kpiCardStyle,
-                            background: "linear-gradient(135deg, #FFC53D 0%, #FF9c6e 100%)",
+                            borderLeft: "4px solid #0A84FF",
                         }}
                     >
                         <Spin spinning={kpiLoading}>
                             <Statistic
-                                title={<span style={{ color: "#fff" }}>Active Students</span>}
+                                title="Active Students"
                                 value={kpiData.activeStudents}
-                                suffix={<UserOutlined style={{ marginLeft: 8 }} />}
-                                valueStyle={{ color: "#fff" }}
+                                suffix={
+                                    <UserOutlined style={{ marginLeft: 8, color: "#0A84FF" }} />
+                                }
                             />
                         </Spin>
                     </Card>
@@ -90,16 +82,16 @@ const DashboardView = () => {
                 <Col xs={24} sm={6}>
                     <Card
                         style={{
-                            ...kpiCardStyle,
-                            background: "linear-gradient(135deg, #722ED1 0%, #B37FEB 100%)",
+                            borderLeft: "4px solid #0A84FF",
                         }}
                     >
                         <Spin spinning={kpiLoading}>
                             <Statistic
-                                title={<span style={{ color: "#fff" }}>Today's Classes</span>}
+                                title="Today's Classes"
                                 value={kpiData.todayClasses}
-                                suffix={<BookOutlined style={{ marginLeft: 8 }} />}
-                                valueStyle={{ color: "#fff" }}
+                                suffix={
+                                    <BookOutlined style={{ marginLeft: 8, color: "#0A84FF" }} />
+                                }
                             />
                         </Spin>
                     </Card>
@@ -107,17 +99,17 @@ const DashboardView = () => {
                 <Col xs={24} sm={6}>
                     <Card
                         style={{
-                            ...kpiCardStyle,
-                            background: "linear-gradient(135deg, #EB2F96 0%, #F759AB 100%)",
+                            borderLeft: "4px solid #0A84FF",
                         }}
                     >
                         <Spin spinning={kpiLoading}>
                             <Statistic
-                                title={<span style={{ color: "#fff" }}>Monthly Revenue</span>}
+                                title="Monthly Revenue"
                                 value={kpiData.monthlyRevenue}
                                 precision={2}
-                                suffix={<DollarOutlined style={{ marginLeft: 8 }} />}
-                                valueStyle={{ color: "#fff" }}
+                                suffix={
+                                    <DollarOutlined style={{ marginLeft: 8, color: "#0A84FF" }} />
+                                }
                             />
                         </Spin>
                     </Card>
@@ -125,17 +117,19 @@ const DashboardView = () => {
                 <Col xs={24} sm={6}>
                     <Card
                         style={{
-                            ...kpiCardStyle,
-                            background: "linear-gradient(135deg, #87dd93 0%, #3dbd48 100%)",
+                            borderLeft: "4px solid #0A84FF",
                         }}
                     >
                         <Spin spinning={kpiLoading}>
                             <Statistic
-                                title={<span style={{ color: "#fff" }}>Attendance Rate</span>}
+                                title="Attendance Rate"
                                 value={kpiData.attendanceRate}
                                 precision={1}
-                                suffix={<CheckCircleOutlined style={{ marginLeft: 8 }} />}
-                                valueStyle={{ color: "#fff" }}
+                                suffix={
+                                    <CheckCircleOutlined
+                                        style={{ marginLeft: 8, color: "#0A84FF" }}
+                                    />
+                                }
                             />
                         </Spin>
                     </Card>
@@ -403,7 +397,10 @@ const DashboardView = () => {
                                             avatar={
                                                 <Avatar
                                                     icon={<UserOutlined />}
-                                                    style={{ backgroundColor: "#ff4d4f" }}
+                                                    style={{
+                                                        backgroundColor: "rgba(10, 132, 255, 0.2)",
+                                                        color: "#0A84FF",
+                                                    }}
                                                 />
                                             }
                                             title={`${user.first_name} ${user.last_name}`}
