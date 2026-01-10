@@ -26,41 +26,81 @@ const BaseView = ({
     fixedValues,
     hiddenFields,
     viewOptions,
-    cardComponent: CardComponent
+    cardComponent: CardComponent,
 }) => {
     const { hasPermission } = useContext(AuthContext);
     const { message, modal } = App.useApp();
     const [form] = Form.useForm();
 
-    const initialSort = columns.reduce((acc, col) => {
-        if (col.defaultSortOrder) {
-            return { field: col.dataIndex || col.key, order: col.defaultSortOrder };
-        }
-        return acc;
-    }, { field: null, order: null });
+    // Determine initial view and page size before useCrud
+    const initialView = viewOptions?.[0] || "table";
+    const initialPageSize = initialView === "card" ? 8 : 10;
+
+    const initialSort = columns.reduce(
+        (acc, col) => {
+            if (col.defaultSortOrder) {
+                return { field: col.dataIndex || col.key, order: col.defaultSortOrder };
+            }
+            return acc;
+        },
+        { field: null, order: null }
+    );
 
     const {
-        items, loading, search, setSearch, pagination, fetchItems,
-        handlePageChange, handlePageSizeChange, setItems, setPagination, request, handleTableChange, getAllItems,
-        selectedKeys, setSelectedKeys, isAllSelected, handleSelectAll, setIsAllSelected
-    } = useCrud(endpoint, titlePlural, filters, initialSort);
+        items,
+        loading,
+        search,
+        setSearch,
+        pagination,
+        fetchItems,
+        handlePageChange,
+        handlePageSizeChange,
+        setItems,
+        setPagination,
+        request,
+        handleTableChange,
+        getAllItems,
+        selectedKeys,
+        setSelectedKeys,
+        isAllSelected,
+        handleSelectAll,
+        setIsAllSelected,
+    } = useCrud(endpoint, titlePlural, filters, initialSort, initialPageSize);
 
     const {
-        modalVisible, editingId, moduleData,
-        openModal, closeModal, handleSubmit
-    } = useFormModal(request, endpoint, moduleFieldId, titleSingular, fixedValues, form);
+        modalVisible,
+        editingId,
+        moduleData,
+        openModal,
+        closeModal,
+        handleSubmit,
+    } = useFormModal(
+        request,
+        endpoint,
+        moduleFieldId,
+        titleSingular,
+        fixedValues,
+        form
+    );
 
     const {
-        drawerVisible, selectedRecordId, drawerData, drawerLoading,
-        handleRowClick, handleDrawerClose
+        drawerVisible,
+        selectedRecordId,
+        drawerData,
+        drawerLoading,
+        handleRowClick,
+        handleDrawerClose,
     } = useDrawerDetail(request, endpoint, titleSingular);
 
     const handleDelete = async (id) => {
         try {
             await request(`${endpoint}/${id}`, "DELETE");
-            message.success(`${titleSingular} eliminad${titleSingular.endsWith('a') ? 'a' : 'o'} correctamente`);
-            setItems(prev => prev.filter(i => i.id !== id));
-            setPagination(prev => ({ ...prev, total: prev.total - 1 }));
+            message.success(
+                `${titleSingular} eliminad${titleSingular.endsWith("a") ? "a" : "o"
+                } correctamente`
+            );
+            setItems((prev) => prev.filter((i) => i.id !== id));
+            setPagination((prev) => ({ ...prev, total: prev.total - 1 }));
         } catch (error) {
             message.error(error?.message || `Error al eliminar ${titleSingular}`);
         }
@@ -73,8 +113,10 @@ const BaseView = ({
         }
 
         modal.confirm({
-            title: `¿Eliminar ${isAllSelected ? "todos los" : selectedKeys.length} registros?`,
-            content: `Esta acción no se puede deshacer. Se eliminán ${isAllSelected ? pagination.total : selectedKeys.length} registros.`,
+            title: `¿Eliminar ${isAllSelected ? "todos los" : selectedKeys.length
+                } registros?`,
+            content: `Esta acción no se puede deshacer. Se eliminán ${isAllSelected ? pagination.total : selectedKeys.length
+                } registros.`,
             okText: "Sí, eliminar",
             okType: "danger",
             cancelText: "Cancelar",
@@ -84,12 +126,14 @@ const BaseView = ({
                     let idsToDelete = selectedKeys;
                     if (isAllSelected) {
                         const allItems = await getAllItems();
-                        idsToDelete = allItems.map(i => i.id);
+                        idsToDelete = allItems.map((i) => i.id);
                     }
 
                     for (let i = 0; i < idsToDelete.length; i += 5) {
                         const chunk = idsToDelete.slice(i, i + 5);
-                        await Promise.all(chunk.map(id => request(`${endpoint}/${id}`, "DELETE")));
+                        await Promise.all(
+                            chunk.map((id) => request(`${endpoint}/${id}`, "DELETE"))
+                        );
                     }
 
                     message.success("Registros eliminados correctamente");
@@ -102,7 +146,7 @@ const BaseView = ({
                 } finally {
                     hide();
                 }
-            }
+            },
         });
     };
 
@@ -128,7 +172,7 @@ const BaseView = ({
         let dataToExport = allData;
 
         if (!isAllSelected && selectedKeys.length > 0) {
-            dataToExport = allData.filter(item => selectedKeys.includes(item.id));
+            dataToExport = allData.filter((item) => selectedKeys.includes(item.id));
         }
 
         exportToExcel(dataToExport, titlePlural);
@@ -141,10 +185,35 @@ const BaseView = ({
         writeFileXLSX(wb, `${title}.xlsx`);
     };
 
-    const [currentView, setCurrentView] = React.useState(viewOptions?.[0] || 'table');
+    const [currentView, setCurrentView] = React.useState(initialView);
+
+    // Helper functions for adaptive pagination
+    const getPageSizeOptions = (view) => {
+        if (view === "card") {
+            return [8, 16, 24, 48, 96];
+        }
+        return [5, 10, 20, 50, 100];
+    };
+
+    const adjustPageSizeForView = (currentSize, targetView) => {
+        const options = getPageSizeOptions(targetView);
+
+        // Find closest option
+        return options.reduce((prev, curr) => {
+            return Math.abs(curr - currentSize) < Math.abs(prev - currentSize)
+                ? curr
+                : prev;
+        });
+    };
 
     const handleViewChange = (view) => {
         setCurrentView(view);
+
+        // Adjust page size when changing views
+        const newPageSize = adjustPageSizeForView(pagination.pageSize, view);
+        if (newPageSize !== pagination.pageSize) {
+            handlePageSizeChange(newPageSize);
+        }
     };
 
     const rowSelection = {
@@ -170,6 +239,7 @@ const BaseView = ({
                 titlePlural={titlePlural}
                 pageSize={pagination.pageSize}
                 onPageSizeChange={handlePageSizeChange}
+                pageSizeOptions={getPageSizeOptions(currentView)}
                 onExport={handleExport}
                 onBulkDelete={handleBulkDelete}
                 viewOptions={viewOptions}
@@ -177,52 +247,56 @@ const BaseView = ({
                 onViewChange={handleViewChange}
             />
 
-            {currentView === 'table' ? (
+            {currentView === "table" ? (
                 <DataTable
                     columns={columns}
                     data={items}
                     loading={loading}
                     onEdit={hasPermission(`${endpoint}:edit`) ? openModal : undefined}
-                    onDelete={hasPermission(`${endpoint}:delete`) ? handleDelete : undefined}
-                    disableEdit={(record) => ["admin"].includes(record.role_name?.toLowerCase())}
-                    disableDelete={(record) => ["admin"].includes(record.role_name?.toLowerCase())}
+                    onDelete={
+                        hasPermission(`${endpoint}:delete`) ? handleDelete : undefined
+                    }
+                    disableEdit={(record) =>
+                        ["admin"].includes(record.role_name?.toLowerCase())
+                    }
+                    disableDelete={(record) =>
+                        ["admin"].includes(record.role_name?.toLowerCase())
+                    }
                     onRow={(record) => ({
                         onClick: () => handleRowClick(record),
-                        style: { cursor: 'pointer' }
+                        style: { cursor: "pointer" },
                     })}
                     selectedRowId={selectedRecordId}
                     onChange={handleTableChange}
                     rowSelection={rowSelection}
                 />
-            ) : (
-                CardComponent ? (
-                    loading ? (
-                        <div style={{ textAlign: "center", padding: "50px" }}>
-                            <Spin size="large" />
-                        </div>
-                    ) : (
-                        <Row gutter={[16, 16]}>
-                            {items.length === 0 && (
-                                <Col xs={24}>
-                                    <Empty />
-                                </Col>
-                            )}
-                            {items.map(item => (
-                                <Col xs={24} sm={12} md={8} lg={6} xl={6} key={item.id}>
-                                    <CardComponent
-                                        record={item}
-                                        onEdit={openModal}
-                                        onDelete={handleDelete}
-                                        onRowClick={handleRowClick}
-                                        canEdit={hasPermission(`${endpoint}:edit`)}
-                                        canDelete={hasPermission(`${endpoint}:delete`)}
-                                    />
-                                </Col>
-                            ))}
-                        </Row>
-                    )
-                ) : null
-            )}
+            ) : CardComponent ? (
+                loading ? (
+                    <div style={{ textAlign: "center", padding: "50px" }}>
+                        <Spin size="large" />
+                    </div>
+                ) : (
+                    <Row gutter={[16, 16]} justify="start">
+                        {items.length === 0 && (
+                            <Col xs={24}>
+                                <Empty />
+                            </Col>
+                        )}
+                        {items.map((item) => (
+                            <Col xs={24} sm={12} md={8} lg={6} xl={6} key={item.id}>
+                                <CardComponent
+                                    record={item}
+                                    onEdit={openModal}
+                                    onDelete={handleDelete}
+                                    onRowClick={handleRowClick}
+                                    canEdit={hasPermission(`${endpoint}:edit`)}
+                                    canDelete={hasPermission(`${endpoint}:delete`)}
+                                />
+                            </Col>
+                        ))}
+                    </Row>
+                )
+            ) : null}
 
             <PaginationControl
                 page={pagination.current}
@@ -243,7 +317,11 @@ const BaseView = ({
                     moduleData.blocks?.length > 0 ? (
                         <>
                             <FormHeader
-                                title={editingId ? `Editar ${titleSingular}` : `Crear ${titleSingular}`}
+                                title={
+                                    editingId
+                                        ? `Editar ${titleSingular}`
+                                        : `Crear ${titleSingular}`
+                                }
                                 subtitle={
                                     editingId
                                         ? `Edita los datos del ${titleSingular.toLowerCase()}`
@@ -262,14 +340,21 @@ const BaseView = ({
                                     <FormSection
                                         key={block.block_id}
                                         title={block.block_name}
-                                        fields={block.fields.filter(f => !hiddenFields?.includes(f.name))}
+                                        fields={block.fields.filter(
+                                            (f) => !hiddenFields?.includes(f.name)
+                                        )}
                                     />
                                 ))}
-                                <FormFooter onCancel={handleCloseModal} onSave={() => form.submit()} />
+                                <FormFooter
+                                    onCancel={handleCloseModal}
+                                    onSave={() => form.submit()}
+                                />
                             </Form>
                         </>
                     ) : (
-                        <div style={{ textAlign: "center", padding: 50 }}>No hay campos para mostrar.</div>
+                        <div style={{ textAlign: "center", padding: 50 }}>
+                            No hay campos para mostrar.
+                        </div>
                     )
                 ) : (
                     <div style={{ textAlign: "center", padding: 50 }}>
@@ -289,7 +374,6 @@ const BaseView = ({
                     </div>
                 )}
             </DrawerDetails>
-
         </>
     );
 };

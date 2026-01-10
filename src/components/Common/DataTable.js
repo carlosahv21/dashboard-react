@@ -45,6 +45,7 @@ const DataTable = ({
                                 <Button
                                     type="link"
                                     icon={<EditOutlined />}
+                                    style={{ color: "#13a8a8" }}
                                     onClick={(e) => {
                                         e.stopPropagation();
                                         !editDisabled && onEdit(record.id);

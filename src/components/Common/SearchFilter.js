@@ -1,7 +1,15 @@
 // components/SearchFilter.jsx (Con Alineación Vertical y Botón de Exportar)
 import React from "react";
 import { Input, Button, Space, Select, Typography, Dropdown } from "antd";
-import { SearchOutlined, PlusOutlined, FileExcelOutlined, DeleteOutlined, DownOutlined, AppstoreOutlined, TableOutlined } from "@ant-design/icons";
+import {
+    SearchOutlined,
+    PlusOutlined,
+    FileExcelOutlined,
+    DeleteOutlined,
+    DownOutlined,
+    AppstoreOutlined,
+    TableOutlined,
+} from "@ant-design/icons";
 
 const { Title } = Typography;
 
@@ -15,37 +23,38 @@ const SearchFilter = ({
     canCreate,
     pageSize,
     onPageSizeChange,
+    pageSizeOptions = [5, 10, 20, 50, 100],
     onExport,
     onBulkDelete,
     viewOptions,
     currentView,
-    onViewChange
+    onViewChange,
 }) => {
-
     const masiveActions = [
         {
-            value: 'export',
-            label: 'Exportar a Excel',
+            value: "export",
+            label: "Exportar a Excel",
             onClick: () => onExport(),
-            icon: <FileExcelOutlined />
+            icon: <FileExcelOutlined />,
         },
         canDelete && {
-            value: 'delete',
-            label: 'Eliminar',
+            value: "delete",
+            label: "Eliminar",
             onClick: () => onBulkDelete(),
             icon: <DeleteOutlined />,
             danger: true,
-        }
+        },
     ];
     return (
-        <div style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            width: '100%',
-            marginBottom: 16
-        }}>
-
+        <div
+            style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                width: "100%",
+                marginBottom: 16,
+            }}
+        >
             <Title level={2} style={{ marginBottom: 0, marginTop: 0 }}>
                 {titlePlural}
             </Title>
@@ -55,15 +64,12 @@ const SearchFilter = ({
                     <Typography.Text type="secondary">Mostrar</Typography.Text>
                     <Select
                         value={pageSize}
-                        style={{ width: 60 }}
+                        style={{ width: 70 }}
                         onChange={onPageSizeChange}
-                        options={[
-                            { value: 5, label: '5' },
-                            { value: 10, label: '10' },
-                            { value: 20, label: '20' },
-                            { value: 50, label: '50' },
-                            { value: 100, label: '100' },
-                        ]}
+                        options={pageSizeOptions.map((size) => ({
+                            value: size,
+                            label: String(size),
+                        }))}
                     />
                 </Space>
 
@@ -79,7 +85,7 @@ const SearchFilter = ({
                 <Dropdown
                     menu={{ items: masiveActions }}
                     placement="bottomRight"
-                    trigger={['click']}
+                    trigger={["click"]}
                 >
                     <Button>
                         Acciones masivas <DownOutlined />
@@ -89,18 +95,18 @@ const SearchFilter = ({
                 {viewOptions && viewOptions.length > 1 && (
                     <>
                         <Space>
-                            {viewOptions.includes('table') && (
+                            {viewOptions.includes("table") && (
                                 <Button
-                                    type={currentView === 'table' ? 'primary' : 'default'}
+                                    type={currentView === "table" ? "primary" : "default"}
                                     icon={<TableOutlined />}
-                                    onClick={() => onViewChange('table')}
+                                    onClick={() => onViewChange("table")}
                                 />
                             )}
-                            {viewOptions.includes('card') && (
+                            {viewOptions.includes("card") && (
                                 <Button
-                                    type={currentView === 'card' ? 'primary' : 'default'}
+                                    type={currentView === "card" ? "primary" : "default"}
                                     icon={<AppstoreOutlined />}
-                                    onClick={() => onViewChange('card')}
+                                    onClick={() => onViewChange("card")}
                                 />
                             )}
                         </Space>
@@ -113,7 +119,6 @@ const SearchFilter = ({
                     </Button>
                 )}
             </Space>
-
         </div>
     );
 };

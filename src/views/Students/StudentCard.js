@@ -13,7 +13,7 @@ const StudentCard = ({ record, onEdit, onDelete, onRowClick, canEdit, canDelete 
             title={`${record.first_name} ${record.last_name}`}
             extra={<EyeOutlined key="view" style={{ color: "#1668dc" }} onClick={() => onRowClick(record)} />}
             actions={[
-                <HistoryOutlined key="history" style={{ color: "#bfbfbf" }} onClick={() => navigate(`/students/${record.id}/history`)} />,
+                <HistoryOutlined key="history" style={{ color: "#696969" }} onClick={() => navigate(`/students/${record.id}/history`)} />,
                 canEdit && <EditOutlined key="edit" style={{ color: "#13a8a8" }} onClick={() => onEdit(record.id)} />,
                 canDelete && <DeleteOutlined key="delete" style={{ color: "#d32029" }} onClick={() => onDelete(record.id)} />,
             ].filter(Boolean)}

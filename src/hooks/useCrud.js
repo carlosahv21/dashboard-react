@@ -3,17 +3,31 @@ import { useState, useEffect } from "react";
 import { message } from "antd";
 import useFetch from "./useFetch";
 
-export const useCrud = (endpoint, titlePlural, filters, initialSort = { field: null, order: null }) => {
+export const useCrud = (
+    endpoint,
+    titlePlural,
+    filters,
+    initialSort = { field: null, order: null },
+    initialPageSize = 10
+) => {
     const { request } = useFetch();
     const [items, setItems] = useState([]);
     const [loading, setLoading] = useState(false);
     const [search, setSearch] = useState("");
-    const [pagination, setPagination] = useState({ current: 1, pageSize: 10, total: 0 });
+    const [pagination, setPagination] = useState({
+        current: 1,
+        pageSize: initialPageSize,
+        total: 0,
+    });
     const [sort, setSort] = useState(initialSort);
     const [selectedKeys, setSelectedKeys] = useState([]);
     const [isAllSelected, setIsAllSelected] = useState(false);
 
-    const fetchItems = async (page = pagination.current, limit = pagination.pageSize, currentSort = sort) => {
+    const fetchItems = async (
+        page = pagination.current,
+        limit = pagination.pageSize,
+        currentSort = sort
+    ) => {
         try {
             setLoading(true);
             const params = {
@@ -21,11 +35,18 @@ export const useCrud = (endpoint, titlePlural, filters, initialSort = { field: n
                 limit,
                 search: search.length >= 3 ? search : undefined,
                 order_by: currentSort.field,
-                order_direction: currentSort.order === "ascend" ? "asc" : currentSort.order === "descend" ? "desc" : undefined,
+                order_direction:
+                    currentSort.order === "ascend"
+                        ? "asc"
+                        : currentSort.order === "descend"
+                            ? "desc"
+                            : undefined,
                 ...filters,
             };
             const queryParams = new URLSearchParams(
-                Object.entries(params).filter(([_, v]) => v !== undefined && v !== "" && v !== null)
+                Object.entries(params).filter(
+                    ([_, v]) => v !== undefined && v !== "" && v !== null
+                )
             ).toString();
 
             const response = await request(`${endpoint}/?${queryParams}`, "GET");
@@ -36,7 +57,7 @@ export const useCrud = (endpoint, titlePlural, filters, initialSort = { field: n
             const total = pagination.total || 0;
             const lastPage = Math.max(1, Math.ceil(total / limit));
             const current = page > lastPage ? lastPage : page;
-            setPagination(prev => ({ ...prev, total, current, pageSize: limit }));
+            setPagination((prev) => ({ ...prev, total, current, pageSize: limit }));
         } catch (error) {
             console.error(error);
             message.error(`Error al cargar ${titlePlural}`);
@@ -46,14 +67,17 @@ export const useCrud = (endpoint, titlePlural, filters, initialSort = { field: n
     };
 
     useEffect(() => {
-        const delay = setTimeout(() => fetchItems(1, pagination.pageSize, sort), 500);
+        const delay = setTimeout(
+            () => fetchItems(1, pagination.pageSize, sort),
+            500
+        );
         return () => clearTimeout(delay);
     }, [search]);
 
     useEffect(() => {
         if (isAllSelected) {
-            const newIds = items.map(i => i.id);
-            setSelectedKeys(prev => {
+            const newIds = items.map((i) => i.id);
+            setSelectedKeys((prev) => {
                 const unique = new Set([...prev, ...newIds]);
                 if (unique.size !== prev.length) return [...unique];
                 return prev;
@@ -64,17 +88,17 @@ export const useCrud = (endpoint, titlePlural, filters, initialSort = { field: n
     const handleTableChange = (newPagination, filters, sorter) => {
         const newSort = {
             field: sorter.field,
-            order: sorter.order
+            order: sorter.order,
         };
         setSort(newSort);
         const currentSize = pagination.pageSize;
-        setPagination(prev => ({ ...prev, current: 1 }));
+        setPagination((prev) => ({ ...prev, current: 1 }));
         fetchItems(1, currentSize, newSort);
     };
 
     const handlePageChange = (newPage) => fetchItems(newPage);
     const handlePageSizeChange = (newSize) => {
-        setPagination(prev => ({ ...prev, pageSize: newSize, current: 1 }));
+        setPagination((prev) => ({ ...prev, pageSize: newSize, current: 1 }));
         fetchItems(1, newSize);
     };
 
@@ -85,11 +109,18 @@ export const useCrud = (endpoint, titlePlural, filters, initialSort = { field: n
                 limit: 10000,
                 search: search.length >= 3 ? search : undefined,
                 order_by: sort.field,
-                order_direction: sort.order === "ascend" ? "asc" : sort.order === "descend" ? "desc" : undefined,
+                order_direction:
+                    sort.order === "ascend"
+                        ? "asc"
+                        : sort.order === "descend"
+                            ? "desc"
+                            : undefined,
                 ...filters,
             };
             const queryParams = new URLSearchParams(
-                Object.entries(params).filter(([_, v]) => v !== undefined && v !== "" && v !== null)
+                Object.entries(params).filter(
+                    ([_, v]) => v !== undefined && v !== "" && v !== null
+                )
             ).toString();
 
             const response = await request(`${endpoint}/?${queryParams}`, "GET");
@@ -103,9 +134,9 @@ export const useCrud = (endpoint, titlePlural, filters, initialSort = { field: n
 
     const handleSelectRow = (id, checked) => {
         if (checked) {
-            setSelectedKeys(prev => [...prev, id]);
+            setSelectedKeys((prev) => [...prev, id]);
         } else {
-            setSelectedKeys(prev => prev.filter(k => k !== id));
+            setSelectedKeys((prev) => prev.filter((k) => k !== id));
             if (isAllSelected) setIsAllSelected(false);
         }
     };
@@ -113,8 +144,8 @@ export const useCrud = (endpoint, titlePlural, filters, initialSort = { field: n
     const handleSelectAll = (checked) => {
         setIsAllSelected(checked);
         if (checked) {
-            const allIdsOnPage = items.map(i => i.id);
-            setSelectedKeys(prev => [...new Set([...prev, ...allIdsOnPage])]);
+            const allIdsOnPage = items.map((i) => i.id);
+            setSelectedKeys((prev) => [...new Set([...prev, ...allIdsOnPage])]);
         } else {
             setSelectedKeys([]);
         }
@@ -141,6 +172,6 @@ export const useCrud = (endpoint, titlePlural, filters, initialSort = { field: n
         isAllSelected,
         setIsAllSelected,
         handleSelectRow,
-        handleSelectAll
+        handleSelectAll,
     };
 };
