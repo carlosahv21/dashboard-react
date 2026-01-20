@@ -173,7 +173,7 @@ const DashboardView = () => {
                                             justifyContent: "center",
                                         }}
                                     >
-                                        <p>Cargando datos del reporte...</p>
+                                        <p>No hay datos para mostrar</p>
                                     </div>
                                 )}
                             </div>
@@ -199,12 +199,23 @@ const DashboardView = () => {
                                 >
                                     <Spin size="large" />
                                 </div>
-                            ) : (
+                            ) : charts.userDistribution ? (
                                 <ReactECharts
                                     option={charts.userDistribution}
                                     theme={chartTheme}
                                     style={{ height: "100%", width: "100%" }}
                                 />
+                            ) : (
+                                <div
+                                    style={{
+                                        height: "100%",
+                                        display: "flex",
+                                        alignItems: "center",
+                                        justifyContent: "center",
+                                    }}
+                                >
+                                    <Empty description="No hay datos de distribución" />
+                                </div>
                             )}
                         </div>
                     </Card>
@@ -259,7 +270,7 @@ const DashboardView = () => {
                                         justifyContent: "center",
                                     }}
                                 >
-                                    <p>No hay datos de cohortes suficientes.</p>
+                                    <p>No hay datos para mostrar</p>
                                 </div>
                             )}
                         </div>
@@ -289,11 +300,15 @@ const DashboardView = () => {
                                 </div>
                             ) : (
                                 <>
-                                    <ReactECharts
-                                        option={charts.churnGauge}
-                                        theme={chartTheme}
-                                        style={{ height: "300px", width: "100%" }}
-                                    />
+                                    {charts.churnGauge ? (
+                                        <ReactECharts
+                                            option={charts.churnGauge}
+                                            theme={chartTheme}
+                                            style={{ height: "300px", width: "100%" }}
+                                        />
+                                    ) : (
+                                        <Empty description="Sin datos de Churn" />
+                                    )}
                                     <div style={{ textAlign: "center", marginTop: -40 }}>
                                         <p style={{ color: "#999" }}>Último mes analizado</p>
                                     </div>
@@ -320,12 +335,14 @@ const DashboardView = () => {
                                 >
                                     <Spin size="large" />
                                 </div>
-                            ) : (
+                            ) : charts.revenueDonut ? (
                                 <ReactECharts
                                     option={charts.revenueDonut}
                                     theme={chartTheme}
                                     style={{ height: "100%", width: "100%" }}
                                 />
+                            ) : (
+                                <Empty description="Sin datos de ingresos" />
                             )}
                         </div>
                     </Card>
@@ -344,12 +361,14 @@ const DashboardView = () => {
                                 >
                                     <Spin size="large" />
                                 </div>
-                            ) : (
+                            ) : charts.revenueComparison ? (
                                 <ReactECharts
                                     option={charts.revenueComparison}
                                     theme={chartTheme}
                                     style={{ height: "100%", width: "100%" }}
                                 />
+                            ) : (
+                                <Empty description="Sin datos comparativos" />
                             )}
                         </div>
                     </Card>
@@ -372,12 +391,14 @@ const DashboardView = () => {
                                 >
                                     <Spin size="large" />
                                 </div>
-                            ) : (
+                            ) : charts.engagementScatter ? (
                                 <ReactECharts
                                     option={charts.engagementScatter}
                                     theme={chartTheme}
                                     style={{ height: "100%", width: "100%" }}
                                 />
+                            ) : (
+                                <Empty description="Sin datos de engagement" />
                             )}
                         </div>
                     </Card>
@@ -439,12 +460,14 @@ const DashboardView = () => {
                                 >
                                     <Spin size="large" />
                                 </div>
-                            ) : (
+                            ) : charts.efficiencyFillRate ? (
                                 <ReactECharts
                                     option={charts.efficiencyFillRate}
                                     theme={chartTheme}
                                     style={{ height: "100%", width: "100%" }}
                                 />
+                            ) : (
+                                <Empty description="Sin datos para mostrar" />
                             )}
                         </div>
                     </Card>
@@ -463,12 +486,14 @@ const DashboardView = () => {
                                 >
                                     <Spin size="large" />
                                 </div>
-                            ) : (
+                            ) : charts.efficiencyRadar ? (
                                 <ReactECharts
                                     option={charts.efficiencyRadar}
                                     theme={chartTheme}
                                     style={{ height: "100%", width: "100%" }}
                                 />
+                            ) : (
+                                <Empty description="Sin datos para mostrar" />
                             )}
                         </div>
                     </Card>

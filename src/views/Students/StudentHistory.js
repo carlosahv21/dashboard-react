@@ -48,8 +48,8 @@ const StudentHistory = () => {
                 const planResponse = await request(`plans/student/${id}`);
                 setActivePlan(planResponse.data);
 
-                // Fetch Attendance
-                const attResponse = await request(`attendance?student_id=${id}`);
+                // Fetch Attendances
+                const attResponse = await request(`attendances?student_id=${id}`);
                 setAttendances(attResponse.data || []);
 
                 // Fetch Payments

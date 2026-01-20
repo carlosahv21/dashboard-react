@@ -183,7 +183,7 @@ const useAttendanceData = () => {
 
                 const todayDate = getCurrentDate();
                 const attendanceResponse = await request(
-                    `attendance?class_id=${selectedClass.id}&date=${todayDate}&limit=1000`,
+                    `attendances?class_id=${selectedClass.id}&date=${todayDate}&limit=1000`,
                     "GET"
                 );
                 const existingAttendance = attendanceResponse.data || [];
@@ -297,7 +297,7 @@ const useAttendanceData = () => {
                 return;
             }
 
-            await request("attendance", "POST", attendanceArray);
+            await request("attendances", "POST", attendanceArray);
             message.success("Asistencia guardada correctamente");
         } catch (error) {
             console.error("Error al guardar asistencia:", error);

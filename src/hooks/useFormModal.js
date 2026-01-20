@@ -45,7 +45,6 @@ export const useFormModal = (request, endpoint, moduleFieldId, titleSingular, fi
             setModalVisible(false);
         }
     };
-
     /**
      * Cierra el modal y limpia el estado.
      * @param {boolean} refetch - Indica si la tabla principal debe refrescarse.
@@ -83,8 +82,10 @@ export const useFormModal = (request, endpoint, moduleFieldId, titleSingular, fi
                 await request(`${endpoint}/${editingId}`, 'PUT', transformedValues);
                 message.success(`${titleSingular} actualizad${titleSingular.endsWith('a') ? 'a' : 'o'} correctamente`);
             } else {
-                await request(`${endpoint}/`, 'POST', transformedValues);
-                message.success(`${titleSingular} cread${titleSingular.endsWith('a') ? 'a' : 'o'} correctamente`);
+                const response = await request(`${endpoint}/`, 'POST', transformedValues);
+                if (response?.success) {
+                    message.success(`${titleSingular} cread${titleSingular.endsWith('a') ? 'a' : 'o'} correctamente`);
+                }
             }
             return closeModal(true);
         } catch (error) {
@@ -97,7 +98,6 @@ export const useFormModal = (request, endpoint, moduleFieldId, titleSingular, fi
             } else {
                 message.error(error?.message || `Error al guardar ${titleSingular}`);
             }
-            return closeModal(false);
         }
     };
 

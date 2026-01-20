@@ -94,7 +94,7 @@ const BaseView = ({
 
     const handleDelete = async (id) => {
         try {
-            await request(`${endpoint}/${id}`, "DELETE");
+            await request(`${endpoint}/${id}/bin`, "PATCH");
             message.success(
                 `${titleSingular} eliminad${titleSingular.endsWith("a") ? "a" : "o"
                 } correctamente`

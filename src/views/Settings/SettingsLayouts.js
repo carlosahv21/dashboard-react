@@ -2,7 +2,7 @@ import React, { useContext, useMemo } from "react";
 import { Row, Col, Menu, theme } from "antd";
 import { Link, useLocation, Routes, Route, Navigate } from "react-router-dom";
 import { AuthContext } from "../../context/AuthContext";
-import { SettingOutlined, UserOutlined, DollarOutlined, AppstoreAddOutlined } from "@ant-design/icons";
+import { SettingOutlined, UserOutlined, DollarOutlined, AppstoreAddOutlined, DeleteOutlined } from "@ant-design/icons";
 
 import SettingsGeneral from "./Sections/GeneralInformation";
 import SettingsActiveModules from "./Sections/ActiveModules";
@@ -11,6 +11,7 @@ import SettingsPermissions from "./Sections/Permissions";
 import SettingsUsers from "./Sections/Users";
 import SettingsCustomFields from "./Sections/CustomFields";
 import SettingsPayments from "./Sections/Payments";
+import SettingsRecycleBin from "./Sections/RecycleBin";
 
 const componentsMap = {
     "settings.general": SettingsGeneral,
@@ -20,16 +21,17 @@ const componentsMap = {
     "settings.users": SettingsUsers,
     "settings.customFields": SettingsCustomFields,
     "settings.payments": SettingsPayments,
+    "settings.recycle_bin": SettingsRecycleBin,
 };
 
 const staticSettingsSections = [
     { path: "general", label: "Información General", name: "settings.general", permission: "settings:view", group: "academySettings" },
-    { path: "activeModules", label: "Módulos Activos", name: "settings.activeModules", permission: "modules:view", group: "academySettings" },
     { path: "roles", label: "Roles", name: "settings.roles", permission: "roles:view", group: "userManagement" },
     { path: "permissions", label: "Permisos", name: "settings.permissions", permission: "permissions:view", group: "userManagement" },
     { path: "users", label: "Usuarios", name: "settings.users", permission: "users:view", group: "userManagement" },
     { path: "customFields", label: "Campos Personalizados", name: "settings.customFields", permission: "fields:view", group: "customization" },
     { path: "payments", label: "Historial de Pagos", name: "settings.payments", permission: "settings:view", group: "finance" },
+    { path: "recycle_bin", label: "Papelera de Reciclaje", name: "settings.recycle_bin", group: "recycle_bin", permission: "recycle_bin:view" },
 ];
 
 const iconMap = {
@@ -37,6 +39,7 @@ const iconMap = {
     userManagement: <UserOutlined />,
     customization: <AppstoreAddOutlined />,
     finance: <DollarOutlined />,
+    recycle_bin: <DeleteOutlined />,
 };
 
 const menuGroups = [
@@ -44,6 +47,7 @@ const menuGroups = [
     { key: "userManagement", label: "Gestión de Usuarios" },
     { key: "customization", label: "Personalización" },
     { key: "finance", label: "Finanzas" },
+    { key: "recycle_bin", label: "Papelera de Reciclaje", isLeaf: true },
 ];
 
 
@@ -56,15 +60,29 @@ const SettingsLayout = () => {
         return staticSettingsSections.filter(r => hasPermission(r.permission));
     }, [hasPermission]);
     const menuItems = useMemo(() => {
-        return menuGroups
-            .map(group => {
-                const childrenRoutes = settingsRoutes.filter(r => r.group === group.key);
+        const items = [];
 
-                if (childrenRoutes.length === 0) {
-                    return null;
-                }
+        menuGroups.forEach((group, index) => {
+            const childrenRoutes = settingsRoutes.filter(r => r.group === group.key);
 
-                return {
+            if (childrenRoutes.length === 0) {
+                return;
+            }
+
+            // Add divider before recycle_bin
+            if (group.key === "recycle_bin" && items.length > 0) {
+                items.push({ type: 'divider' });
+            }
+
+            if (group.isLeaf && childrenRoutes.length > 0) {
+                const route = childrenRoutes[0];
+                items.push({
+                    key: route.path,
+                    icon: iconMap[group.key],
+                    label: <Link to={route.path}>{group.label}</Link>,
+                });
+            } else {
+                items.push({
                     key: group.key,
                     icon: iconMap[group.key],
                     label: group.label,
@@ -72,9 +90,11 @@ const SettingsLayout = () => {
                         key: r.path,
                         label: <Link to={r.path}>{r.label}</Link>,
                     })),
-                };
-            })
-            .filter(item => item !== null);
+                });
+            }
+        });
+
+        return items;
     }, [settingsRoutes]);
 
     const selectedKey = location.pathname.split("/").pop() || (settingsRoutes[0]?.path || "general");

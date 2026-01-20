@@ -41,12 +41,10 @@ export const AuthProvider = ({ children }) => {
                 setPermissions(response.data.permissions);
             }
         } catch (err) {
-            console.log(err);
-
-            if (err.message === "Invalid or expired token" && !modalShownRef.current) {
+            if (err.message === "Sesión expirada o token inválido" && !modalShownRef.current) {
                 modalShownRef.current = true;
                 Modal.confirm({
-                    title: "Sesión expirada",
+                    title: "Sesión expirada o token inválido",
                     content: "Tu sesión ha expirado. Debes iniciar sesión nuevamente.",
                     okText: "Aceptar",
                     onOk: () => logout(),

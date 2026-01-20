@@ -6,6 +6,11 @@ const { Text } = Typography;
 
 // Función auxiliar para resaltar el texto que coincide con la búsqueda
 const highlightMatch = (text, query) => {
+    // Si no hay texto, devolvemos lo que sea que haya (null/undefined)
+    if (!text) {
+        return text;
+    }
+
     // Si no hay término de búsqueda o es muy corto, devolvemos el texto normal.
     if (!query || query.length < 3) {
         return text;
