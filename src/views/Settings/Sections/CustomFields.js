@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useContext, useCallback } from "react";
 import { Divider, Form, Select, Card, Row, Col, Button, Modal, Checkbox, Input, Skeleton, Empty, Space, Tooltip, theme, App } from "antd";
-import { EditOutlined, PlusOutlined, DeleteOutlined } from "@ant-design/icons";
+import { EditOutlined, PlusOutlined, DeleteOutlined, InfoCircleOutlined } from "@ant-design/icons";
 import useFetch from "../../../hooks/useFetch";
 import FormHeader from "../../../components/Common/FormHeader";
 import FormFooter from "../../../components/Common/FormFooter";
@@ -85,7 +85,7 @@ const FieldCard = ({ block, onEdit, onAddField, onDeleteField, onDeleteBlock }) 
                                 <Button
                                     type="link"
                                     icon={<EditOutlined />}
-                                    onClick={() => !field.inherited && onEdit(field)}
+                                    onClick={() => !field.inherited && onEdit(field, block.block_id)}
                                     disabled={field.inherited}
                                 />
                             )}
@@ -96,8 +96,8 @@ const FieldCard = ({ block, onEdit, onAddField, onDeleteField, onDeleteBlock }) 
                                     type="link"
                                     danger
                                     icon={<DeleteOutlined />}
-                                    onClick={() => !field.inherited && onDeleteField(field.field_id)}
-                                    disabled={field.inherited}
+                                    onClick={() => !field.inherited && field.type !== 'relation' && onDeleteField(field.field_id)}
+                                    disabled={field.inherited || field.type === 'relation'}
                                 />
                             )}
                         </Space>
@@ -171,18 +171,34 @@ const CustomFields = () => {
         fetchFields();
     }, [request, changeModule]);
 
-
-
     // Edit field
-    const showModal = (field) => {
-        form.setFieldsValue({ ...field });
+    const showModal = (field, blockId) => {
+        let formattedField = { ...field };
+        // Ensure options are an array for the Select tags mode
+        if (field.type === 'select' && field.options && typeof field.options === 'string') {
+            try {
+                // Try parsing if it looks like JSON array
+                if (field.options.startsWith('[')) {
+                    formattedField.options = JSON.parse(field.options);
+                } else {
+                    // Otherwise split by comma
+                    formattedField.options = field.options.split(',').map(op => op.trim());
+                }
+            } catch (e) {
+                formattedField.options = [];
+            }
+        }
+
+        form.setFieldsValue(formattedField);
         setEditField(field);
+        setCurrentBlockId(blockId);
         setIsModalOpen(true);
     };
 
     const handleSubmit = async (values) => {
         try {
-            const payload = { ...values, id: editField.field_id, module_id: selectedModule };
+            // Options are already an array from Select mode="tags"
+            const payload = { ...values, id: editField.field_id, block_id: currentBlockId };
             await request(`fields/${editField.field_id}`, "PUT", payload);
             message.success("Campo actualizado.");
             setIsModalOpen(false);
@@ -367,9 +383,8 @@ const CustomFields = () => {
             <Modal
                 title={editField?.name || ""}
                 open={isModalOpen}
-                width={350}
+                width={450}
                 footer={[]}
-                destroyOnClose
                 onCancel={handleCancel}
             >
                 <Divider style={{ margin: "12px 0" }} />
@@ -381,12 +396,30 @@ const CustomFields = () => {
 
                     <Divider style={{ margin: "12px 0" }} />
 
-                    <Form.Item label="Required" name="required" valuePropName="checked">
-                        <Checkbox />
+                    <Form.Item
+                        label={
+                            <Space>
+                                Required
+                                <Tooltip title="Si se marca, el campo será obligatorio.">
+                                    <InfoCircleOutlined style={{ color: "rgba(0,0,0,0.45)" }} />
+                                </Tooltip>
+                            </Space>
+                        }
+                        name="required"
+                        valuePropName="checked"
+                    >
+                        <Checkbox disabled={editField?.type === 'relation'} />
                     </Form.Item>
 
                     <Form.Item
-                        label="Label"
+                        label={
+                            <Space>
+                                Label
+                                <Tooltip title="Nombre visible del campo.">
+                                    <InfoCircleOutlined style={{ color: "rgba(0,0,0,0.45)" }} />
+                                </Tooltip>
+                            </Space>
+                        }
                         name="label"
                         rules={[{ required: true, message: "Label is required" }]}
                     >
@@ -394,8 +427,24 @@ const CustomFields = () => {
                     </Form.Item>
 
                     {editField?.type === "select" && (
-                        <Form.Item name="options" label="Options">
-                            <Input placeholder="Comma-separated values" />
+                        <Form.Item
+                            name="options"
+                            label={
+                                <Space>
+                                    Options
+                                    <Tooltip title="Escribe una opción y presiona Enter o Coma (,) para agregarla.">
+                                        <InfoCircleOutlined style={{ color: "rgba(0,0,0,0.45)" }} />
+                                    </Tooltip>
+                                </Space>
+                            }
+                        >
+                            <Select
+                                mode="tags"
+                                style={{ width: '100%' }}
+                                placeholder="Escribe y presiona Enter o Coma"
+                                tokenSeparators={[',']}
+                                open={false}
+                            />
                         </Form.Item>
                     )}
 
@@ -457,7 +506,14 @@ const CustomFields = () => {
                     </Form.Item>
 
                     <Form.Item
-                        label="Etiqueta"
+                        label={
+                            <Space>
+                                Etiqueta
+                                <Tooltip title="El nombre visible del campo para el usuario.">
+                                    <InfoCircleOutlined style={{ color: "rgba(0,0,0,0.45)" }} />
+                                </Tooltip>
+                            </Space>
+                        }
                         name="label"
                         rules={[{ required: true, message: "La etiqueta es obligatoria" }]}
                     >
@@ -491,13 +547,40 @@ const CustomFields = () => {
                     </Form.Item>
 
                     {fieldType === "select" && (
-                        <Form.Item name="options" label="Opciones">
-                            <Input placeholder="rojo,verde,azul" />
+                        <Form.Item
+                            name="options"
+                            label={
+                                <Space>
+                                    Opciones
+                                    <Tooltip title="Escribe una opción y presiona Enter o Coma (,) para agregarla.">
+                                        <InfoCircleOutlined style={{ color: "rgba(0,0,0,0.45)" }} />
+                                    </Tooltip>
+                                </Space>
+                            }
+                        >
+                            <Select
+                                mode="tags"
+                                style={{ width: '100%' }}
+                                placeholder="Escribe y presiona Enter o Coma"
+                                tokenSeparators={[',']}
+                                open={false}
+                            />
                         </Form.Item>
                     )}
 
-                    <Form.Item name="required" valuePropName="checked">
-                        <Checkbox>Required</Checkbox>
+                    <Form.Item
+                        name="required"
+                        valuePropName="checked"
+                        label={
+                            <Space>
+                                Required
+                                <Tooltip title="Si se marca, el usuario estará obligado a llenar este campo.">
+                                    <InfoCircleOutlined style={{ color: "rgba(0,0,0,0.45)" }} />
+                                </Tooltip>
+                            </Space>
+                        }
+                    >
+                        <Checkbox />
                     </Form.Item>
 
                     <FormFooter

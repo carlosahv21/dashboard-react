@@ -12,17 +12,29 @@ import {
     Statistic,
     Tooltip,
     theme,
-} from "antd";
+    Form,
+    Modal,
+    Spin,
+    App,
+    Input,
+    Space,
+} from "antd"; 
 import {
     LeftOutlined,
     ClockCircleOutlined,
     CreditCardOutlined,
-} from "@ant-design/icons";
+    PauseCircleOutlined,
+    ExclamationCircleOutlined,
+} from "@ant-design/icons"; // Added PauseCircleOutlined
 import dayjs from "dayjs";
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 
 import useFetch from "../../hooks/useFetch";
+import { useFormModal } from "../../hooks/useFormModal";
+import FormHeader from "../../components/Common/FormHeader";
+import FormFooter from "../../components/Common/FormFooter";
+import FormSection from "../../components/Common/FormSection";
 
 const { Title, Text } = Typography;
 
@@ -31,39 +43,88 @@ const StudentHistory = () => {
     const navigate = useNavigate();
     const { request } = useFetch();
     const { token } = theme.useToken();
+    const { message } = App.useApp(); // Get message instance
 
     const [student, setStudent] = useState(null);
     const [attendances, setAttendances] = useState([]);
     const [payments, setPayments] = useState([]);
     const [activePlan, setActivePlan] = useState(null);
 
-    useEffect(() => {
-        const fetchData = async () => {
-            try {
-                // Fetch Student Data
-                const response = await request(`students/${id}`);
-                setStudent(response.data);
+    const [isPauseModalOpen, setIsPauseModalOpen] = useState(false);
+    const [pauseReason, setPauseReason] = useState("");
 
-                // Fetch Plan Data
-                const planResponse = await request(`plans/student/${id}`);
-                setActivePlan(planResponse.data);
+    const [form] = Form.useForm();
 
-                // Fetch Attendances
-                const attResponse = await request(`attendances?student_id=${id}`);
-                setAttendances(attResponse.data || []);
+    const fetchAllData = React.useCallback(async () => {
+        try {
+            // Fetch Student Data
+            const response = await request(`students/${id}`);
+            setStudent(response.data);
 
-                // Fetch Payments
-                const payResponse = await request(`payments?user_id=${id}`);
-                setPayments(payResponse.data || []);
-            } catch (error) {
-                console.error("Error fetching history:", error);
-            }
-        };
+            // Fetch Plan Data
+            const planResponse = await request(`plans/student/${id}`);
+            setActivePlan(planResponse.data);
 
-        if (id) {
-            fetchData();
+            // Fetch Attendances
+            const attResponse = await request(`attendances?student_id=${id}`);
+            setAttendances(attResponse.data || []);
+
+            // Fetch Payments
+            const payResponse = await request(`payments?user_id=${id}`);
+            setPayments(payResponse.data || []);
+        } catch (error) {
+            console.error("Error fetching history:", error);
         }
     }, [id, request]);
+
+    useEffect(() => {
+        if (id) {
+            fetchAllData();
+        }
+    }, [id, fetchAllData]);
+
+    const {
+        modalVisible,
+        moduleData,
+        openModal,
+        closeModal,
+        handleSubmit,
+    } = useFormModal(
+        request,
+        "payments",
+        13,
+        "Pago",
+        { user_id: id },
+        form
+    );
+
+    const handleFormSubmit = async (values) => {
+        const shouldRefetch = await handleSubmit(values);
+        if (shouldRefetch) {
+            fetchAllData();
+        }
+    };
+
+    const handlePausePlan = async () => {
+        if (!pauseReason.trim()) {
+            message.error("Por favor, ingresa una nota explicando la razón de la pausa.");
+            return;
+        }
+
+        try {
+            await request(`plans/${activePlan.id}`, "PUT", {
+                status: 'paused',
+                notes: pauseReason
+            });
+
+            message.success("El plan ha sido pausado correctamente.");
+            setIsPauseModalOpen(false);
+            setPauseReason("");
+            fetchAllData();
+        } catch (error) {
+            message.error(error.message || "Error al pausar el plan.");
+        }
+    };
 
     // Map attendances to Calendar Events
     const events = attendances.map((att) => ({
@@ -347,13 +408,27 @@ const StudentHistory = () => {
                                     )
                                 }
                                 actions={[
-                                    <Button
-                                        type="default"
-                                        icon={<CreditCardOutlined />}
-                                        className="align-self-end"
-                                    >
-                                        Renovar Plan
-                                    </Button>,
+                                    activePlan && activePlan.status === "active" ? (
+                                        <Button
+                                            danger
+                                            type="default"
+                                            icon={<PauseCircleOutlined />}
+                                            className="align-self-end"
+                                            onClick={() => setIsPauseModalOpen(true)}
+                                        >
+                                            Pausar Plan
+                                        </Button>
+                                    ) : (
+                                        <Button
+                                            type="primary"
+                                            icon={<CreditCardOutlined />}
+                                            className="align-self-end"
+                                            onClick={() => openModal()}
+                                            disabled={false} // Always enabled if not active
+                                        >
+                                            Renovar Plan
+                                        </Button>
+                                    ),
                                 ]}
                             >
                                 {activePlan ? (
@@ -414,8 +489,87 @@ const StudentHistory = () => {
                             </Card>
                         </Col>
                     </Row>
-                </Col>
-            </Row>
+                </Col >
+            </Row >
+            <Modal
+                open={modalVisible}
+                title={null}
+                footer={null}
+                width={800}
+                onCancel={() => closeModal(false)}
+                destroyOnHidden
+            >
+                {moduleData ? (
+                    moduleData.blocks?.length > 0 ? (
+                        <>
+                            <FormHeader
+                                title="Crear Pago"
+                                subtitle="Registra un nuevo pago para renovar el plan."
+                                onSave={() => form.submit()}
+                                onCancel={() => closeModal(false)}
+                            />
+                            <Form
+                                form={form}
+                                layout="vertical"
+                                onFinish={handleFormSubmit}
+                                style={{ padding: "0 10px" }}
+                            >
+                                {moduleData.blocks.map((block) => (
+                                    <FormSection
+                                        key={block.block_id}
+                                        title={block.block_name}
+                                        fields={block.fields}
+                                    />
+                                ))}
+                                <FormFooter
+                                    onCancel={() => closeModal(false)}
+                                    onSave={() => form.submit()}
+                                />
+                            </Form>
+                        </>
+                    ) : (
+                        <div style={{ textAlign: "center", padding: 50 }}>
+                            No hay campos para mostrar.
+                        </div>
+                    )
+                ) : (
+                    <div style={{ textAlign: "center", padding: 50 }}>
+                        <Spin /> <p>Cargando campos...</p>
+                    </div>
+                )}
+            </Modal>
+
+            <Modal
+                title={
+                    <Space>
+                        <ExclamationCircleOutlined style={{ color: token.colorError }} />
+                        <span>Pausar Plan</span>
+                    </Space>
+                }
+                open={isPauseModalOpen}
+                onOk={handlePausePlan}
+                onCancel={() => setIsPauseModalOpen(false)}
+                okText="Pausar Plan"
+                okButtonProps={{ danger: true }}
+                cancelText="Cancelar"
+            >
+                <div style={{ marginBottom: 16 }}>
+                    <Typography.Paragraph>
+                        Al pausar este plan, se suspenderá el acceso del estudiante y se detendrá el ciclo de facturación o vigencia actual.
+                        Es necesario que ingreses una nota justificando esta acción.
+                    </Typography.Paragraph>
+                </div>
+                <div>
+                    <Typography.Text strong>Motivo de la pausa:</Typography.Text>
+                    <Input.TextArea
+                        rows={4}
+                        placeholder="Ej: El estudiante solicitó congelar su plan por viaje..."
+                        value={pauseReason}
+                        onChange={(e) => setPauseReason(e.target.value)}
+                        style={{ marginTop: 8 }}
+                    />
+                </div>
+            </Modal>
         </>
     );
 };

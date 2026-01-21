@@ -6,7 +6,7 @@ const Students = () => {
     const endpoint = "students";
     const titleSingular = "Estudiante";
     const titlePlural = "Estudiantes";
-    const moduleFieldId = 14;
+    const moduleFieldId = 15;
     const hiddenFields = ["role_id"];
 
     const columns = [
