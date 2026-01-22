@@ -4,6 +4,7 @@ import { AuthContext } from "../context/AuthContext";
 import { useNavigate, useLocation } from "react-router-dom";
 import * as Icons from "@ant-design/icons";
 import { MoonOutlined, SunOutlined } from "@ant-design/icons";
+import { useTranslation } from "react-i18next";
 
 const { Sider } = Layout;
 
@@ -11,6 +12,7 @@ const Sidebar = () => {
 	const { settings, hasPermission, toggleTheme } = useContext(AuthContext);
 	const navigate = useNavigate();
 	const location = useLocation();
+	const { t } = useTranslation();
 
 	const isDarkMode = settings?.theme === "dark";
 
@@ -23,43 +25,43 @@ const Sidebar = () => {
 
 	const staticMenuDefinition = [
 		{
-			label: "Dashboard",
+			label: t("menu.dashboard"),
 			icon: "Dashboard",
 			path: "/",
 			permissionRequired: "dashboard:view",
 		},
 		{
-			label: "Planes",
+			label: t("menu.plans"),
 			icon: "SolutionOutlined",
 			path: "/plans",
 			permissionRequired: "plans:view",
 		},
 		{
-			label: "Clases",
+			label: t("menu.classes"),
 			icon: "Read",
 			path: "/classes",
 			permissionRequired: "classes:view",
 		},
 		{
-			label: "Estudiantes",
+			label: t("menu.students"),
 			icon: "Team",
 			path: "/students",
 			permissionRequired: "students:view",
 		},
 		{
-			label: "Profesores",
+			label: t("menu.teachers"),
 			icon: "IdcardOutlined",
 			path: "/teachers",
 			permissionRequired: "teachers:view",
 		},
 		{
-			label: "Inscripciones",
+			label: t("menu.registrations"),
 			icon: "UserAddOutlined",
 			path: "/registrations",
 			permissionRequired: "registrations:view",
 		},
 		{
-			label: "Asistencias",
+			label: t("menu.attendances"),
 			icon: "CalendarOutlined",
 			path: "/attendances",
 			permissionRequired: "attendances:view",
@@ -88,7 +90,7 @@ const Sidebar = () => {
 
 	const items = buildMenuItems(staticMenuDefinition);
 
-	const logo = settings?.logo_url;
+	const logo = "logo-" + settings?.theme + ".png";
 
 	return (
 		<Sider
@@ -111,7 +113,7 @@ const Sidebar = () => {
 				className="logo"
 				style={{
 					height: 64,
-					margin: 8,
+					margin: 1,
 					display: "flex",
 					justifyContent: "center",
 					alignItems: "center",
@@ -124,7 +126,8 @@ const Sidebar = () => {
 							src={logo}
 							alt="Logo"
 							style={{
-								width: "40px",
+								width: "4rem",
+								paddingTop: "0.5rem",
 								height: "auto",
 								transition: "width 0.2s ease",
 							}}

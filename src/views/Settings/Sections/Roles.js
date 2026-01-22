@@ -1,11 +1,13 @@
 import React from "react";
 import BaseCrudView from "../../../components/Common/BaseView";
+import { useTranslation } from "react-i18next";
 
 
 const Roles = () => {
+    const { t } = useTranslation();
     const columns = [
-        { title: "Nombre", dataIndex: "name", key: "name", sorter: true, defaultSortOrder: "ascend" },
-        { title: "Descripción", dataIndex: "description", key: "description", sorter: true },
+        { title: t('settings.roleName'), dataIndex: "name", key: "name", sorter: true, defaultSortOrder: "ascend" },
+        { title: t('settings.roleDescription'), dataIndex: "description", key: "description", sorter: true },
     ];
 
     return (
@@ -15,8 +17,8 @@ const Roles = () => {
                 endpoint="roles"
                 moduleFieldId={4}
                 columns={columns}
-                titleSingular="Rol"
-                titlePlural="Roles"
+                titleSingular={t('settings.role')}
+                titlePlural={t('settings.roles_title')}
             />
         </>
     );

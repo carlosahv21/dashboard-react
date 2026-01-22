@@ -8,6 +8,7 @@ import {
     HistoryOutlined,
 } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 
 const { Meta } = Card;
 
@@ -19,16 +20,17 @@ const StudentCard = ({
     canEdit,
     canDelete,
 }) => {
+    const { t } = useTranslation();
     const { modal } = App.useApp();
     const navigate = useNavigate();
 
     const handleDeleteConfirm = (id) => {
         modal.confirm({
-            title: "¿Eliminar?",
-            content: "Esta acción no se puede deshacer.",
-            okText: "Sí",
+            title: t('global.deleteTitle'),
+            content: t('global.deleteConfirm'),
+            okText: t('global.yes'),
             okType: "danger",
-            cancelText: "Cancelar",
+            cancelText: t('global.cancel'),
             onOk: () => onDelete && onDelete(id),
         });
     };

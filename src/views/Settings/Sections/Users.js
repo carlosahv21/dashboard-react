@@ -1,20 +1,22 @@
 import React from "react";
 import BaseCrudView from "../../../components/Common/BaseView";
+import { useTranslation } from "react-i18next";
 
 
 const Users = () => {
+    const { t } = useTranslation();
     const columns = [
         {
-            title: "Nombre",
+            title: t('students.firstName'),
             dataIndex: "first_name",
             key: "full_name",
             render: (_, record) => `${record.first_name} ${record.last_name}`,
             sorter: true,
             defaultSortOrder: "ascend"
         },
-        { title: "Email", dataIndex: "email", key: "email", sorter: true },
+        { title: t('students.email'), dataIndex: "email", key: "email", sorter: true },
         {
-            title: "Rol",
+            title: t('students.role'),
             dataIndex: "role_name",
             key: "role_name",
             render: (text) =>
@@ -29,8 +31,8 @@ const Users = () => {
                 endpoint="users"
                 moduleFieldId={3}
                 columns={columns}
-                titleSingular="Usuario"
-                titlePlural="Usuarios"
+                titleSingular={t('settings.user')}
+                titlePlural={t('settings.users_title')}
             />
         </>
     );

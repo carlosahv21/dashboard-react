@@ -3,6 +3,7 @@ import { Row, Col, Menu, theme } from "antd";
 import { Link, useLocation, Routes, Route, Navigate } from "react-router-dom";
 import { AuthContext } from "../../context/AuthContext";
 import { SettingOutlined, UserOutlined, DollarOutlined, AppstoreAddOutlined, DeleteOutlined } from "@ant-design/icons";
+import { useTranslation } from "react-i18next";
 
 import SettingsGeneral from "./Sections/GeneralInformation";
 import SettingsActiveModules from "./Sections/ActiveModules";
@@ -24,16 +25,6 @@ const componentsMap = {
     "settings.recycle_bin": SettingsRecycleBin,
 };
 
-const staticSettingsSections = [
-    { path: "general", label: "Información General", name: "settings.general", permission: "settings:view", group: "academySettings" },
-    { path: "roles", label: "Roles", name: "settings.roles", permission: "roles:view", group: "userManagement" },
-    { path: "permissions", label: "Permisos", name: "settings.permissions", permission: "permissions:view", group: "userManagement" },
-    { path: "users", label: "Usuarios", name: "settings.users", permission: "users:view", group: "userManagement" },
-    { path: "customFields", label: "Campos Personalizados", name: "settings.customFields", permission: "fields:view", group: "customization" },
-    { path: "payments", label: "Historial de Pagos", name: "settings.payments", permission: "settings:view", group: "finance" },
-    { path: "recycle_bin", label: "Papelera de Reciclaje", name: "settings.recycle_bin", group: "recycle_bin", permission: "recycle_bin:view" },
-];
-
 const iconMap = {
     academySettings: <SettingOutlined />,
     userManagement: <UserOutlined />,
@@ -42,23 +33,35 @@ const iconMap = {
     recycle_bin: <DeleteOutlined />,
 };
 
-const menuGroups = [
-    { key: "academySettings", label: "Configuración de Academia" },
-    { key: "userManagement", label: "Gestión de Usuarios" },
-    { key: "customization", label: "Personalización" },
-    { key: "finance", label: "Finanzas" },
-    { key: "recycle_bin", label: "Papelera de Reciclaje", isLeaf: true },
-];
-
 
 const SettingsLayout = () => {
+    const { t } = useTranslation();
     const { hasPermission } = useContext(AuthContext);
     const location = useLocation();
     const { token } = theme.useToken();
 
+    const staticSettingsSections = useMemo(() => [
+        { path: "general", label: t('settings.general'), name: "settings.general", permission: "settings:view", group: "academySettings" },
+        { path: "roles", label: t('settings.roles'), name: "settings.roles", permission: "roles:view", group: "userManagement" },
+        { path: "permissions", label: t('settings.permissions'), name: "settings.permissions", permission: "permissions:view", group: "userManagement" },
+        { path: "users", label: t('settings.users'), name: "settings.users", permission: "users:view", group: "userManagement" },
+        { path: "customFields", label: t('settings.customFields'), name: "settings.customFields", permission: "fields:view", group: "customization" },
+        { path: "payments", label: t('settings.payments'), name: "settings.payments", permission: "settings:view", group: "finance" },
+        { path: "recycle_bin", label: t('settings.recycle_bin'), name: "settings.recycle_bin", group: "recycle_bin", permission: "recycle_bin:view" },
+    ], [t]);
+
+    const menuGroups = useMemo(() => [
+        { key: "academySettings", label: t('settings.academySettings') },
+        { key: "userManagement", label: t('settings.userManagement') },
+        { key: "customization", label: t('settings.customization') },
+        { key: "finance", label: t('settings.finance') },
+        { key: "recycle_bin", label: t('settings.recycle_bin'), isLeaf: true },
+    ], [t]);
+
     const settingsRoutes = useMemo(() => {
         return staticSettingsSections.filter(r => hasPermission(r.permission));
-    }, [hasPermission]);
+    }, [hasPermission, staticSettingsSections]);
+
     const menuItems = useMemo(() => {
         const items = [];
 
@@ -95,7 +98,7 @@ const SettingsLayout = () => {
         });
 
         return items;
-    }, [settingsRoutes]);
+    }, [settingsRoutes, menuGroups]);
 
     const selectedKey = location.pathname.split("/").pop() || (settingsRoutes[0]?.path || "general");
     const defaultOpenKey = menuItems[0]?.key;

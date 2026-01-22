@@ -1,19 +1,21 @@
 import React from "react";
 import BaseView from "../../components/Common/BaseView";
 import StudentCard from "./StudentCard";
+import { useTranslation } from "react-i18next";
 
 const Students = () => {
+    const { t } = useTranslation();
     const endpoint = "students";
-    const titleSingular = "Estudiante";
-    const titlePlural = "Estudiantes";
+    const titleSingular = t('students.name_singular');
+    const titlePlural = t('students.name_plural');
     const moduleFieldId = 15;
     const hiddenFields = ["role_id"];
 
     const columns = [
-        { title: "Nombre", dataIndex: "first_name", key: "first_name", sorter: true, defaultSortOrder: "ascend" },
-        { title: "Apellido", dataIndex: "last_name", key: "last_name", sorter: true },
-        { title: "Email", dataIndex: "email", key: "email", sorter: true },
-        { title: "Rol", dataIndex: "role_name", key: "role_name", render: (text) => text ? text.charAt(0).toUpperCase() + text.slice(1) : "" },
+        { title: t('students.firstName'), dataIndex: "first_name", key: "first_name", sorter: true, defaultSortOrder: "ascend" },
+        { title: t('students.lastName'), dataIndex: "last_name", key: "last_name", sorter: true },
+        { title: t('students.email'), dataIndex: "email", key: "email", sorter: true },
+        { title: t('students.role'), dataIndex: "role_name", key: "role_name", render: (text) => text ? text.charAt(0).toUpperCase() + text.slice(1) : "" },
     ];
 
     return (

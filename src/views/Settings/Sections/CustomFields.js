@@ -1,16 +1,17 @@
-import React, { useState, useEffect, useContext, useCallback } from "react";
+import React, { useState, useEffect, useContext, useCallback, useMemo } from "react";
 import { Divider, Form, Select, Card, Row, Col, Button, Modal, Checkbox, Input, Skeleton, Empty, Space, Tooltip, theme, App } from "antd";
 import { EditOutlined, PlusOutlined, DeleteOutlined, InfoCircleOutlined } from "@ant-design/icons";
 import useFetch from "../../../hooks/useFetch";
 import FormHeader from "../../../components/Common/FormHeader";
 import FormFooter from "../../../components/Common/FormFooter";
 import { AuthContext } from "../../../context/AuthContext"; // <--- IMPORTANTE
+import { useTranslation } from "react-i18next";
 
 // -----------------------------------------------------------
 // FIELD CARD → Ahora con permisos del AuthContext
 // -----------------------------------------------------------
 const FieldCard = ({ block, onEdit, onAddField, onDeleteField, onDeleteBlock }) => {
-
+    const { t } = useTranslation();
     const { hasPermission } = useContext(AuthContext);
     const { token } = theme.useToken();
 
@@ -33,7 +34,7 @@ const FieldCard = ({ block, onEdit, onAddField, onDeleteField, onDeleteBlock }) 
 
                         {/* Agregar campo */}
                         {canCreateField && (
-                            <Tooltip title={isInheritedBlock ? "No se puede agregar campo a bloque heredado" : "Agregar campo"}>
+                            <Tooltip title={isInheritedBlock ? t('settings.cannotAddFieldInherited') : t('settings.addField')}>
                                 <Button
                                     size="small"
                                     type="text"
@@ -46,7 +47,7 @@ const FieldCard = ({ block, onEdit, onAddField, onDeleteField, onDeleteBlock }) 
 
                         {/* Eliminar bloque */}
                         {canDeleteBlock && (
-                            <Tooltip title={isInheritedBlock ? "No se puede eliminar bloque heredado" : "Eliminar bloque"}>
+                            <Tooltip title={isInheritedBlock ? t('settings.cannotDeleteBlockInherited') : t('settings.deleteBlock')}>
                                 <Button
                                     size="small"
                                     type="link"
@@ -109,6 +110,7 @@ const FieldCard = ({ block, onEdit, onAddField, onDeleteField, onDeleteBlock }) 
 };
 
 const CustomFields = () => {
+    const { t } = useTranslation();
     const { request } = useFetch();
 
     // -----------------------------------------------------------
@@ -144,11 +146,11 @@ const CustomFields = () => {
             const dataFields = await request(`fields/module/${value}`, "GET");
             setBlocks(dataFields?.data?.blocks || []);
         } catch (err) {
-            message.error(err.message || "Error al cargar campos.");
+            message.error(err.message || t('settings.loadFieldsError'));
         } finally {
             setLoading(false);
         }
-    }, [request, message]);
+    }, [request, message, t]);
 
     useEffect(() => {
         const fetchFields = async () => {
@@ -162,14 +164,14 @@ const CustomFields = () => {
                     await changeModule(modulesWithFields[0].id);
                 }
             } catch (err) {
-                message.error(err.message || "Error al cargar módulos.");
+                message.error(err.message || t('settings.loadModulesError'));
             } finally {
                 setLoading(false);
             }
         };
 
         fetchFields();
-    }, [request, changeModule]);
+    }, [request, changeModule, t]);
 
     // Edit field
     const showModal = (field, blockId) => {
@@ -200,11 +202,11 @@ const CustomFields = () => {
             // Options are already an array from Select mode="tags"
             const payload = { ...values, id: editField.field_id, block_id: currentBlockId };
             await request(`fields/${editField.field_id}`, "PUT", payload);
-            message.success("Campo actualizado.");
+            message.success(t('settings.fieldUpdated'));
             setIsModalOpen(false);
             changeModule(selectedModule);
         } catch (err) {
-            message.error(err.message || "Error al actualizar campo.");
+            message.error(err.message || t('settings.updateFieldError'));
         }
     };
 
@@ -222,17 +224,17 @@ const CustomFields = () => {
 
     const handleConfirmDeleteBlock = async (blockId) => {
         modal.confirm({
-            title: "¿Eliminar bloque?",
-            content: "Esta acción no se puede deshacer.",
-            okText: "Sí",
+            title: t('settings.deleteBlockConfirmTitle'),
+            content: t('global.deleteConfirm'),
+            okText: t('global.yes'),
             okType: "danger",
-            cancelText: "No",
+            cancelText: t('global.cancel'),
             onOk: async () => {
                 try {
                     await handleDeleteBlock(blockId);
-                    message.success("Bloque eliminado.");
+                    message.success(t('settings.blockDeleted'));
                 } catch (error) {
-                    message.error("No se pudo eliminar el bloque.");
+                    message.error(t('settings.deleteBlockError'));
                 }
             }
         });
@@ -243,7 +245,7 @@ const CustomFields = () => {
             await request(`blocks/${blockId}`, "DELETE");
             changeModule(selectedModule);
         } catch (err) {
-            throw new Error(err.message || "Error eliminando bloque.");
+            throw new Error(err.message || t('settings.deleteBlockError'));
         }
     };
 
@@ -253,11 +255,11 @@ const CustomFields = () => {
             await request("blocks", "POST", {
                 ...values
             });
-            message.success("Bloque creado.");
+            message.success(t('settings.blockCreated'));
             setIsBlockModalOpen(false);
             changeModule(selectedModule);
         } catch (err) {
-            message.error("No se pudo crear el bloque.");
+            message.error(t('settings.createBlockError'));
         }
     };
 
@@ -276,28 +278,28 @@ const CustomFields = () => {
             };
 
             await request("fields", "POST", payload);
-            message.success("Campo creado.");
+            message.success(t('settings.fieldCreated'));
             setIsFieldModalOpen(false);
             setCurrentBlockId(null);
             changeModule(selectedModule);
         } catch (err) {
-            message.error(err.message || "Error al crear campo.");
+            message.error(err.message || t('settings.createFieldError'));
         }
     };
 
     const handleConfirmDeleteField = async (fieldId) => {
         modal.confirm({
-            title: "¿Eliminar campo?",
-            content: "Esta acción no se puede deshacer.",
-            okText: "Sí",
+            title: t('settings.deleteFieldConfirmTitle'),
+            content: t('global.deleteConfirm'),
+            okText: t('global.yes'),
             okType: "danger",
-            cancelText: "No",
+            cancelText: t('global.cancel'),
             onOk: async () => {
                 try {
                     await handleDelete(fieldId);
-                    message.success("Campo eliminado.");
+                    message.success(t('settings.fieldDeleted'));
                 } catch (error) {
-                    message.error("No se pudo eliminar el campo.");
+                    message.error(t('settings.deleteFieldError'));
                 }
             }
         });
@@ -308,19 +310,30 @@ const CustomFields = () => {
             await request(`fields/${fieldId}`, "DELETE");
             changeModule(selectedModule);
         } catch (err) {
-            message.error("No se pudo eliminar el campo.");
+            message.error(t('settings.deleteFieldError'));
         }
     };
+
+    const fieldTypes = useMemo(() => [
+        { value: "text", label: t('settings.fieldTypeText') },
+        { value: "number", label: t('settings.fieldTypeNumber') },
+        { value: "select", label: t('settings.fieldTypeSelect') },
+        { value: "date", label: t('settings.fieldTypeDate') },
+        { value: "time", label: t('settings.fieldTypeTime') },
+        { value: "checkbox", label: t('settings.fieldTypeCheckbox') },
+        { value: "image", label: t('settings.fieldTypeImage') },
+        { value: "textarea", label: t('settings.fieldTypeTextarea') }
+    ], [t]);
 
     return (
         <>
             <FormHeader
-                title="Campos personalizados"
-                subtitle="Define y gestiona campos personalizados dinámicamente."
+                title={t('settings.customFieldsTitle')}
+                subtitle={t('settings.customFieldsSubtitle')}
             />
 
             <Form.Item
-                label="Modulo"
+                label={t('settings.moduleLabel')}
                 style={{
                     marginBottom: "10px",
                     marginTop: "20px",
@@ -335,7 +348,7 @@ const CustomFields = () => {
                 ) : (
                     <Space>
                         <Select
-                            placeholder="Select a module"
+                            placeholder={t('settings.selectModulePlaceholder')}
                             style={{ width: "200px" }}
                             onChange={changeModule}
                             value={selectedModule}
@@ -354,7 +367,7 @@ const CustomFields = () => {
                                 icon={<PlusOutlined />}
                                 onClick={handleAddBlock}
                             >
-                                Agregar bloque
+                                {t('settings.addBlock')}
                             </Button>
                         )}
                     </Space>
@@ -375,7 +388,7 @@ const CustomFields = () => {
                     />
                 ))
             ) : (
-                !loading && <Empty description="No fields available" />
+                !loading && <Empty description={t('global.noData')} />
             )}
 
             {/* MODALS — sin cambios excepto permisos ya aplicados arriba */}
@@ -391,7 +404,7 @@ const CustomFields = () => {
 
                 <Form form={form} onFinish={handleSubmit}>
                     <Row>
-                        <Col span={24}>Type: {editField?.type}</Col>
+                        <Col span={24}>{t('settings.typeLabel')}: {editField?.type}</Col>
                     </Row>
 
                     <Divider style={{ margin: "12px 0" }} />
@@ -399,8 +412,8 @@ const CustomFields = () => {
                     <Form.Item
                         label={
                             <Space>
-                                Required
-                                <Tooltip title="Si se marca, el campo será obligatorio.">
+                                {t('settings.requiredLabel')}
+                                <Tooltip title={t('settings.requiredTooltip')}>
                                     <InfoCircleOutlined style={{ color: "rgba(0,0,0,0.45)" }} />
                                 </Tooltip>
                             </Space>
@@ -414,16 +427,16 @@ const CustomFields = () => {
                     <Form.Item
                         label={
                             <Space>
-                                Label
-                                <Tooltip title="Nombre visible del campo.">
+                                {t('settings.fieldLabel')}
+                                <Tooltip title={t('settings.fieldLabelTooltip')}>
                                     <InfoCircleOutlined style={{ color: "rgba(0,0,0,0.45)" }} />
                                 </Tooltip>
                             </Space>
                         }
                         name="label"
-                        rules={[{ required: true, message: "Label is required" }]}
+                        rules={[{ required: true, message: t('forms.requiredField') }]}
                     >
-                        <Input placeholder="Label" />
+                        <Input placeholder={t('settings.fieldLabel')} />
                     </Form.Item>
 
                     {editField?.type === "select" && (
@@ -431,8 +444,8 @@ const CustomFields = () => {
                             name="options"
                             label={
                                 <Space>
-                                    Options
-                                    <Tooltip title="Escribe una opción y presiona Enter o Coma (,) para agregarla.">
+                                    {t('settings.optionsLabel')}
+                                    <Tooltip title={t('settings.optionsTooltip')}>
                                         <InfoCircleOutlined style={{ color: "rgba(0,0,0,0.45)" }} />
                                     </Tooltip>
                                 </Space>
@@ -441,7 +454,7 @@ const CustomFields = () => {
                             <Select
                                 mode="tags"
                                 style={{ width: '100%' }}
-                                placeholder="Escribe y presiona Enter o Coma"
+                                placeholder={t('settings.optionsPlaceholder')}
                                 tokenSeparators={[',']}
                                 open={false}
                             />
@@ -454,7 +467,7 @@ const CustomFields = () => {
 
             {/* Crear bloque */}
             <Modal
-                title="Nuevo bloque"
+                title={t('settings.newBlockTitle')}
                 open={isBlockModalOpen}
                 onCancel={() => setIsBlockModalOpen(false)}
                 footer={null}
@@ -462,19 +475,19 @@ const CustomFields = () => {
             >
                 <Form form={blockForm} onFinish={handleSubmitBlock} layout="vertical">
                     <Form.Item
-                        label="Nombre del bloque"
+                        label={t('settings.blockNameLabel')}
                         name="name"
-                        rules={[{ required: true, message: "El nombre es obligatorio" }]}
+                        rules={[{ required: true, message: t('forms.requiredField') }]}
                     >
-                        <Input placeholder="Ej. Información adicional" />
+                        <Input placeholder={t('settings.blockNamePlaceholder')} />
                     </Form.Item>
 
                     <Form.Item
-                        label="Descripción"
+                        label={t('settings.descriptionLabel')}
                         name="description"
-                        rules={[{ required: true, message: "La descripción es obligatoria" }]}
+                        rules={[{ required: true, message: t('forms.requiredField') }]}
                     >
-                        <Input placeholder="Ej. Información para el usuario" />
+                        <Input placeholder={t('settings.blockDescriptionPlaceholder')} />
                     </Form.Item>
 
                     <FormFooter
@@ -486,7 +499,7 @@ const CustomFields = () => {
 
             {/* Crear campo */}
             <Modal
-                title="Nuevo campo"
+                title={t('settings.newFieldTitle')}
                 open={isFieldModalOpen}
                 onCancel={() => {
                     setIsFieldModalOpen(false);
@@ -498,47 +511,38 @@ const CustomFields = () => {
             >
                 <Form form={fieldForm} onFinish={handleSubmitField} layout="vertical">
                     <Form.Item
-                        label="Nombre"
+                        label={t('settings.fieldNameLabel')}
                         name="name"
-                        rules={[{ required: true, message: "El nombre es obligatorio" }]}
+                        rules={[{ required: true, message: t('forms.requiredField') }]}
                     >
-                        <Input placeholder="Ej. nombre" />
+                        <Input placeholder={t('settings.fieldNamePlaceholder')} />
                     </Form.Item>
 
                     <Form.Item
                         label={
                             <Space>
-                                Etiqueta
-                                <Tooltip title="El nombre visible del campo para el usuario.">
+                                {t('settings.fieldLabel')}
+                                <Tooltip title={t('settings.fieldLabelTooltip')}>
                                     <InfoCircleOutlined style={{ color: "rgba(0,0,0,0.45)" }} />
                                 </Tooltip>
                             </Space>
                         }
                         name="label"
-                        rules={[{ required: true, message: "La etiqueta es obligatoria" }]}
+                        rules={[{ required: true, message: t('forms.requiredField') }]}
                     >
-                        <Input placeholder="Ej. Nombre completo" />
+                        <Input placeholder={t('settings.fieldLabelPlaceholder')} />
                     </Form.Item>
 
                     <Form.Item
-                        label="Tipo de campo"
+                        label={t('settings.fieldTypeLabel')}
                         name="type"
-                        rules={[{ required: true, message: "El tipo es obligatorio" }]}
+                        rules={[{ required: true, message: t('forms.requiredField') }]}
                     >
                         <Select
                             onChange={value => setFieldType(value)}
-                            placeholder="Selecciona tipo de campo"
+                            placeholder={t('settings.fieldTypePlaceholder')}
                         >
-                            {[
-                                { value: "text", label: "Texto" },
-                                { value: "number", label: "Número" },
-                                { value: "select", label: "Selección" },
-                                { value: "date", label: "Fecha" },
-                                { value: "time", label: "Hora" },
-                                { value: "checkbox", label: "Checkbox" },
-                                { value: "image", label: "Imagen" },
-                                { value: "textarea", label: "Textarea" }
-                            ].map(t => (
+                            {fieldTypes.map(t => (
                                 <Select.Option key={t.value} value={t.value}>
                                     {t.label}
                                 </Select.Option>
@@ -551,8 +555,8 @@ const CustomFields = () => {
                             name="options"
                             label={
                                 <Space>
-                                    Opciones
-                                    <Tooltip title="Escribe una opción y presiona Enter o Coma (,) para agregarla.">
+                                    {t('settings.optionsLabel')}
+                                    <Tooltip title={t('settings.optionsTooltip')}>
                                         <InfoCircleOutlined style={{ color: "rgba(0,0,0,0.45)" }} />
                                     </Tooltip>
                                 </Space>
@@ -561,7 +565,7 @@ const CustomFields = () => {
                             <Select
                                 mode="tags"
                                 style={{ width: '100%' }}
-                                placeholder="Escribe y presiona Enter o Coma"
+                                placeholder={t('settings.optionsPlaceholder')}
                                 tokenSeparators={[',']}
                                 open={false}
                             />
@@ -573,8 +577,8 @@ const CustomFields = () => {
                         valuePropName="checked"
                         label={
                             <Space>
-                                Required
-                                <Tooltip title="Si se marca, el usuario estará obligado a llenar este campo.">
+                                {t('settings.requiredLabel')}
+                                <Tooltip title={t('settings.requiredTooltip')}>
                                     <InfoCircleOutlined style={{ color: "rgba(0,0,0,0.45)" }} />
                                 </Tooltip>
                             </Space>

@@ -1,6 +1,7 @@
 import React from "react";
 import { Drawer, Descriptions, Avatar, Divider, theme } from "antd";
 import { UserOutlined, MailOutlined, InfoCircleOutlined, CalendarOutlined, SolutionOutlined } from "@ant-design/icons";
+import { useTranslation } from "react-i18next";
 
 // --- Componente Auxiliar: Renderiza una sección ---
 
@@ -50,11 +51,12 @@ const DetailSection = ({ label, items }) => {
 
 const DrawerDetails = ({ visible, onClose, data }) => {
     const { token } = theme.useToken();
+    const { t } = useTranslation();
 
     if (!data) {
         return (
             <Drawer
-                title="Detalle"
+                title={t('global.detail')}
                 placement="right"
                 onClose={onClose}
                 open={visible}
@@ -62,7 +64,7 @@ const DrawerDetails = ({ visible, onClose, data }) => {
                 styles={{ body: { padding: 0 } }}
             >
                 <div style={{ textAlign: "center", padding: "20px", color: token.colorText }}>
-                    Cargando o no hay datos.
+                    {t('global.loadingOrNoData')}
                 </div>
             </Drawer>
         );
@@ -107,7 +109,7 @@ const DrawerDetails = ({ visible, onClose, data }) => {
                         {avatarChar}
                     </Avatar>
                     <h2 style={{ margin: 0, fontWeight: 600, fontSize: '20px', color: token.colorText }}>
-                        {title || "Detalle"}
+                        {title || t('global.detail')}
                     </h2>
                     <p style={{ color: token.colorTextSecondary, margin: '4px 0 8px 0', fontSize: '14px' }}>
                         {subtitle}

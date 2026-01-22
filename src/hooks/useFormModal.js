@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import { message } from 'antd';
 import dayjs from 'dayjs';
+import { useTranslation } from 'react-i18next';
 
 /**
  * Hook para gestionar el estado, la apertura/cierre y el envío de datos de un formulario CRUD
@@ -14,6 +15,7 @@ import dayjs from 'dayjs';
  * @param {object} form - Instancia del formulario de Ant Design (obtenida de Form.useForm() en el componente padre).
  */
 export const useFormModal = (request, endpoint, moduleFieldId, titleSingular, fixedValues, form) => {
+    const { t } = useTranslation();
     const [modalVisible, setModalVisible] = useState(false);
     const [editingId, setEditingId] = useState(null);
     const [moduleData, setModuleData] = useState(null);
@@ -45,7 +47,7 @@ export const useFormModal = (request, endpoint, moduleFieldId, titleSingular, fi
             }
         } catch (err) {
             console.error("Error al cargar formulario/campos:", err);
-            message.error("Error al cargar los campos dinámicos o datos de edición");
+            message.error(t('forms.errorLoadingFields'));
             setModalVisible(false);
         }
     };
@@ -84,11 +86,11 @@ export const useFormModal = (request, endpoint, moduleFieldId, titleSingular, fi
         try {
             if (editingId) {
                 await request(`${endpoint}/${editingId}`, 'PUT', transformedValues);
-                message.success(`${titleSingular} actualizad${titleSingular.endsWith('a') ? 'a' : 'o'} correctamente`);
+                message.success(t('forms.updateSuccess', { title: titleSingular }));
             } else {
                 const response = await request(`${endpoint}/`, 'POST', transformedValues);
                 if (response?.success) {
-                    message.success(`${titleSingular} cread${titleSingular.endsWith('a') ? 'a' : 'o'} correctamente`);
+                    message.success(t('forms.createSuccess', { title: titleSingular }));
                 }
             }
             return closeModal(true);
@@ -100,7 +102,7 @@ export const useFormModal = (request, endpoint, moduleFieldId, titleSingular, fi
                 }));
                 form.setFields(fieldsWithErrors);
             } else {
-                message.error(error?.message || `Error al guardar ${titleSingular}`);
+                message.error(error?.message || t('forms.errorSaving', { title: titleSingular }));
             }
         }
     };

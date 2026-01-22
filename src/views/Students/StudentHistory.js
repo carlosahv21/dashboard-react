@@ -18,7 +18,7 @@ import {
     App,
     Input,
     Space,
-} from "antd"; 
+} from "antd";
 import {
     LeftOutlined,
     ClockCircleOutlined,
@@ -35,10 +35,12 @@ import { useFormModal } from "../../hooks/useFormModal";
 import FormHeader from "../../components/Common/FormHeader";
 import FormFooter from "../../components/Common/FormFooter";
 import FormSection from "../../components/Common/FormSection";
+import { useTranslation } from "react-i18next";
 
 const { Title, Text } = Typography;
 
 const StudentHistory = () => {
+    const { t } = useTranslation();
     const { id } = useParams();
     const navigate = useNavigate();
     const { request } = useFetch();
@@ -93,7 +95,7 @@ const StudentHistory = () => {
         request,
         "payments",
         13,
-        "Pago",
+        t('students.payment'),
         { user_id: id },
         form
     );
@@ -107,7 +109,7 @@ const StudentHistory = () => {
 
     const handlePausePlan = async () => {
         if (!pauseReason.trim()) {
-            message.error("Por favor, ingresa una nota explicando la razón de la pausa.");
+            message.error(t('students.pauseNoteRequired'));
             return;
         }
 
@@ -117,12 +119,12 @@ const StudentHistory = () => {
                 notes: pauseReason
             });
 
-            message.success("El plan ha sido pausado correctamente.");
+            message.success(t('students.pauseSuccess'));
             setIsPauseModalOpen(false);
             setPauseReason("");
             fetchAllData();
         } catch (error) {
-            message.error(error.message || "Error al pausar el plan.");
+            message.error(error.message || t('students.pauseError'));
         }
     };
 
@@ -142,41 +144,41 @@ const StudentHistory = () => {
 
     const attendanceColumns = [
         {
-            title: "Fecha",
+            title: t('students.date'),
             dataIndex: "date",
             key: "date",
             render: (d) => dayjs(d).format("DD/MM/YYYY"),
         },
-        { title: "Clase", dataIndex: "class_name", key: "class_name" },
+        { title: t('students.class'), dataIndex: "class_name", key: "class_name" },
         {
-            title: "Estado",
+            title: t('students.status'),
             dataIndex: "status",
             key: "status",
             render: (status) =>
                 status === "present" ? (
-                    <Tag color="green">Presente</Tag>
+                    <Tag color="green">{t('students.present')}</Tag>
                 ) : (
-                    <Tag color="red">Ausente</Tag>
+                    <Tag color="red">{t('students.absent')}</Tag>
                 ),
         },
     ];
 
     const paymentColumns = [
         {
-            title: "Fecha",
+            title: t('students.date'),
             dataIndex: "payment_date",
             key: "payment_date",
             render: (d) => dayjs(d).format("DD/MM/YYYY"),
         },
-        { title: "Método", dataIndex: "payment_method", key: "payment_method" },
+        { title: t('students.method'), dataIndex: "payment_method", key: "payment_method" },
         {
-            title: "Monto",
+            title: t('students.amount'),
             dataIndex: "amount",
             key: "amount",
             render: (amount) => `$${amount}`,
         },
         {
-            title: "Estado",
+            title: t('students.status'),
             dataIndex: "status",
             key: "status",
             render: (status) => (
@@ -188,7 +190,7 @@ const StudentHistory = () => {
     const items = [
         {
             key: "1",
-            label: "Historial de Pagos",
+            label: t('students.paymentsHistory'),
             children: (
                 <Table
                     columns={paymentColumns}
@@ -201,7 +203,7 @@ const StudentHistory = () => {
         },
         {
             key: "2",
-            label: "Asistencias",
+            label: t('students.attendances'),
             children: (
                 <Table
                     columns={attendanceColumns}
@@ -223,17 +225,17 @@ const StudentHistory = () => {
                     onClick={() => navigate("/students")}
                     style={{ marginRight: 16 }}
                 >
-                    Volver
+                    {t('students.back')}
                 </Button>
                 <Title level={3} style={{ margin: 0 }}>
-                    Historial de {student?.first_name} {student?.last_name}
+                    {t('students.history', { name: `${student?.first_name} ${student?.last_name}` })}
                 </Title>
             </div>
 
             <Row gutter={[24, 24]}>
                 {/* Left Column: Calendar */}
                 <Col xs={24} lg={16}>
-                    <Card title="Calendario de Actividades" variant={false}>
+                    <Card title={t('students.activitiesCalendar')} variant={false}>
                         <FullCalendar
                             plugins={[dayGridPlugin]}
                             initialView="dayGridMonth"
@@ -251,8 +253,8 @@ const StudentHistory = () => {
                                             <strong>{eventInfo.event.extendedProps.fullTitle}</strong>
                                             <br />
                                             {eventInfo.event.extendedProps.status === "present"
-                                                ? "Presente"
-                                                : "Ausente"}{" "}
+                                                ? t('students.present')
+                                                : t('students.absent')}{" "}
                                             <br />
                                             {dayjs(eventInfo.event.start).format("DD/MM/YYYY")}
                                         </div>
@@ -395,16 +397,16 @@ const StudentHistory = () => {
                     <Row gutter={[0, 24]}>
                         <Col span={24}>
                             <Card
-                                title="Plan Actual"
+                                title={t('students.currentPlan')}
                                 extra={
                                     activePlan ? (
                                         activePlan.status === "active" ? (
-                                            <Tag color="green">Activo</Tag>
+                                            <Tag color="green">{t('students.active')}</Tag>
                                         ) : (
-                                            <Tag color="red">Inactivo</Tag>
+                                            <Tag color="red">{t('students.inactive')}</Tag>
                                         )
                                     ) : (
-                                        <Tag color="red">Inactivo</Tag>
+                                        <Tag color="red">{t('students.inactive')}</Tag>
                                     )
                                 }
                                 actions={[
@@ -416,7 +418,7 @@ const StudentHistory = () => {
                                             className="align-self-end"
                                             onClick={() => setIsPauseModalOpen(true)}
                                         >
-                                            Pausar Plan
+                                            {t('students.pausePlan')}
                                         </Button>
                                     ) : (
                                         <Button
@@ -426,7 +428,7 @@ const StudentHistory = () => {
                                             onClick={() => openModal()}
                                             disabled={false} // Always enabled if not active
                                         >
-                                            Renovar Plan
+                                            {t('students.renewPlan')}
                                         </Button>
                                     ),
                                 ]}
@@ -435,13 +437,13 @@ const StudentHistory = () => {
                                     <>
                                         <div style={{ textAlign: "center", marginBottom: 20 }}>
                                             <Title level={4} style={{ margin: 0 }}>
-                                                {activePlan.name || "Plan Desconocido"}
+                                                {activePlan.name || t('students.unknownPlan')}
                                             </Title>
                                             <Typography.Text>
-                                                Tipo: {activePlan.type || "Tipo Desconocido"}. <br />
-                                                Inicio:{" "}
+                                                {t('students.type')}: {activePlan.type || t('students.unknownType')}. <br />
+                                                {t('students.start')}:{" "}
                                                 {dayjs(activePlan.start_date).format("DD MMM YYYY")} -
-                                                Vence:{" "}
+                                                {t('students.expires')}:{" "}
                                                 {dayjs(activePlan.end_date).format("DD MMM YYYY")}
                                             </Typography.Text>
                                         </div>
@@ -449,14 +451,14 @@ const StudentHistory = () => {
                                             <Col span={12} style={{ textAlign: "center" }}>
                                                 {activePlan.max_classes === 0 ? (
                                                     <Statistic
-                                                        title="Clases Restantes"
-                                                        value="Ilimitado"
+                                                        title={t('students.classesRemaining')}
+                                                        value={t('students.unlimited')}
                                                         prefix={<ClockCircleOutlined />}
                                                         style={{ fontSize: 16 }}
                                                     />
                                                 ) : (
                                                     <Statistic
-                                                        title="Clases Restantes"
+                                                        title={t('students.classesRemaining')}
                                                         value={`${activePlan.classes_remaining || 0}/${activePlan.max_classes || 0
                                                             }`}
                                                         prefix={<ClockCircleOutlined />}
@@ -466,7 +468,7 @@ const StudentHistory = () => {
                                             </Col>
                                             <Col span={12} style={{ textAlign: "center" }}>
                                                 <Statistic
-                                                    title="Próximo Pago"
+                                                    title={t('students.nextPayment')}
                                                     value={activePlan.price || 0}
                                                     prefix="$"
                                                     style={{ fontSize: 16 }}
@@ -477,14 +479,14 @@ const StudentHistory = () => {
                                 ) : (
                                     <div style={{ textAlign: "center", padding: 20 }}>
                                         <Text type="secondary">
-                                            No hay un plan activo actualmente.
+                                            {t('students.noActivePlan')}
                                         </Text>
                                     </div>
                                 )}
                             </Card>
                         </Col>
                         <Col span={24}>
-                            <Card title="Detalles" variant={false} style={{ padding: 0 }}>
+                            <Card title={t('students.details')} variant={false} style={{ padding: 0 }}>
                                 <Tabs defaultActiveKey="1" items={items} />
                             </Card>
                         </Col>
@@ -503,8 +505,8 @@ const StudentHistory = () => {
                     moduleData.blocks?.length > 0 ? (
                         <>
                             <FormHeader
-                                title="Crear Pago"
-                                subtitle="Registra un nuevo pago para renovar el plan."
+                                title={t('students.createPayment')}
+                                subtitle={t('students.renewPlanSubtitle')}
                                 onSave={() => form.submit()}
                                 onCancel={() => closeModal(false)}
                             />
@@ -529,12 +531,12 @@ const StudentHistory = () => {
                         </>
                     ) : (
                         <div style={{ textAlign: "center", padding: 50 }}>
-                            No hay campos para mostrar.
+                            {t('global.noFields')}
                         </div>
                     )
                 ) : (
                     <div style={{ textAlign: "center", padding: 50 }}>
-                        <Spin /> <p>Cargando campos...</p>
+                        <Spin /> <p>{t('global.loadingFields')}</p>
                     </div>
                 )}
             </Modal>
@@ -543,27 +545,26 @@ const StudentHistory = () => {
                 title={
                     <Space>
                         <ExclamationCircleOutlined style={{ color: token.colorError }} />
-                        <span>Pausar Plan</span>
+                        <span>{t('students.pausePlan')}</span>
                     </Space>
                 }
                 open={isPauseModalOpen}
                 onOk={handlePausePlan}
                 onCancel={() => setIsPauseModalOpen(false)}
-                okText="Pausar Plan"
+                okText={t('students.pausePlan')}
                 okButtonProps={{ danger: true }}
-                cancelText="Cancelar"
+                cancelText={t('global.cancel')}
             >
                 <div style={{ marginBottom: 16 }}>
                     <Typography.Paragraph>
-                        Al pausar este plan, se suspenderá el acceso del estudiante y se detendrá el ciclo de facturación o vigencia actual.
-                        Es necesario que ingreses una nota justificando esta acción.
+                        {t('students.pausePlanConfirm')}
                     </Typography.Paragraph>
                 </div>
                 <div>
-                    <Typography.Text strong>Motivo de la pausa:</Typography.Text>
+                    <Typography.Text strong>{t('students.pauseReason')}</Typography.Text>
                     <Input.TextArea
                         rows={4}
-                        placeholder="Ej: El estudiante solicitó congelar su plan por viaje..."
+                        placeholder={t('students.pausePlaceholder')}
                         value={pauseReason}
                         onChange={(e) => setPauseReason(e.target.value)}
                         style={{ marginTop: 8 }}

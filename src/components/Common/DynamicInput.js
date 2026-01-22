@@ -2,6 +2,8 @@ import React, { useState, useCallback } from "react";
 import { Form, Input, Select, Upload, DatePicker, TimePicker, Checkbox, message } from "antd";
 import { UploadOutlined } from "@ant-design/icons";
 import useFetch from "../../hooks/useFetch";
+import { useTranslation } from "react-i18next";
+
 const { Option } = Select;
 const { TextArea } = Input;
 
@@ -17,14 +19,14 @@ const debounce = (func, delay) => {
 };
 
 // Función para convertir `validation_rules` a formato de Ant Design
-const parseValidationRules = (required, type) => {
+const parseValidationRules = (required, type, t) => {
     const rules = [];
 
     // ✅ Validar si el campo es obligatorio
     if (required) {
         rules.push({
             required: true,
-            message: "Este campo es obligatorio",
+            message: t('forms.requiredField'),
         });
     }
 
@@ -34,7 +36,7 @@ const parseValidationRules = (required, type) => {
             case "text":
                 rules.push({
                     type: "string",
-                    message: "Debe ser un texto válido",
+                    message: t('forms.invalidText'),
                 });
                 break;
             case "number":
@@ -43,7 +45,7 @@ const parseValidationRules = (required, type) => {
                         if (!value) return Promise.resolve(); // vacío pasa si no es requerido
                         if (value === "Ilimitadas") return Promise.resolve(); // para max_sessions
                         if (!isNaN(Number(value))) return Promise.resolve();
-                        return Promise.reject(new Error("Debe ser un número válido"));
+                        return Promise.reject(new Error(t('forms.invalidNumber')));
                     },
                 });
                 break;
@@ -53,7 +55,7 @@ const parseValidationRules = (required, type) => {
                     validator: (_, value) => {
                         if (!value) return Promise.resolve(); // permite vacío si no es requerido
                         if (typeof value === "string" || typeof value === "number") return Promise.resolve();
-                        return Promise.reject(new Error("Debe seleccionar una opción válida"));
+                        return Promise.reject(new Error(t('forms.invalidSelect')));
                     },
                 });
                 break;
@@ -62,7 +64,7 @@ const parseValidationRules = (required, type) => {
                     validator: (_, value) =>
                         value
                             ? Promise.resolve()
-                            : Promise.reject(new Error("Debe seleccionar una fecha válida")),
+                            : Promise.reject(new Error(t('forms.invalidDate'))),
                 });
                 break;
             case "time":
@@ -70,31 +72,31 @@ const parseValidationRules = (required, type) => {
                     validator: (_, value) =>
                         value
                             ? Promise.resolve()
-                            : Promise.reject(new Error("Debe seleccionar una hora válida")),
+                            : Promise.reject(new Error(t('forms.invalidTime'))),
                 });
                 break;
             case "boolean":
                 rules.push({
                     type: "boolean",
-                    message: "Debe ser verdadero o falso",
+                    message: t('forms.invalidBoolean'),
                 });
                 break;
             case "image":
                 rules.push({
                     required: true,
-                    message: "Debe subir una imagen",
+                    message: t('forms.invalidImage'),
                 });
                 break;
             case "relation":
                 rules.push({
                     required: true,
-                    message: "Debe seleccionar una opción",
+                    message: t('forms.invalidRelation'),
                 });
                 break;
             default:
                 rules.push({
                     type: "string",
-                    message: "Debe ser un texto válido",
+                    message: t('forms.invalidText'),
                 });
         }
     }
@@ -113,6 +115,7 @@ const DynamicInput = ({
     placeholder,
     onImageUpload
 }) => {
+    const { t } = useTranslation();
     const { request } = useFetch();
 
     // Estado para manejar las opciones de relación y la carga
@@ -137,14 +140,14 @@ const DynamicInput = ({
                 const response = await request(`fields/relation`, "POST", payload);
                 setRelationOptions(response.data);
             } catch (error) {
-                message.error("Error al cargar opciones de relación.");
+                message.error(t('forms.relationLoadError'));
                 console.error("Error fetching relation options:", error);
                 setRelationOptions([]);
             } finally {
                 setLoadingOptions(false);
             }
         }, 300),
-        [relationConfig, request]
+        [relationConfig, request, t]
     );
 
     React.useEffect(() => {
@@ -158,13 +161,13 @@ const DynamicInput = ({
     const handleRemoveImage = async (file) => {
         try {
             await request(`images/`, "DELETE", { imageUrl: file.url || file.response.url });
-            message.success("Image removed successfully");
+            message.success(t('forms.removeImageSuccess'));
 
             form.setFieldsValue({ [name]: null });
 
             if (onImageUpload) onImageUpload(null);
         } catch (error) {
-            message.error("Failed to remove image");
+            message.error(t('forms.removeImageError'));
             console.error(error);
         }
     };
@@ -182,19 +185,20 @@ const DynamicInput = ({
             if (onImageUpload) onImageUpload(imageUrl);
             onSuccess(data);
         } catch (error) {
-            message.error("Failed to upload image");
+            message.error(t('forms.uploadImageError'));
             console.error(error);
             onError(error);
         }
     };
 
     const renderInputComponent = () => {
+        const p = placeholder || label;
         switch (type) {
-            case "text": return <Input placeholder={placeholder || `Escribe ${label}`} />;
-            case "number": return <Input type="number" placeholder={placeholder || `Escribe ${label}`} />;
+            case "text": return <Input placeholder={p} />;
+            case "number": return <Input type="number" placeholder={p} />;
             case "select":
                 return (
-                    <Select placeholder={placeholder || `Selecciona ${label}`}>
+                    <Select placeholder={p}>
                         {options?.map(opt => (
                             <Option key={opt.toString()} value={opt.toString()}>
                                 {opt.toString()}
@@ -206,16 +210,16 @@ const DynamicInput = ({
             case "relation":
                 if (!relationConfig) {
                     console.error(`DynamicInput: El campo '${name}' de tipo 'relation' requiere 'relationConfig'.`);
-                    return <Input disabled value="Error: Falta Configuración de Relación" />;
+                    return <Input disabled value={t('forms.relationErrorMissingConfig')} />;
                 }
                 return (
                     <Select
-                        placeholder={placeholder || `Busca y selecciona ${label}`}
+                        placeholder={p}
                         showSearch // Permite la búsqueda
                         loading={loadingOptions} // Muestra el estado de carga
                         onSearch={fetchRelationOptions} // Dispara la búsqueda al escribir (con debounce)
                         filterOption={false} // Deshabilita el filtro del lado del cliente, ya que el backend lo hace
-                        notFoundContent={loadingOptions ? 'Cargando opciones...' : 'No se encontraron resultados'}
+                        notFoundContent={loadingOptions ? t('forms.loadingOptions') : t('forms.noOptionsFound')}
                     >
                         {relationOptions?.map(opt => (
                             <Option key={opt.value} value={opt.value}>
@@ -226,7 +230,7 @@ const DynamicInput = ({
                 );
             case "date": return <DatePicker format="YYYY-MM-DD" placeholder={placeholder} />;
             case "time": return <TimePicker format="HH:mm" placeholder={placeholder} needConfirm={false} minuteStep={15} use12Hours />;
-            case "textarea": return <TextArea placeholder={placeholder || `Escribe ${label}`} style={{ resize: "none" }} />;
+            case "textarea": return <TextArea placeholder={p} style={{ resize: "none" }} />;
             case "image":
                 return (
                     <Upload
@@ -237,13 +241,13 @@ const DynamicInput = ({
                         beforeUpload={(file) => {
                             const isJpgOrPng = file.type === "image/jpeg" || file.type === "image/png";
                             if (!isJpgOrPng) {
-                                message.error("Solo se permiten archivos JPG o PNG");
+                                message.error(t('forms.imageTypeErrorMessage'));
                                 return Upload.LIST_IGNORE; // evita que se agregue el archivo
                             }
 
                             const isLt5M = file.size / 1024 / 1024 < 5;
                             if (!isLt5M) {
-                                message.error("La imagen debe ser menor a 5MB");
+                                message.error(t('forms.imageSizeErrorMessage'));
                                 return Upload.LIST_IGNORE;
                             }
 
@@ -253,12 +257,12 @@ const DynamicInput = ({
                     >
                         <button style={{ border: 0, background: "none" }} type="button">
                             <UploadOutlined />
-                            <div style={{ marginTop: 8 }}>Upload</div>
+                            <div style={{ marginTop: 8 }}>{t('forms.upload')}</div>
                         </button>
                     </Upload>
                 );
             case "boolean": return <Checkbox placeholder={placeholder} />;
-            default: return <Input placeholder={placeholder || label} />;
+            default: return <Input placeholder={p} />;
         }
     };
 
@@ -272,7 +276,7 @@ const DynamicInput = ({
         <Form.Item
             label={label}
             name={name}
-            rules={parseValidationRules(required, type)}
+            rules={parseValidationRules(required, type, t)}
             {...valueProp}
             {...imageProps}
         >

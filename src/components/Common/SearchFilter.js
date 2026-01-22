@@ -10,6 +10,7 @@ import {
     AppstoreOutlined,
     TableOutlined,
 } from "@ant-design/icons";
+import { useTranslation } from "react-i18next";
 
 const { Title } = Typography;
 
@@ -30,16 +31,17 @@ const SearchFilter = ({
     currentView,
     onViewChange,
 }) => {
+    const { t } = useTranslation();
     const masiveActions = [
         {
             value: "export",
-            label: "Exportar a Excel",
+            label: t('global.exportExcel'),
             onClick: () => onExport(),
             icon: <FileExcelOutlined />,
         },
         canDelete && {
             value: "delete",
-            label: "Eliminar",
+            label: t('global.delete'),
             onClick: () => onBulkDelete(),
             icon: <DeleteOutlined />,
             danger: true,
@@ -61,7 +63,7 @@ const SearchFilter = ({
 
             <Space>
                 <Space size={5}>
-                    <Typography.Text type="secondary">Mostrar</Typography.Text>
+                    <Typography.Text type="secondary">{t('global.show')}</Typography.Text>
                     <Select
                         value={pageSize}
                         style={{ width: 70 }}
@@ -74,7 +76,7 @@ const SearchFilter = ({
                 </Space>
 
                 <Input
-                    placeholder={`Buscar ${title.toLowerCase()}`}
+                    placeholder={t('global.searchPlaceholder', { title: title.toLowerCase() })}
                     allowClear
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
@@ -88,7 +90,7 @@ const SearchFilter = ({
                     trigger={["click"]}
                 >
                     <Button>
-                        Acciones masivas <DownOutlined />
+                        {t('global.massiveActions')} <DownOutlined />
                     </Button>
                 </Dropdown>
 
@@ -115,7 +117,7 @@ const SearchFilter = ({
 
                 {canCreate && (
                     <Button type="primary" onClick={onCreate} icon={<PlusOutlined />}>
-                        Crear {title}
+                        {t('global.createTitle', { title: title })}
                     </Button>
                 )}
             </Space>

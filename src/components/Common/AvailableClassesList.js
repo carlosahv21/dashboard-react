@@ -1,6 +1,7 @@
 import React from "react";
 import { List, Card, Tag, Typography, Empty } from "antd";
 import { ClockCircleOutlined, CalendarOutlined, TeamOutlined, TrophyOutlined, StarOutlined } from "@ant-design/icons";
+import { useTranslation } from "react-i18next";
 
 const { Text } = Typography;
 
@@ -46,11 +47,12 @@ const highlightMatch = (text, query) => {
 
 
 const AvailableClassesList = ({ classes, onClassSelect, enrolledClassIds = [], searchTerm }) => {
+    const { t } = useTranslation();
     if (!classes || classes.length === 0) {
         // Mejoramos el mensaje cuando se está buscando pero no hay resultados
         const description = searchTerm && searchTerm.length >= 3
-            ? "No se encontraron clases que coincidan con la búsqueda."
-            : "No hay clases disponibles o escriba al menos 3 caracteres para buscar.";
+            ? t('classes.noResultsSearch')
+            : t('classes.noAvailableClasses');
 
         return <Empty description={description} />;
     }
@@ -96,7 +98,7 @@ const AvailableClassesList = ({ classes, onClassSelect, enrolledClassIds = [], s
 
                                 {isEnrolled && (
                                     <Tag color="success" style={{ marginLeft: 8 }}>
-                                        Inscrito
+                                        {t('global.enrolled')}
                                     </Tag>
                                 )}
                             </div>
@@ -112,7 +114,7 @@ const AvailableClassesList = ({ classes, onClassSelect, enrolledClassIds = [], s
                                 <div>
                                     <TrophyOutlined style={{ marginRight: 6, color: "#1890ff" }} />
                                     <Text type="secondary">
-                                        Nivel: {highlightMatch(classItem.level, searchTerm)}
+                                        {t('global.level')}: {highlightMatch(classItem.level, searchTerm)}
                                     </Text>
                                 </div>
 
@@ -120,7 +122,7 @@ const AvailableClassesList = ({ classes, onClassSelect, enrolledClassIds = [], s
                                     <div>
                                         <TeamOutlined style={{ marginRight: 6, color: "#722ed1" }} />
                                         <Text type="secondary">
-                                            Género: {highlightMatch(classItem.genre, searchTerm)}
+                                            {t('global.genre')}: {highlightMatch(classItem.genre, searchTerm)}
                                         </Text>
                                     </div>
                                 )}
@@ -136,14 +138,14 @@ const AvailableClassesList = ({ classes, onClassSelect, enrolledClassIds = [], s
                                 <div>
                                     <CalendarOutlined style={{ marginRight: 6, color: "#52c41a" }} />
                                     <Text type="secondary">
-                                        Día: {highlightMatch(classItem.date, searchTerm)}
+                                        {t('global.day')}: {highlightMatch(classItem.date, searchTerm)}
                                     </Text>
                                 </div>
 
                                 <div>
                                     <ClockCircleOutlined style={{ marginRight: 6, color: "#fa8c16" }} />
                                     <Text type="secondary">
-                                        Hora: {highlightMatch(classItem.hour, searchTerm)}
+                                        {t('global.hour')}: {highlightMatch(classItem.hour, searchTerm)}
                                     </Text>
                                 </div>
                             </div>

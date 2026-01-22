@@ -1,41 +1,43 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect, useContext, useMemo } from "react";
 import { Form, message } from "antd";
 import FormHeader from "../../../components/Common/FormHeader";
 import FormSection from "../../../components/Common/FormSection";
 import FormFooter from "../../../components/Common/FormFooter";
 import useFetch from "../../../hooks/useFetch";
 import { AuthContext } from "../../../context/AuthContext";
+import { useTranslation } from "react-i18next";
 
 const GeneralInformation = () => {
+    const { t } = useTranslation();
     const [form] = Form.useForm();
     const { request } = useFetch();
     const { settings, setSettings } = useContext(AuthContext); // ahora usamos AuthContext
     const [imageUrl, setImageUrl] = useState(settings?.logo_url || "");
     const [uploadKey, setUploadKey] = useState(Date.now());
 
-    const moduleData = {
-        module_name: "Información General",
+    const moduleData = useMemo(() => ({
+        module_name: t('settings.general'),
         blocks: [
             {
-                block_name: "Información de la Academia",
+                block_name: t('settings.academyInfo'),
                 fields: [
-                    { label: "Nombre de la Academia", name: "academy_name", type: "text", required: true, placeholder: "Ej: Academia Estelar" },
-                    { label: "Logo", name: "logo_url", type: "image" },
-                    { label: "Correo de contacto", name: "contact_email", type: "email" },
-                    { label: "Número de teléfono", name: "phone_number", type: "text" },
+                    { label: t('settings.academyName'), name: "academy_name", type: "text", required: true, placeholder: t('settings.academyNamePlaceholder') },
+                    { label: t('settings.logo'), name: "logo_url", type: "image" },
+                    { label: t('settings.contactEmail'), name: "contact_email", type: "email" },
+                    { label: t('settings.phoneNumber'), name: "phone_number", type: "text" },
                 ],
             },
             {
-                block_name: "Preferencias del Sistema",
+                block_name: t('settings.systemPreferences'),
                 fields: [
-                    { label: "Moneda", name: "currency", type: "select", options: ["USD", "EUR", "VES"] },
-                    { label: "Formato de fecha", name: "date_format", type: "select", options: ["DD/MM/YYYY", "MM/DD/YYYY", "YYYY-MM-DD"] },
-                    { label: "Tema", name: "theme", type: "select", options: ["light", "dark"] },
-                    { label: "Idioma", name: "language", type: "select", options: ["es", "en"] },
+                    { label: t('settings.currency'), name: "currency", type: "select", options: ["USD", "EUR", "VES"] },
+                    { label: t('settings.dateFormat'), name: "date_format", type: "select", options: ["DD/MM/YYYY", "MM/DD/YYYY", "YYYY-MM-DD"] },
+                    { label: t('settings.theme'), name: "theme", type: "select", options: ["light", "dark"] },
+                    { label: t('settings.language'), name: "language", type: "select", options: ["es", "en"] },
                 ],
             },
         ],
-    };
+    }), [t]);
 
     // Cargar settings desde AuthContext en el formulario
     useEffect(() => {
@@ -51,7 +53,7 @@ const GeneralInformation = () => {
     const handleSubmit = async (values) => {
         try {
             const payload = { ...values, logo_url: imageUrl || values.logo_url };
-            const response = await request("settings", "POST", payload);
+            const response = await request("settings", "PUT", payload);
 
             // Actualizar AuthContext con los datos que devuelve el backend
             const updatedSettings = response || payload;
@@ -60,10 +62,10 @@ const GeneralInformation = () => {
             localStorage.setItem("settings", JSON.stringify(updatedSettings));
             setUploadKey(Date.now());
 
-            message.success("Configuración actualizada correctamente");
+            message.success(t('settings.updateSuccess'));
         } catch (err) {
             console.error("Error al actualizar settings:", err);
-            message.error("No se pudo actualizar la configuración");
+            message.error(t('settings.updateError'));
         }
     };
 
@@ -71,7 +73,7 @@ const GeneralInformation = () => {
         <>
             <FormHeader
                 title={moduleData.module_name}
-                subtitle="Edita la información general de la academía"
+                subtitle={t('settings.generalSubtitle')}
                 onCancel={() => null}
                 onSave={() => form.submit()}
             />

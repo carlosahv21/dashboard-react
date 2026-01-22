@@ -1,7 +1,10 @@
 import React from "react";
 import BaseCrudView from "../../components/Common/BaseView";
+import { useTranslation } from "react-i18next";
 
 const Plans = () => {
+    const { t } = useTranslation();
+    
     const columns = [
         {
             title: "Nombre",
@@ -23,8 +26,8 @@ const Plans = () => {
             endpoint="plans"
             moduleFieldId={11}
             columns={columns}
-            titleSingular="Plan"
-            titlePlural="Planes"
+            titleSingular={t("plans.name_singular")}
+            titlePlural={t("plans.name_plural")}
         />
 
     );

@@ -1,6 +1,7 @@
 import React from "react";
 import { Table, Space, Button, App } from "antd";
 import { EditOutlined, DeleteOutlined } from "@ant-design/icons";
+import { useTranslation } from "react-i18next";
 
 const DataTable = ({
     columns,
@@ -17,14 +18,15 @@ const DataTable = ({
     rowSelection
 }) => {
     const { modal } = App.useApp();
+    const { t } = useTranslation();
 
     const handleDeleteConfirm = (id, record) => {
         modal.confirm({
-            title: "¿Eliminar?",
-            content: "Esta acción no se puede deshacer.",
-            okText: "Sí",
+            title: t('global.deleteTitle'),
+            content: t('global.deleteConfirm'),
+            okText: t('global.yes'),
             okType: "danger",
-            cancelText: "Cancelar",
+            cancelText: t('global.cancel'),
             onOk: () => onDelete && onDelete(id, record),
         });
     };
@@ -33,7 +35,7 @@ const DataTable = ({
         ? [
             ...columns,
             {
-                title: "Acciones",
+                title: t('global.actions'),
                 key: "actions",
                 render: (_, record) => {
                     const editDisabled = disableEdit ? disableEdit(record) : false;

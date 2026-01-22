@@ -1,5 +1,12 @@
-import React, { useContext } from "react";
+import React, { useContext, useEffect } from "react";
 import ReactDOM from "react-dom/client";
+
+import "./i18n";
+import { useTranslation } from "react-i18next";
+
+import es_ES from "antd/locale/es_ES";
+import en_US from "antd/locale/en_US";
+
 import { ConfigProvider, theme, App as AntdApp } from "antd";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider, AuthContext } from "./context/AuthContext";
@@ -85,22 +92,26 @@ const AppRoutes = () => {
 
 const AppContent = () => {
   const { settings } = useContext(AuthContext);
+  const { i18n } = useTranslation(); // Hook para detectar cambios de idioma
   const { defaultAlgorithm, darkAlgorithm } = theme;
 
   const isDarkMode = settings?.theme === "dark";
 
-  React.useEffect(() => {
+  // Determinamos el locale de Ant Design basado en el idioma actual de i18next
+  const currentAntLocale = i18n.language.startsWith('en') ? en_US : es_ES;
+
+  useEffect(() => {
     document.body.style.backgroundColor = isDarkMode ? "#121212" : "#F8F9FA";
   }, [isDarkMode]);
 
   const darkThemeConfig = {
     algorithm: darkAlgorithm,
     token: {
-      colorBgBase: "#121212", // Fondo Principal
-      colorBgContainer: "#1E1E1E", // Superficie Principal (Header, Sidebar, Content containers if not overridden)
-      colorText: "#E0E0E0", // Texto Primario
-      colorTextSecondary: "#A0A0A0", // Texto Secundario
-      colorPrimary: "#0A84FF", // Color de Acento
+      colorBgBase: "#121212",
+      colorBgContainer: "#1E1E1E",
+      colorText: "#E0E0E0",
+      colorTextSecondary: "#A0A0A0",
+      colorPrimary: "#0A84FF",
       borderRadius: 8,
       colorBorder: "#2D2D2D",
       colorBorderSecondary: "#2D2D2D",
@@ -112,18 +123,18 @@ const AppContent = () => {
         siderBg: "#1E1E1E",
       },
       Card: {
-        colorBgContainer: "#2D2D2D", // Superficie Secundaria
+        colorBgContainer: "#2D2D2D",
         colorBorderSecondary: "#2D2D2D",
         boxShadow: "none",
       },
       Table: {
-        colorBgContainer: "#2D2D2D", // Superficie Secundaria
+        colorBgContainer: "#2D2D2D",
         headerBg: "#2D2D2D",
         borderColor: "#2D2D2D",
       },
       Menu: {
         darkItemBg: "#1E1E1E",
-        itemSelectedBg: "rgba(10, 132, 255, 0.1)", // Menú Activo
+        itemSelectedBg: "rgba(10, 132, 255, 0.1)",
         itemBg: "#1E1E1E",
       },
     },
@@ -153,7 +164,10 @@ const AppContent = () => {
   };
 
   return (
-    <ConfigProvider theme={isDarkMode ? darkThemeConfig : lightThemeConfig}>
+    <ConfigProvider
+      theme={isDarkMode ? darkThemeConfig : lightThemeConfig}
+      locale={currentAntLocale}
+    >
       <AntdApp>
         <BrowserRouter>
           <AppRoutes />

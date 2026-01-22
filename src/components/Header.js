@@ -9,8 +9,10 @@ import {
     LogoutOutlined,
     SearchOutlined,
 } from "@ant-design/icons";
+
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
+import { useTranslation } from "react-i18next";
 
 const { Header } = Layout;
 
@@ -27,6 +29,7 @@ const HeaderComponent = () => {
     const navigate = useNavigate();
     const { logout, hasPermission, user, settings } = useContext(AuthContext);
     const [scrolled, setScrolled] = useState(false);
+    const { t } = useTranslation();
 
     const isDarkMode = settings?.theme === "dark";
 
@@ -69,14 +72,14 @@ const HeaderComponent = () => {
     const allMenuItems = [
         {
             key: "settings",
-            label: "Configuración",
+            label: t("menu.settings"),
             permission: "settings:view",
             icon: <SettingOutlined />,
             onClick: () => navigate("/settings"),
         },
         {
             key: "logout",
-            label: "Cerrar sesión",
+            label: t("menu.logout"),
             danger: true,
             icon: <LogoutOutlined />,
             onClick: handleLogout,
@@ -105,7 +108,7 @@ const HeaderComponent = () => {
         >
             {/* Search Bar */}
             <Input
-                placeholder="Buscar estudiantes, clases, profesores..."
+                placeholder={t("menu.search")}
                 suffix={<SearchOutlined />}
                 allowClear
                 style={{
@@ -119,8 +122,8 @@ const HeaderComponent = () => {
                     <div
                         title={
                             isPlanActiveAndVigent
-                                ? `Te quedan ${classesAvailable} clases de tu plan.`
-                                : "Tu plan ha expirado o está inactivo."
+                                ? t("menu.studentMessage", { classesAvailable })
+                                : t("menu.studentMessageExpired")
                         }
                         style={{
                             padding: "6px 12px",
@@ -141,7 +144,7 @@ const HeaderComponent = () => {
                             color: isDarkMode ? "rgba(255, 255, 255, 0.85)" : "inherit",
                         }}
                     >
-                        Clases Disp:
+                        {t("menu.classesAvailable")}:
                         <span
                             style={{
                                 marginLeft: 5,
@@ -183,7 +186,7 @@ const HeaderComponent = () => {
                             }}
                         >
                             <span style={{ fontWeight: 600, fontSize: 14 }}>
-                                {user?.name || "Usuario"}
+                                {user?.name || t("menu.user")}
                             </span>
                             <span style={{ fontSize: 12, color: "#888" }}>{user?.email}</span>
                         </div>

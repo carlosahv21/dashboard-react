@@ -4,8 +4,6 @@ import {
     BookOutlined,
     DollarOutlined,
     CheckCircleOutlined,
-    SafetyCertificateOutlined,
-    SearchOutlined,
     WarningOutlined,
 } from "@ant-design/icons";
 import {
@@ -21,13 +19,17 @@ import {
     Avatar,
     Typography,
     Divider,
+    theme,
 } from "antd";
 import ReactECharts from "echarts-for-react";
 import { AuthContext } from "../../context/AuthContext";
 import { useDashboardData } from "../../hooks/useDashboardData";
+import { useTranslation } from "react-i18next";
 
 const DashboardView = () => {
     const { settings } = useContext(AuthContext);
+    const { token } = theme.useToken();
+    const { t } = useTranslation();
 
     const {
         kpiLoading,
@@ -65,15 +67,15 @@ const DashboardView = () => {
                 <Col xs={24} sm={6}>
                     <Card
                         style={{
-                            borderLeft: "4px solid #0A84FF",
+                            borderLeft: `4px solid ${token.colorPrimary}`,
                         }}
                     >
                         <Spin spinning={kpiLoading}>
                             <Statistic
-                                title="Active Students"
+                                title={t("dashboard.activeStudents")}
                                 value={kpiData.activeStudents}
                                 suffix={
-                                    <UserOutlined style={{ marginLeft: 8, color: "#0A84FF" }} />
+                                    <UserOutlined style={{ marginLeft: 8, color: token.colorPrimary }} />
                                 }
                             />
                         </Spin>
@@ -82,15 +84,15 @@ const DashboardView = () => {
                 <Col xs={24} sm={6}>
                     <Card
                         style={{
-                            borderLeft: "4px solid #0A84FF",
+                            borderLeft: `4px solid ${token.colorPrimary}`,
                         }}
                     >
                         <Spin spinning={kpiLoading}>
                             <Statistic
-                                title="Today's Classes"
+                                title={t("dashboard.todayClasses")}
                                 value={kpiData.todayClasses}
                                 suffix={
-                                    <BookOutlined style={{ marginLeft: 8, color: "#0A84FF" }} />
+                                    <BookOutlined style={{ marginLeft: 8, color: token.colorPrimary }} />
                                 }
                             />
                         </Spin>
@@ -99,16 +101,16 @@ const DashboardView = () => {
                 <Col xs={24} sm={6}>
                     <Card
                         style={{
-                            borderLeft: "4px solid #0A84FF",
+                            borderLeft: `4px solid ${token.colorPrimary}`,
                         }}
                     >
                         <Spin spinning={kpiLoading}>
                             <Statistic
-                                title="Monthly Revenue"
+                                title={t("dashboard.monthlyRevenue")}
                                 value={kpiData.monthlyRevenue}
                                 precision={2}
                                 suffix={
-                                    <DollarOutlined style={{ marginLeft: 8, color: "#0A84FF" }} />
+                                    <DollarOutlined style={{ marginLeft: 8, color: token.colorPrimary }} />
                                 }
                             />
                         </Spin>
@@ -117,17 +119,17 @@ const DashboardView = () => {
                 <Col xs={24} sm={6}>
                     <Card
                         style={{
-                            borderLeft: "4px solid #0A84FF",
+                            borderLeft: `4px solid ${token.colorPrimary}`,
                         }}
                     >
                         <Spin spinning={kpiLoading}>
                             <Statistic
-                                title="Attendance Rate"
+                                title={t("dashboard.attendanceRate")}
                                 value={kpiData.attendanceRate}
                                 precision={1}
                                 suffix={
                                     <CheckCircleOutlined
-                                        style={{ marginLeft: 8, color: "#0A84FF" }}
+                                        style={{ marginLeft: 8, color: token.colorPrimary }}
                                     />
                                 }
                             />
@@ -141,13 +143,13 @@ const DashboardView = () => {
                 <Col span={24}>
                     <Card
                         hoverable
-                        title="Tasa de Ocupación por Clase"
+                        title={t("stats.occupancyByClass")}
                         extra={
                             <Select
                                 value={selectedGenre}
                                 onChange={setSelectedGenre}
                                 style={{ width: 200 }}
-                                placeholder="Selecciona un género"
+                                placeholder={t("stats.selectGenre")}
                                 options={availableGenres.map((genre) => ({
                                     label: genre,
                                     value: genre,
@@ -173,7 +175,7 @@ const DashboardView = () => {
                                             justifyContent: "center",
                                         }}
                                     >
-                                        <p>No hay datos para mostrar</p>
+                                        <p>{t("global.noData")}</p>
                                     </div>
                                 )}
                             </div>
@@ -182,11 +184,11 @@ const DashboardView = () => {
                 </Col>
             </Row>
 
-            <Divider orientation="left">Auditoría</Divider>
+            <Divider orientation="left">{t("divider.auditLog")}</Divider>
             <Row gutter={[24, 24]} style={{ marginBottom: 24 }}>
                 <Col span={12}>
                     {/* User Distribution */}
-                    <Card hoverable title="Distribución de Usuarios por Plan">
+                    <Card hoverable title={t("stats.userDistributionByPlan")}>
                         <div style={{ height: "400px", width: "100%" }}>
                             {userDistributionLoading ? (
                                 <div
@@ -214,7 +216,7 @@ const DashboardView = () => {
                                         justifyContent: "center",
                                     }}
                                 >
-                                    <Empty description="No hay datos de distribución" />
+                                    <Empty description={t("global.noData")} />
                                 </div>
                             )}
                         </div>
@@ -224,9 +226,9 @@ const DashboardView = () => {
                 {/* Teachers Table - Half Width (Right) */}
                 <Col span={12}>
                     <Card
-                        title="Teachers Performance"
+                        title={t("stats.teachersParticipation")}
                         hoverable
-                        style={{ minHeight: "505px" }}
+                        style={{ minHeight: "505px", maxHeight: "505px", overflowY: "auto" }}
                     >
                         <Spin spinning={teachersParticipationLoading}>
                             <Table
@@ -239,10 +241,10 @@ const DashboardView = () => {
                 </Col>
             </Row>
 
-            <Divider orientation="left">Retention & Churn</Divider>
+            <Divider orientation="left">{t("divider.retentionChurn")}</Divider>
             <Row gutter={[24, 24]}>
                 <Col span={16}>
-                    <Card hoverable title="Análisis de Cohortes (Retención %)">
+                    <Card hoverable title={t("stats.retentionChurn")}>
                         <div style={{ height: "450px", width: "100%" }}>
                             {retentionChurnLoading ? (
                                 <div
@@ -270,14 +272,14 @@ const DashboardView = () => {
                                         justifyContent: "center",
                                     }}
                                 >
-                                    <p>No hay datos para mostrar</p>
+                                    <p>{t("global.noData")}</p>
                                 </div>
                             )}
                         </div>
                     </Card>
                 </Col>
                 <Col span={8}>
-                    <Card hoverable title="Churn Rate (Tasa de Abandono)">
+                    <Card hoverable title={t("stats.churnRate")}>
                         <div
                             style={{
                                 height: "450px",
@@ -307,10 +309,10 @@ const DashboardView = () => {
                                             style={{ height: "300px", width: "100%" }}
                                         />
                                     ) : (
-                                        <Empty description="Sin datos de Churn" />
+                                        <Empty description={t('stats.noChurnData')} />
                                     )}
                                     <div style={{ textAlign: "center", marginTop: -40 }}>
-                                        <p style={{ color: "#999" }}>Último mes analizado</p>
+                                        <p style={{ color: "#999" }}>{t("stats.lastMonthAnalyzed")}</p>
                                     </div>
                                 </>
                             )}
@@ -319,10 +321,10 @@ const DashboardView = () => {
                 </Col>
             </Row>
 
-            <Divider orientation="left">Revenue Optimization</Divider>
+            <Divider orientation="left">{t("divider.revenueOptimization")}</Divider>
             <Row gutter={[24, 24]} style={{ marginBottom: 24 }}>
                 <Col span={12}>
-                    <Card hoverable title="Análisis por Método de Pago">
+                    <Card hoverable title={t('stats.paymentMethodAnalysis')}>
                         <div style={{ height: "400px", width: "100%" }}>
                             {revenueLoading ? (
                                 <div
@@ -342,13 +344,13 @@ const DashboardView = () => {
                                     style={{ height: "100%", width: "100%" }}
                                 />
                             ) : (
-                                <Empty description="Sin datos de ingresos" />
+                                <Empty description={t("global.noData")} />
                             )}
                         </div>
                     </Card>
                 </Col>
                 <Col span={12}>
-                    <Card hoverable title="Transacciones vs Promedio">
+                    <Card hoverable title={t("stats.transactionsVsAverage")}>
                         <div style={{ height: "400px", width: "100%" }}>
                             {revenueLoading ? (
                                 <div
@@ -368,17 +370,17 @@ const DashboardView = () => {
                                     style={{ height: "100%", width: "100%" }}
                                 />
                             ) : (
-                                <Empty description="Sin datos comparativos" />
+                                <Empty description={t("global.noData")} />
                             )}
                         </div>
                     </Card>
                 </Col>
             </Row>
 
-            <Divider orientation="left">Student Engagement</Divider>
+            <Divider orientation="left">{t("divider.studentEngagement")}</Divider>
             <Row gutter={[24, 24]} style={{ marginBottom: 24 }}>
                 <Col span={16}>
-                    <Card hoverable title="Utilización de Clases (Scatter Analysis)">
+                    <Card hoverable title={t("stats.utilizationByClass")}>
                         <div style={{ height: "450px", width: "100%" }}>
                             {engagementLoading ? (
                                 <div
@@ -398,7 +400,7 @@ const DashboardView = () => {
                                     style={{ height: "100%", width: "100%" }}
                                 />
                             ) : (
-                                <Empty description="Sin datos de engagement" />
+                                <Empty description={t("global.noData")} />
                             )}
                         </div>
                     </Card>
@@ -406,8 +408,8 @@ const DashboardView = () => {
                 <Col span={8}>
                     <Card
                         hoverable
-                        title="Usuarios en Riesgo"
-                        style={{ minHeight: "555px", overflowY: "auto" }}
+                        title={t("stats.usersAtRisk")}
+                        style={{ minHeight: "555px", maxHeight: "555px", overflowY: "auto" }}
                     >
                         <Spin spinning={engagementLoading}>
                             <List
@@ -420,7 +422,7 @@ const DashboardView = () => {
                                                     icon={<UserOutlined />}
                                                     style={{
                                                         backgroundColor: "rgba(10, 132, 255, 0.2)",
-                                                        color: "#0A84FF",
+                                                        color: token.colorPrimary,
                                                     }}
                                                 />
                                             }
@@ -430,8 +432,8 @@ const DashboardView = () => {
                                                     {user.email} <br />
                                                     <Typography.Text type="danger">
                                                         {user.last_attendance === null
-                                                            ? "Sin asistencia registrada"
-                                                            : `Última asis: ${user.last_attendance}`}
+                                                            ? t("stats.noAttendanceData")
+                                                            : t("stats.lastAttendance") + " " + user.last_attendance}
                                                     </Typography.Text>
                                                 </>
                                             }
@@ -444,10 +446,10 @@ const DashboardView = () => {
                 </Col>
             </Row>
 
-            <Divider orientation="left">Operational Efficiency</Divider>
+            <Divider orientation="left">{t("divider.operationalEfficiency")}</Divider>
             <Row gutter={[24, 24]} style={{ marginBottom: 24 }}>
                 <Col span={14}>
-                    <Card hoverable title="Tasa de Llenado por Clase (%)">
+                    <Card hoverable title={t("stats.occupancyClass")}>
                         <div style={{ height: "500px", width: "100%" }}>
                             {efficiencyLoading ? (
                                 <div
@@ -467,13 +469,13 @@ const DashboardView = () => {
                                     style={{ height: "100%", width: "100%" }}
                                 />
                             ) : (
-                                <Empty description="Sin datos para mostrar" />
+                                <Empty description={t("global.noData")} />
                             )}
                         </div>
                     </Card>
                 </Col>
                 <Col span={10}>
-                    <Card hoverable title="Eficiencia de Profesores (Radar)">
+                    <Card hoverable title={t("stats.teachersEfficiency")}>
                         <div style={{ height: "500px", width: "100%" }}>
                             {efficiencyLoading ? (
                                 <div
@@ -493,14 +495,14 @@ const DashboardView = () => {
                                     style={{ height: "100%", width: "100%" }}
                                 />
                             ) : (
-                                <Empty description="Sin datos para mostrar" />
+                                <Empty description={t("global.noData")} />
                             )}
                         </div>
                     </Card>
                 </Col>
             </Row>
 
-            <Divider orientation="left">Admin Audit & Control</Divider>
+            <Divider orientation="left">{t("divider.adminAuditControl")}</Divider>
             <Card hoverable style={{ textAlign: "center", padding: "40px 0" }}>
                 {auditLoading ? (
                     <Spin size="large" />
@@ -511,13 +513,12 @@ const DashboardView = () => {
                         }
                         description={
                             <Typography.Title level={4} style={{ color: "#52c41a" }}>
-                                Sin actividad sospechosa detectada
+                                {t("stats.noSuspiciousActivity")}
                             </Typography.Title>
                         }
                     >
                         <Typography.Text type="secondary">
-                            El sistema de auditoría no ha detectado cambios manuales ni
-                            cancelaciones sospechosas en el último periodo.
+                            {t("stats.noSuspiciousActivityDescription")}
                         </Typography.Text>
                     </Empty>
                 ) : (
@@ -527,7 +528,7 @@ const DashboardView = () => {
                         }
                         description={
                             <Typography.Title level={4} style={{ color: "#faad14" }}>
-                                Se requiere revisión administrativa
+                                {t("stats.suspiciousActivity")}
                             </Typography.Title>
                         }
                     />

@@ -5,10 +5,12 @@ import useFetch from "../../../hooks/useFetch";
 import FormHeader from "../../../components/Common/FormHeader";
 import dayjs from "dayjs";
 import { AuthContext } from "../../../context/AuthContext";
+import { useTranslation } from "react-i18next";
 
 const { Title, Text } = Typography;
 
 const RecycleBin = () => {
+    const { t } = useTranslation();
     const { request } = useFetch();
     const { message, modal } = App.useApp();
     const { token } = theme.useToken();
@@ -37,26 +39,26 @@ const RecycleBin = () => {
                 setSelectedModule(availableModules[0].name);
             }
         } catch (err) {
-            message.error("Error al cargar módulos");
+            message.error(t('settings.loadModulesError'));
         } finally {
             setFetchingModules(false);
         }
-    }, [request, message]);
+    }, [request, message, t]);
 
     const fetchData = useCallback(async (moduleName) => {
         if (!moduleName) return;
         setLoading(true);
         try {
             const response = await request(`${moduleName}?onlyDeleted=true`, "GET");
-            
+
             setData(response.data || []);
         } catch (err) {
-            message.error(`Error al cargar la papelera de ${moduleName}`);
+            message.error(t('settings.loadRecycleBinError', { moduleName }));
             setData([]);
         } finally {
             setLoading(false);
         }
-    }, [request, message]);
+    }, [request, message, t]);
 
     useEffect(() => {
         fetchModules();
@@ -70,17 +72,17 @@ const RecycleBin = () => {
 
     const handleRestore = (record) => {
         modal.confirm({
-            title: "¿Restaurar registro?",
-            content: `Estás a punto de restaurar el registro "${record.name || record.first_name || record.label || record.id}".`,
-            okText: "Restaurar",
-            cancelText: "Cancelar",
+            title: t('settings.restoreTitle'),
+            content: t('settings.restoreConfirm', { name: record.name || record.first_name || record.label || record.id }),
+            okText: t('settings.restore'),
+            cancelText: t('global.cancel'),
             onOk: async () => {
                 try {
                     await request(`${selectedModule}/${record.id}/restore`, "PATCH");
-                    message.success("Registro restaurado correctamente");
+                    message.success(t('settings.restoreSuccess'));
                     fetchData(selectedModule);
                 } catch (err) {
-                    message.error("Error al restaurar el registro");
+                    message.error(t('settings.restoreError'));
                 }
             }
         });
@@ -93,22 +95,22 @@ const RecycleBin = () => {
     };
 
     const handlePermanentDelete = async () => {
-        if (deleteConfirmText !== "eliminar") return;
+        if (deleteConfirmText !== t('global.deleteKeyword')) return;
 
         try {
             await request(`${selectedModule}/${recordToDelete.id}`, "DELETE");
-            message.success("Registro eliminado permanentemente");
+            message.success(t('settings.permanentDeleteSuccess'));
             setIsDeleteModalOpen(false);
             setRecordToDelete(null);
             fetchData(selectedModule);
         } catch (err) {
-            message.error("Error al eliminar el registro permanentemente");
+            message.error(t('settings.permanentDeleteError'));
         }
     };
 
     const columns = [
         {
-            title: "Nombre",
+            title: t('students.firstName'),
             key: "name",
             render: (_, record) => {
                 const name = record.name || record.label || (record.first_name && `${record.first_name} ${record.last_name}`) || record.id;
@@ -116,26 +118,26 @@ const RecycleBin = () => {
             }
         },
         {
-            title: "Fecha de borrado",
+            title: t('settings.deletedDate'),
             dataIndex: "updated_at",
             key: "updated_at",
             render: (date) => date ? dayjs(date).format("DD/MM/YYYY HH:mm") : "-"
         },
         {
-            title: "Acciones",
+            title: t('global.actions'),
             key: "actions",
             align: "center",
             width: 150,
             render: (_, record) => (
                 <Space>
-                    <Tooltip title="Restaurar">
+                    <Tooltip title={t('settings.restore')}>
                         <Button
                             type="text"
                             icon={<UndoOutlined style={{ color: token.colorSuccess }} />}
                             onClick={() => handleRestore(record)}
                         />
                     </Tooltip>
-                    <Tooltip title="Eliminar permanentemente">
+                    <Tooltip title={t('settings.deletePermanently')}>
                         <Button
                             type="text"
                             danger
@@ -153,20 +155,20 @@ const RecycleBin = () => {
     return (
         <>
             <FormHeader
-                title="Papelera de Reciclaje"
-                subtitle="Gestiona y restaura registros eliminados recientemente."
+                title={t('settings.recycle_bin')}
+                subtitle={t('settings.recycleBinSubtitle')}
             />
 
             <div style={{ marginTop: 24 }}>
                 <Space direction="vertical" style={{ width: "100%" }} size="large">
                     <Space align="center">
-                        <Text strong>Módulo:</Text>
+                        <Text strong>{t('settings.moduleLabel')}:</Text>
                         <Select
                             style={{ width: 250 }}
                             value={selectedModule}
                             onChange={setSelectedModule}
                             loading={fetchingModules}
-                            placeholder="Selecciona un módulo"
+                            placeholder={t('settings.selectModulePlaceholder')}
                         >
                             {modules.map(m => (
                                 <Select.Option key={m.id} value={m.name}>
@@ -183,7 +185,7 @@ const RecycleBin = () => {
                         dataSource={data}
                         rowKey="id"
                         loading={loading}
-                        locale={{ emptyText: <Empty description={`No hay registros en la papelera de ${moduleName}`} /> }}
+                        locale={{ emptyText: <Empty description={t('settings.emptyRecycleBin', { moduleName })} /> }}
                         pagination={{ pageSize: 10 }}
                     />
                 </Space>
@@ -193,34 +195,34 @@ const RecycleBin = () => {
                 title={
                     <Space>
                         <ExclamationCircleOutlined style={{ color: token.colorError }} />
-                        <span>Confirmar eliminación permanente</span>
+                        <span>{t('settings.permanentDeleteConfirmTitle')}</span>
                     </Space>
                 }
                 open={isDeleteModalOpen}
                 onCancel={() => setIsDeleteModalOpen(false)}
                 footer={[
                     <Button key="cancel" onClick={() => setIsDeleteModalOpen(false)}>
-                        Cancelar
+                        {t('global.cancel')}
                     </Button>,
                     <Button
                         key="delete"
                         type="primary"
                         danger
-                        disabled={deleteConfirmText !== "eliminar"}
+                        disabled={deleteConfirmText !== t('global.deleteKeyword')}
                         onClick={handlePermanentDelete}
                     >
-                        Eliminar
+                        {t('global.delete')}
                     </Button>
                 ]}
             >
                 <div style={{ padding: "10px 0" }}>
                     <Text>
-                        Estás a punto de eliminar de forma permanente esta <strong>{moduleName}</strong>. Esta acción no se puede deshacer.
+                        {t('settings.permanentDeleteConfirmText', { moduleName })}
                     </Text>
                     <div style={{ marginTop: 20 }}>
-                        <Text type="secondary">Escribe <strong>eliminar</strong> para continuar</Text>
+                        <Text type="secondary">{t('settings.typeToDelete', { keyword: t('global.deleteKeyword') })}</Text>
                         <Input
-                            placeholder="Escribe 'eliminar' aquí"
+                            placeholder={t('settings.typeToDeletePlaceholder', { keyword: t('global.deleteKeyword') })}
                             value={deleteConfirmText}
                             onChange={(e) => setDeleteConfirmText(e.target.value)}
                             style={{ marginTop: 8 }}

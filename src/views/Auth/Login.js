@@ -1,9 +1,10 @@
 // src/views/Auth/Login.js
-import React, { useState, useContext, useEffect } from "react";
+import React, { useState, useContext, useEffect, useMemo } from "react";
 import { Form, Input, Button, Checkbox, message } from "antd";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../../context/AuthContext";
 import useFetch from "../../hooks/useFetch";
+import { useTranslation } from "react-i18next";
 import {
     MailOutlined,
     LockOutlined,
@@ -14,25 +15,8 @@ import {
 } from '@ant-design/icons';
 import './Login.css';
 
-const slides = [
-    {
-        title: "Tu Talento, Nuestro Motor",
-        text: "Tú pones la pasión y el arte; nosotros nos encargamos del orden. Gestiona alumnos, pagos y planes sin perder tu enfoque creativo.",
-        image: "https://lh3.googleusercontent.com/aida-public/AB6AXuB_MG7Wqc850CDYWrgIuOQT4wWxpLRnp3lmumTfb2HIFCVZmPqznMXqmCaTkZ2E7UO6FRk19nk6v_hEXjuYWkyDohNeyFlAZU8GBj8qlKaPIRa7Mc_hccheBKbr2MBV07aCgPcdMmS1ihldg7Vggea1FNsFUeuM1I7xesAM8WT-0YG-nk_jMfr0ic2lB1H0VHPS2GIUTrNdUmf59C0UJGi22G1lPbwbtdhKWnESONnEhdQhNrTLKYg7qorolB-2we-yd-Fzl3U2H8Y"
-    },
-    {
-        title: "Tu Academia, Tus Reglas",
-        text: "Un espacio diseñado para crecer. Personaliza tu comunicación, conecta tu propio correo y mantén tu identidad de marca.",
-        image: "https://images.unsplash.com/photo-1547153760-18fc86324498?q=80&w=1200&auto=format&fit=crop"
-    },
-    {
-        title: "Conexión Total con tus Alumnos",
-        text: "Automatiza correos de bienvenida, monitorea vencimientos y mantén a tu comunidad artística informada con un solo clic.",
-        image: "https://images.unsplash.com/photo-1518834107812-67b0b7c58434?q=80&w=1200&auto=format&fit=crop"
-    }
-];
-
 const Login = () => {
+    const { t } = useTranslation();
     const [error, setError] = useState("");
     const { login } = useContext(AuthContext);
     const navigate = useNavigate();
@@ -40,6 +24,24 @@ const Login = () => {
 
     const [currentSlide, setCurrentSlide] = useState(0);
     const [theme, setTheme] = useState('light');
+
+    const slides = useMemo(() => [
+        {
+            title: t('auth.slide1Title'),
+            text: t('auth.slide1Text'),
+            image: "https://lh3.googleusercontent.com/aida-public/AB6AXuB_MG7Wqc850CDYWrgIuOQT4wWxpLRnp3lmumTfb2HIFCVZmPqznMXqmCaTkZ2E7UO6FRk19nk6v_hEXjuYWkyDohNeyFlAZU8GBj8qlKaPIRa7Mc_hccheBKbr2MBV07aCgPcdMmS1ihldg7Vggea1FNsFUeuM1I7xesAM8WT-0YG-nk_jMfr0ic2lB1H0VHPS2GIUTrNdUmf59C0UJGi22G1lPbwbtdhKWnESONnEhdQhNrTLKYg7qorolB-2we-yd-Fzl3U2H8Y"
+        },
+        {
+            title: t('auth.slide2Title'),
+            text: t('auth.slide2Text'),
+            image: "https://images.unsplash.com/photo-1547153760-18fc86324498?q=80&w=1200&auto=format&fit=crop"
+        },
+        {
+            title: t('auth.slide3Title'),
+            text: t('auth.slide3Text'),
+            image: "https://images.unsplash.com/photo-1518834107812-67b0b7c58434?q=80&w=1200&auto=format&fit=crop"
+        }
+    ], [t]);
 
     const toggleTheme = () => {
         const newTheme = theme === 'dark' ? 'light' : 'dark';
@@ -51,21 +53,21 @@ const Login = () => {
             setCurrentSlide((prev) => (prev + 1) % slides.length);
         }, 5000);
         return () => clearInterval(timer);
-    }, []);
+    }, [slides.length]);
 
     const handleLogin = async (values) => {
         setError("");
         try {
             const response = await request("auth/login", "POST", values);
             if (!response.data.token) {
-                message.error("Credenciales inválidas. Intenta de nuevo.");
-                setError("Credenciales inválidas");
+                message.error(t('auth.invalidCredentials'));
+                setError(t('auth.invalidCredentials'));
                 return;
             }
             login(response.data.token);
             navigate("/");
         } catch (err) {
-            const msg = err.message || "Ocurrió un error. Intenta de nuevo.";
+            const msg = err.message || t('auth.genericError');
             message.error(msg);
             setError(msg);
         }
@@ -79,22 +81,22 @@ const Login = () => {
                     <div className="dance-logo-box">
                         <ManOutlined style={{ fontSize: '1.5rem' }} />
                     </div>
-                    <span className="dance-nav-title" style={{ fontSize: '1.5rem' }}>DanceFlow</span>
+                    <span className="dance-nav-title" style={{ fontSize: '1.5rem' }}>{t('system.shortName')}</span>
                 </div>
                 <div className="dance-nav-actions">
                     <div className="dance-nav-links">
-                        <a className="dance-nav-link" href="#">Inicio</a>
-                        <a className="dance-nav-link" href="#">Clases</a>
-                        <a className="dance-nav-link" href="#">Nuestra Academia</a>
-                        <a className="dance-nav-link" href="#">Contacto</a>
+                        <a className="dance-nav-link" href="#">{t('auth.navHome')}</a>
+                        <a className="dance-nav-link" href="#">{t('auth.navClasses')}</a>
+                        <a className="dance-nav-link" href="#">{t('auth.navAcademy')}</a>
+                        <a className="dance-nav-link" href="#">{t('auth.navContact')}</a>
                     </div>
 
                     {/* Botón de Cambio de Tema */}
                     <button
                         className="theme-toggle-btn"
                         onClick={toggleTheme}
-                        aria-label={theme === 'dark' ? "Cambiar a modo claro" : "Cambiar a modo oscuro"}
-                        title={theme === 'dark' ? "Cambiar a modo claro" : "Cambiar a modo oscuro"}
+                        aria-label={theme === 'dark' ? t('auth.themeLight') : t('auth.themeDark')}
+                        title={theme === 'dark' ? t('auth.themeLight') : t('auth.themeDark')}
                     >
                         {theme === 'dark' ? <SunOutlined /> : <MoonOutlined />}
                     </button>
@@ -110,8 +112,8 @@ const Login = () => {
 
                         <div className="login-form-container">
                             <div className="login-header" style={{ marginBottom: '0' }}>
-                                <h1 className="login-title">Bienvenido</h1>
-                                <p className="login-subtitle">Por favor, ingresa tus credenciales para acceder al portal.</p>
+                                <h1 className="login-title">{t('auth.welcome')}</h1>
+                                <p className="login-subtitle">{t('auth.instruction')}</p>
                                 <div className="login-divider"></div>
                             </div>
 
@@ -124,10 +126,10 @@ const Login = () => {
                             >
                                 <Form.Item
                                     name="email"
-                                    label="Correo Electrónico"
+                                    label={t('auth.emailLabel')}
                                     rules={[
-                                        { required: true, message: "¡Por favor ingresa tu email!" },
-                                        { type: "email", message: "¡Por favor ingresa un email válido!" },
+                                        { required: true, message: t('auth.emailRequired') },
+                                        { type: "email", message: t('auth.emailInvalid') },
                                     ]}
                                     style={{ marginBottom: '0' }}
                                 >
@@ -139,10 +141,10 @@ const Login = () => {
 
                                 <Form.Item
                                     name="password"
-                                    label="Contraseña"
+                                    label={t('auth.passwordLabel')}
                                     rules={[
-                                        { required: true, message: "¡Por favor ingresa tu contraseña!" },
-                                        { min: 6, message: "¡La contraseña debe tener al menos 6 caracteres!" },
+                                        { required: true, message: t('auth.passwordRequired') },
+                                        { min: 6, message: t('auth.passwordMinLength') },
                                     ]}
                                     style={{ marginBottom: '10px' }}
                                 >
@@ -154,20 +156,20 @@ const Login = () => {
 
                                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
                                     <Form.Item name="remember" valuePropName="checked" noStyle>
-                                        <Checkbox>Recordar por 30 días</Checkbox>
+                                        <Checkbox>{t('auth.rememberMe')}</Checkbox>
                                     </Form.Item>
-                                    <a className="forgot-password-link" href="#">¿Olvidaste tu contraseña?</a>
+                                    <a className="forgot-password-link" href="#">{t('auth.forgotPassword')}</a>
                                 </div>
 
                                 <Form.Item>
                                     <Button type="primary" htmlType="submit" block loading={loading}>
-                                        Iniciar Sesión <LoginOutlined style={{ fontSize: '1.2rem', marginLeft: '8px' }} />
+                                        {t('auth.loginButton')} <LoginOutlined style={{ fontSize: '1.2rem', marginLeft: '8px' }} />
                                     </Button>
                                 </Form.Item>
                             </Form>
 
                             <div className="login-footer-text">
-                                <p> <a href="#">Contacta a administración</a> si necesitas acceso o has perdido los detalles de tu cuenta.</p>
+                                <p> <a href="#">{t('auth.contactAdmin')}</a> {t('auth.accessHelp')}</p>
                             </div>
                         </div>
                     </div>
@@ -178,7 +180,7 @@ const Login = () => {
                     <div className="dance-image-overlay">
                         <img
                             key={currentSlide}
-                            alt="Bailarín Profesional"
+                            alt={t('auth.imageAlt')}
                             className="dance-image"
                             src={slides[currentSlide].image}
                         />
@@ -190,7 +192,7 @@ const Login = () => {
                         <div className="dance-text-wrapper">
                             <div className="pro-badge">
                                 <span className="pro-badge-dot"></span>
-                                <span className="pro-text">Suite Profesional</span>
+                                <span className="pro-text">{t('auth.proBadge')}</span>
                             </div>
                             <h2 className="hero-title">
                                 {slides[currentSlide].title}
@@ -211,7 +213,7 @@ const Login = () => {
                     </div>
 
                     <div className="version-tag">
-                        TECNOLOGÍA PARA EL ARTE • V1.0.0
+                        {t('auth.versionTag')}
                     </div>
                 </div>
             </main>

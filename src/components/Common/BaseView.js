@@ -15,6 +15,7 @@ import FormSection from "./FormSection";
 import FormFooter from "./FormFooter";
 import FormHeader from "./FormHeader";
 import DrawerDetails from "./DrawerDetails";
+import { useTranslation } from "react-i18next";
 
 const BaseView = ({
     endpoint,
@@ -28,6 +29,7 @@ const BaseView = ({
     viewOptions,
     cardComponent: CardComponent,
 }) => {
+    const { t } = useTranslation();
     const { hasPermission } = useContext(AuthContext);
     const { message, modal } = App.useApp();
     const [form] = Form.useForm();
@@ -96,32 +98,29 @@ const BaseView = ({
         try {
             await request(`${endpoint}/${id}/bin`, "PATCH");
             message.success(
-                `${titleSingular} eliminad${titleSingular.endsWith("a") ? "a" : "o"
-                } correctamente`
+                t('global.deleteGenericSuccess', { title: titleSingular })
             );
             setItems((prev) => prev.filter((i) => i.id !== id));
             setPagination((prev) => ({ ...prev, total: prev.total - 1 }));
         } catch (error) {
-            message.error(error?.message || `Error al eliminar ${titleSingular}`);
+            message.error(error?.message || t('global.deleteError', { title: titleSingular }));
         }
     };
 
     const handleBulkDelete = () => {
         if (selectedKeys.length === 0) {
-            message.warning(`Debe seleccionar al menos un registro para eliminar`);
+            message.warning(t('global.noSelectionDelete'));
             return;
         }
 
         modal.confirm({
-            title: `¿Eliminar ${isAllSelected ? "todos los" : selectedKeys.length
-                } registros?`,
-            content: `Esta acción no se puede deshacer. Se eliminán ${isAllSelected ? pagination.total : selectedKeys.length
-                } registros.`,
-            okText: "Sí, eliminar",
+            title: t('global.bulkDeleteTitle', { count: isAllSelected ? t('global.all') : selectedKeys.length }),
+            content: t('global.bulkDeleteConfirm', { count: isAllSelected ? pagination.total : selectedKeys.length }),
+            okText: t('global.yesDelete'),
             okType: "danger",
-            cancelText: "Cancelar",
+            cancelText: t('global.cancel'),
             onOk: async () => {
-                const hide = message.loading("Eliminando registros...", 0);
+                const hide = message.loading(t('global.deleting'), 0);
                 try {
                     let idsToDelete = selectedKeys;
                     if (isAllSelected) {
@@ -136,13 +135,13 @@ const BaseView = ({
                         );
                     }
 
-                    message.success("Registros eliminados correctamente");
+                    message.success(t('global.bulkDeleteSuccess'));
                     fetchItems();
                     setSelectedKeys([]);
                     handleSelectAll(false);
                 } catch (error) {
                     console.error(error);
-                    message.error("Error al eliminar registros masivamente");
+                    message.error(t('global.bulkDeleteError'));
                 } finally {
                     hide();
                 }
@@ -164,7 +163,7 @@ const BaseView = ({
 
     const handleExport = async () => {
         if (selectedKeys.length === 0) {
-            message.warning(`Debe seleccionar al menos un registro para exportar`);
+            message.warning(t('global.noSelectionExport'));
             return;
         }
 
@@ -319,13 +318,13 @@ const BaseView = ({
                             <FormHeader
                                 title={
                                     editingId
-                                        ? `Editar ${titleSingular}`
-                                        : `Crear ${titleSingular}`
+                                        ? t('global.editTitle', { title: titleSingular })
+                                        : t('global.createTitle', { title: titleSingular })
                                 }
                                 subtitle={
                                     editingId
-                                        ? `Edita los datos del ${titleSingular.toLowerCase()}`
-                                        : `Completa los datos para crear un nuevo ${titleSingular.toLowerCase()}`
+                                        ? t('global.editSubtitle', { title: titleSingular.toLowerCase() })
+                                        : t('global.createSubtitle', { title: titleSingular.toLowerCase() })
                                 }
                                 onSave={() => form.submit()}
                                 onCancel={handleCloseModal}
@@ -353,12 +352,12 @@ const BaseView = ({
                         </>
                     ) : (
                         <div style={{ textAlign: "center", padding: 50 }}>
-                            No hay campos para mostrar.
+                            {t('global.noFields')}
                         </div>
                     )
                 ) : (
                     <div style={{ textAlign: "center", padding: 50 }}>
-                        <Spin /> <p>Cargando campos...</p>
+                        <Spin /> <p>{t('global.loadingFields')}</p>
                     </div>
                 )}
             </Modal>

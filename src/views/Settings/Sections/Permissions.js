@@ -3,11 +3,13 @@ import { message, Checkbox, Select, Button } from "antd";
 import useFetch from "../../../hooks/useFetch";
 import FormHeader from "../../../components/Common/FormHeader";
 import DataTable from "../../../components/Common/DataTable";
+import { useTranslation } from "react-i18next";
 
 const { Option } = Select;
 const ACTIONS = ["view", "create", "edit", "delete"];
 
 const RolePermissions = () => {
+    const { t } = useTranslation();
     const [permissions, setPermissions] = useState([]);
     const [roles, setRoles] = useState([]);
     const [rolePermissions, setRolePermissions] = useState([]);
@@ -52,11 +54,11 @@ const RolePermissions = () => {
             }
         } catch (error) {
             console.error(error);
-            message.error("Error al cargar permisos por rol");
+            message.error(t('settings.permissionsLoadError'));
         } finally {
             setLoading(false);
         }
-    }, [request, selectedRole]);
+    }, [request, selectedRole, t]);
 
     useEffect(() => {
         fetchRolePermissions();
@@ -89,12 +91,12 @@ const RolePermissions = () => {
                 permission_ids: localRolePermissions
             });
 
-            message.success("Permisos actualizados correctamente");
+            message.success(t('settings.permissionsSaveSuccess'));
 
             fetchRolePermissions();
         } catch (error) {
             console.error(error);
-            message.error("Error al guardar permisos");
+            message.error(t('settings.permissionsSaveError'));
         }
     };
 
@@ -120,12 +122,12 @@ const RolePermissions = () => {
 
     const columns = [
         {
-            title: "Módulo",
+            title: t('settings.module'),
             dataIndex: "module",
             key: "module"
         },
         ...ACTIONS.map(action => ({
-            title: action.charAt(0).toUpperCase() + action.slice(1),
+            title: t(`settings.${action}`),
             key: action,
             render: (_, record) => {
                 const perm = record[action];
@@ -148,14 +150,14 @@ const RolePermissions = () => {
     return (
         <>
             <FormHeader
-                title="Permisos por Rol"
-                subtitle="Gestiona los permisos del rol seleccionado"
+                title={t('settings.permissionsTitle')}
+                subtitle={t('settings.permissionsSubtitle')}
             />
 
             <div style={{ paddingTop: 20, paddingBottom: 20, display: "flex", gap: 20 }}>
                 <Select
                     style={{ width: 300 }}
-                    placeholder="Selecciona un rol"
+                    placeholder={t('settings.selectRole')}
                     value={selectedRole}
                     onChange={value => setSelectedRole(value)}
                     allowClear
@@ -172,7 +174,7 @@ const RolePermissions = () => {
                     onClick={savePermissions}
                     disabled={!selectedRole}
                 >
-                    Guardar cambios
+                    {t('settings.saveChanges')}
                 </Button>
             </div>
 

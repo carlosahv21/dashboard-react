@@ -2,8 +2,10 @@ import React, { useState, useEffect } from "react";
 import { Table, Switch, message } from "antd";
 import FormHeader from "../../../components/Common/FormHeader";
 import useFetch from "../../../hooks/useFetch";
+import { useTranslation } from "react-i18next";
 
 const ActiveModules = () => {
+    const { t } = useTranslation();
     const { request, error } = useFetch();
     const [modules, setModules] = useState([]);
     const [loading, setLoading] = useState(false);
@@ -17,14 +19,14 @@ const ActiveModules = () => {
                     setModules(response.data);
                 }
             } catch {
-                message.error(error || "Failed to fetch modules.");
+                message.error(error || t('settings.fetchModulesError'));
             } finally {
                 setLoading(false);
             }
         };
 
         fetchModules();
-    }, [request, error]);
+    }, [request, error, t]);
 
     const handleToggle = async (id) => {
         try {
@@ -35,31 +37,31 @@ const ActiveModules = () => {
                         module.id === id ? { ...module, is_active: response.is_active } : module
                     )
                 );
-                message.success("Module status updated successfully.");
+                message.success(t('settings.moduleStatusUpdated'));
             }
         } catch {
-            message.error(error || "Failed to update module status.");
+            message.error(error || t('settings.updateModuleError'));
         }
     };
 
     const columns = [
         {
-            title: "Name",
+            title: t('settings.moduleName'),
             dataIndex: "name",
             key: "name",
         },
         {
-            title: "Description",
+            title: t('settings.descriptionLabel'),
             dataIndex: "description",
             key: "description",
         },
         {
-            title: "Category",
+            title: t('settings.category'),
             dataIndex: "tab",
             key: "tab",
         },
         {
-            title: "Status",
+            title: t('students.status'),
             dataIndex: "is_active",
             key: "is_active",
             render: (isActive, record) => (
@@ -74,8 +76,8 @@ const ActiveModules = () => {
     return (
         <div style={{ borderRadius: "8px" }}>
             <FormHeader
-                title={"Active Modules"}
-                subtitle="Manage the modules that are currently active in your application."
+                title={t('settings.activeModules')}
+                subtitle={t('settings.activeModulesSubtitle')}
             />
             <Table
                 style={{ marginTop: "20px" }}

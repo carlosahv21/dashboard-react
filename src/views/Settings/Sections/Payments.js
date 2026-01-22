@@ -2,17 +2,19 @@ import React from "react";
 import { Tag } from "antd";
 import BaseCrudView from "../../../components/Common/BaseView";
 import dayjs from "dayjs";
+import { useTranslation } from "react-i18next";
 
-const Users = () => {
+const Payments = () => {
+    const { t } = useTranslation();
     const columns = [
         {
-            title: "Estudiante",
+            title: t('students.name_singular'),
             dataIndex: "user_first_name",
             key: "user_first_name",
             render: (text, record) => `${record.user_first_name} ${record.user_last_name}`
         },
         {
-            title: "Fecha de pago",
+            title: t('students.date'),
             dataIndex: "payment_date",
             key: "payment_date",
             sorter: true,
@@ -20,14 +22,14 @@ const Users = () => {
             render: (text, record) => dayjs(record.payment_date).format("DD/MM/YYYY")
         },
         {
-            title: "Monto",
+            title: t('students.amount'),
             dataIndex: "amount",
             key: "amount",
             sorter: true,
-            render: (text, record) => `$`+record.amount
+            render: (text, record) => `$` + record.amount
         },
         {
-            title: "Estado",
+            title: t('students.status'),
             dataIndex: "status",
             key: "status",
             render: (text, record) => {
@@ -45,11 +47,11 @@ const Users = () => {
                 endpoint="payments"
                 moduleFieldId={13}
                 columns={columns}
-                titleSingular="Pago"
-                titlePlural="Pagos"
+                titleSingular={t('settings.payment')}
+                titlePlural={t('settings.payments_title')}
             />
         </>
     );
 };
 
-export default Users;
+export default Payments;
