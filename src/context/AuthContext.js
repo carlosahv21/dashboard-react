@@ -1,6 +1,10 @@
 import React, { createContext, useState, useEffect, useRef, useCallback } from "react";
 import { Modal } from "antd";
 import useFetch from "../hooks/useFetch";
+import i18n from "i18next";
+import dayjs from "dayjs";
+import "dayjs/locale/es";
+import "dayjs/locale/en";
 
 export const AuthContext = createContext();
 
@@ -61,32 +65,45 @@ export const AuthProvider = ({ children }) => {
     const toggleTheme = () => {
         setSettings(prev => {
             const newTheme = prev?.theme === 'dark' ? 'light' : 'dark';
-            const newSettings = { ...prev, theme: newTheme };
-
-            // Persistir setting localmente por si acaso, aunque idealmente debería ir al backend
-            localStorage.setItem("theme", newTheme);
-
-            // TODO: Aquí deberíamos llamar a un endpoint para guardar la preferencia del usuario
-            // request('users/settings', 'POST', { theme: newTheme });
-
-            return newSettings;
+            return { ...prev, theme: newTheme };
         });
     };
 
+    // Sincronizar idioma y díajs con el settings
     useEffect(() => {
+        if (settings?.language) {
+            i18n.changeLanguage(settings.language);
+            dayjs.locale(settings.language);
+        }
+    }, [settings?.language]);
+
+    // Persistencia centralizada de settings
+    useEffect(() => {
+        if (settings) {
+            localStorage.setItem("settings", JSON.stringify(settings));
+            if (settings.theme) localStorage.setItem("theme", settings.theme);
+        }
+    }, [settings]);
+
+    useEffect(() => {
+        const storedSettings = localStorage.getItem("settings");
+        const initialSettings = storedSettings ? JSON.parse(storedSettings) : {
+            theme: localStorage.getItem("theme") || 'light',
+            language: i18n.language || 'es'
+        };
+
         if (token) {
             if (!user) {
                 setLoading(true);
                 fetchUserData(token).then(() => {
-                    // Si el backend no devuelve settings, inicializamos desde localStorage
-                    setSettings(prev => prev || { theme: localStorage.getItem("theme") || 'light' });
+                    // Si el backend no devuelve settings, usamos los iniciales
+                    setSettings(prev => prev || initialSettings);
                 });
             } else {
                 setLoading(false);
             }
         } else {
-            // Si no hay token, intentamos recuperar tema de localStorage para login screen
-            setSettings({ theme: localStorage.getItem("theme") || 'light' });
+            setSettings(initialSettings);
             setLoading(false);
         }
     }, [token, fetchUserData]);

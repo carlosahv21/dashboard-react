@@ -92,13 +92,15 @@ const AppRoutes = () => {
 
 const AppContent = () => {
   const { settings } = useContext(AuthContext);
-  const { i18n } = useTranslation(); // Hook para detectar cambios de idioma
+  const { t, i18n } = useTranslation(); // Hook para detectar cambios de idioma y hacerlo reactivo
   const { defaultAlgorithm, darkAlgorithm } = theme;
 
   const isDarkMode = settings?.theme === "dark";
 
-  // Determinamos el locale de Ant Design basado en el idioma actual de i18next
-  const currentAntLocale = i18n.language.startsWith('en') ? en_US : es_ES;
+  // Determinamos el locale de Ant Design basado en el settings.language
+  // Si no hay settings (ej: login), usamos el idioma de i18next
+  const currentLang = settings?.language || i18n.language || 'es';
+  const currentAntLocale = currentLang.startsWith('en') ? en_US : es_ES;
 
   useEffect(() => {
     document.body.style.backgroundColor = isDarkMode ? "#121212" : "#F8F9FA";

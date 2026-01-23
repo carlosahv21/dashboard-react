@@ -90,7 +90,7 @@ const Sidebar = () => {
 
 	const items = buildMenuItems(staticMenuDefinition);
 
-	const logo = "logo-" + settings?.theme + ".png";
+	const logo = "/logo-" + (settings?.theme || "light") + ".png";
 
 	return (
 		<Sider
@@ -120,25 +120,23 @@ const Sidebar = () => {
 					overflow: "hidden",
 				}}
 			>
-				{settings?.logo_url && (
-					<a href="/">
-						<img
-							src={logo}
-							alt="Logo"
-							style={{
-								width: "4rem",
-								paddingTop: "0.5rem",
-								height: "auto",
-								transition: "width 0.2s ease",
-							}}
-							onError={(e) => {
-								e.target.onerror = null;
-								e.target.src =
-									"https://placehold.co/40x40/0A84FF/ffffff?text=L";
-							}}
-						/>
-					</a>
-				)}
+				<a href="/">
+					<img
+						src={logo}
+						alt="Logo"
+						style={{
+							width: "4rem",
+							paddingTop: "0.5rem",
+							height: "auto",
+							transition: "width 0.2s ease",
+						}}
+						onError={(e) => {
+							e.target.onerror = null;
+							e.target.src =
+								"https://placehold.co/40x40/0A84FF/ffffff?text=L";
+						}}
+					/>
+				</a>
 			</div>
 
 			<Menu

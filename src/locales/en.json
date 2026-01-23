@@ -262,6 +262,7 @@
         "day": "Day",
         "hour": "Hour",
         "actions": "Actions",
+        "save": "Save",
         "deleteTitle": "Delete?",
         "deleteConfirm": "This action cannot be undone.",
         "yes": "Yes",

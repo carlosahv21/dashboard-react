@@ -55,11 +55,10 @@ const GeneralInformation = () => {
             const payload = { ...values, logo_url: imageUrl || values.logo_url };
             const response = await request("settings", "PUT", payload);
 
-            // Actualizar AuthContext con los datos que devuelve el backend
-            const updatedSettings = response || payload;
-            setSettings(updatedSettings);
+            const resultData = response?.data || response;
+            const updatedSettings = { ...settings, ...payload, ...(typeof resultData === 'object' ? resultData : {}) };
 
-            localStorage.setItem("settings", JSON.stringify(updatedSettings));
+            setSettings(updatedSettings);
             setUploadKey(Date.now());
 
             message.success(t('settings.updateSuccess'));

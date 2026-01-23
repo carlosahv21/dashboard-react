@@ -1,4 +1,9 @@
 {
+    "session": {
+        "expiredTitle": "Sesión expirada o token inválido",
+        "expiredContent": "Tu sesión ha expirado. Debes iniciar sesión nuevamente.",
+        "expiredOk": "Aceptar"
+    },
     "dashboard": {
         "activeStudents": "Estudiantes Activos",
         "todayClasses": "Clases de Hoy",
@@ -262,6 +267,7 @@
         "day": "Día",
         "hour": "Hora",
         "actions": "Acciones",
+        "save": "Guardar",
         "deleteTitle": "¿Eliminar?",
         "deleteConfirm": "Esta acción no se puede deshacer.",
         "yes": "Sí",
