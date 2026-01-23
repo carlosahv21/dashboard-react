@@ -1,4 +1,3 @@
-// src/views/Auth/Login.js
 import React, { useState, useContext, useEffect, useMemo } from "react";
 import { Form, Input, Button, Checkbox, message } from "antd";
 import { useNavigate } from "react-router-dom";
@@ -28,17 +27,17 @@ const Login = () => {
     const slides = useMemo(() => [
         {
             title: t('auth.slide1Title'),
-            text: t('auth.slide1Text'),
+            text: t('auth.slide1Description'),
             image: "https://lh3.googleusercontent.com/aida-public/AB6AXuB_MG7Wqc850CDYWrgIuOQT4wWxpLRnp3lmumTfb2HIFCVZmPqznMXqmCaTkZ2E7UO6FRk19nk6v_hEXjuYWkyDohNeyFlAZU8GBj8qlKaPIRa7Mc_hccheBKbr2MBV07aCgPcdMmS1ihldg7Vggea1FNsFUeuM1I7xesAM8WT-0YG-nk_jMfr0ic2lB1H0VHPS2GIUTrNdUmf59C0UJGi22G1lPbwbtdhKWnESONnEhdQhNrTLKYg7qorolB-2we-yd-Fzl3U2H8Y"
         },
         {
             title: t('auth.slide2Title'),
-            text: t('auth.slide2Text'),
+            text: t('auth.slide2Description'),
             image: "https://images.unsplash.com/photo-1547153760-18fc86324498?q=80&w=1200&auto=format&fit=crop"
         },
         {
             title: t('auth.slide3Title'),
-            text: t('auth.slide3Text'),
+            text: t('auth.slide3Description'),
             image: "https://images.unsplash.com/photo-1518834107812-67b0b7c58434?q=80&w=1200&auto=format&fit=crop"
         }
     ], [t]);
@@ -75,13 +74,13 @@ const Login = () => {
 
     return (
         <div className="dance-login-container" data-theme={theme}>
-            {/* Navegación Superior (Solo Links y Toggles) */}
+            {/* Navegación Superior */}
             <nav className="dance-nav">
                 <div className="dance-brand-header">
                     <div className="dance-logo-box">
                         <ManOutlined style={{ fontSize: '1.5rem' }} />
                     </div>
-                    <span className="dance-nav-title" style={{ fontSize: '1.5rem' }}>{t('system.shortName')}</span>
+                    <span className="dance-nav-title" style={{ fontSize: '1.5rem' }}>{t('auth.brandName')}</span>
                 </div>
                 <div className="dance-nav-actions">
                     <div className="dance-nav-links">
@@ -108,12 +107,10 @@ const Login = () => {
                     <div className="dance-bg-pattern" style={{ position: 'absolute', inset: 0 }}></div>
 
                     <div className="login-content-wrapper" style={{ width: '100%', maxWidth: '28rem', zIndex: 10 }}>
-
-
                         <div className="login-form-container">
                             <div className="login-header" style={{ marginBottom: '0' }}>
-                                <h1 className="login-title">{t('auth.welcome')}</h1>
-                                <p className="login-subtitle">{t('auth.instruction')}</p>
+                                <h1 className="login-title">{t('auth.loginTitle')}</h1>
+                                <p className="login-subtitle">{t('auth.loginDescription')}</p>
                                 <div className="login-divider"></div>
                             </div>
 
@@ -135,7 +132,7 @@ const Login = () => {
                                 >
                                     <Input
                                         prefix={<MailOutlined />}
-                                        placeholder="nombre@academia.com"
+                                        placeholder={t('auth.emailPlaceholder')}
                                     />
                                 </Form.Item>
 
@@ -150,7 +147,7 @@ const Login = () => {
                                 >
                                     <Input.Password
                                         prefix={<LockOutlined />}
-                                        placeholder="••••••••"
+                                        placeholder={t('auth.passwordPlaceholder')}
                                     />
                                 </Form.Item>
 
@@ -163,7 +160,7 @@ const Login = () => {
 
                                 <Form.Item>
                                     <Button type="primary" htmlType="submit" block loading={loading}>
-                                        {t('auth.loginButton')} <LoginOutlined style={{ fontSize: '1.2rem', marginLeft: '8px' }} />
+                                        {t('auth.signInButton')} <LoginOutlined style={{ fontSize: '1.2rem', marginLeft: '8px' }} />
                                     </Button>
                                 </Form.Item>
                             </Form>
@@ -180,7 +177,7 @@ const Login = () => {
                     <div className="dance-image-overlay">
                         <img
                             key={currentSlide}
-                            alt={t('auth.imageAlt')}
+                            alt="Bailarín Profesional"
                             className="dance-image"
                             src={slides[currentSlide].image}
                         />
