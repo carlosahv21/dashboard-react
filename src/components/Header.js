@@ -25,7 +25,7 @@ const isPlanVigent = (plan) => {
     return now >= startDate && now <= endDate;
 };
 
-const HeaderComponent = () => {
+const HeaderComponent = ({ searchRef, profileRef, onRestartTour }) => {
     const navigate = useNavigate();
     const { logout, hasPermission, user, settings } = useContext(AuthContext);
     const [scrolled, setScrolled] = useState(false);
@@ -107,15 +107,17 @@ const HeaderComponent = () => {
             }}
         >
             {/* Search Bar */}
-            <Input
-                placeholder={t("menu.search")}
-                suffix={<SearchOutlined />}
-                allowClear
-                style={{
-                    width: 400,
-                    borderRadius: 8,
-                }}
-            />
+            <div ref={searchRef} style={{ width: 400 }}>
+                <Input
+                    placeholder={t("menu.search")}
+                    suffix={<SearchOutlined />}
+                    allowClear
+                    style={{
+                        width: "100%",
+                        borderRadius: 8,
+                    }}
+                />
+            </div>
 
             <Space style={{ marginRight: 0, fontSize: 18 }} size={24}>
                 {user?.plan && (
@@ -175,7 +177,7 @@ const HeaderComponent = () => {
                     placement="bottomRight"
                     trigger={["click"]}
                 >
-                    <Space style={{ cursor: "pointer" }}>
+                    <Space style={{ cursor: "pointer" }} ref={profileRef}>
                         <Avatar size="large" icon={<UserOutlined />} />
 
                         <div

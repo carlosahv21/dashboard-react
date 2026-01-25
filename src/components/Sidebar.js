@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, forwardRef } from "react";
 import { Layout, Menu, Tooltip, Switch } from "antd";
 import { AuthContext } from "../context/AuthContext";
 import { useNavigate, useLocation } from "react-router-dom";
@@ -8,7 +8,7 @@ import { useTranslation } from "react-i18next";
 
 const { Sider } = Layout;
 
-const Sidebar = () => {
+const Sidebar = forwardRef((props, ref) => {
 	const { settings, hasPermission, toggleTheme } = useContext(AuthContext);
 	const navigate = useNavigate();
 	const location = useLocation();
@@ -94,6 +94,7 @@ const Sidebar = () => {
 
 	return (
 		<Sider
+			ref={ref}
 			theme={settings?.theme || "light"}
 			trigger={null}
 			collapsible
@@ -179,6 +180,6 @@ const Sidebar = () => {
 			</div>
 		</Sider>
 	);
-};
+});
 
 export default Sidebar;

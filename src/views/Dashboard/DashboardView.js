@@ -66,6 +66,7 @@ const DashboardView = () => {
             <Row gutter={[24, 24]} style={{ marginBottom: 24 }}>
                 <Col xs={24} sm={6}>
                     <Card
+                        hoverable
                         style={{
                             borderLeft: `4px solid ${token.colorPrimary}`,
                         }}
@@ -83,6 +84,7 @@ const DashboardView = () => {
                 </Col>
                 <Col xs={24} sm={6}>
                     <Card
+                        hoverable
                         style={{
                             borderLeft: `4px solid ${token.colorPrimary}`,
                         }}
@@ -100,6 +102,7 @@ const DashboardView = () => {
                 </Col>
                 <Col xs={24} sm={6}>
                     <Card
+                        hoverable
                         style={{
                             borderLeft: `4px solid ${token.colorPrimary}`,
                         }}
@@ -118,6 +121,7 @@ const DashboardView = () => {
                 </Col>
                 <Col xs={24} sm={6}>
                     <Card
+                        hoverable
                         style={{
                             borderLeft: `4px solid ${token.colorPrimary}`,
                         }}
