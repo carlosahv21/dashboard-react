@@ -320,5 +320,17 @@
         "searchPlaceholder": "Search {{title}}",
         "massiveActions": "Bulk actions",
         "exportExcel": "Export to Excel"
+    },
+    "search": {
+        "title": "Search results",
+        "subtitle": "Search results",
+        "noResults": "No results found",
+        "loading": "Loading results...",
+        "error": "Error loading results",
+        "recent": "Recent searches",
+        "clear": "Clear search",
+        "welcomeTitle": "Type at least 3 characters to start your search",
+        "welcomeDesc": "Search students, classes or teachers",
+        "viewAll": "View all"
     }
 }

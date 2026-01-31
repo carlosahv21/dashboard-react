@@ -1,5 +1,5 @@
 import React, { useContext, useMemo, useState, useEffect } from "react";
-import { Layout, Dropdown, Avatar, Space, Badge, Input } from "antd";
+import { Layout, Dropdown, Avatar, Space, Badge, Input, message } from "antd";
 import {
     BellOutlined,
     MessageOutlined,
@@ -8,11 +8,16 @@ import {
     SettingOutlined,
     LogoutOutlined,
     SearchOutlined,
+    LoadingOutlined,
+    CloseOutlined,
+    ClockCircleOutlined,
+    CloseCircleOutlined,
 } from "@ant-design/icons";
 
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 import { useTranslation } from "react-i18next";
+import useFetch from "../hooks/useFetch";
 
 const { Header } = Layout;
 
@@ -30,8 +35,71 @@ const HeaderComponent = ({ searchRef, profileRef, onRestartTour }) => {
     const { logout, hasPermission, user, settings } = useContext(AuthContext);
     const [scrolled, setScrolled] = useState(false);
     const { t } = useTranslation();
+    const [searchQuery, setSearchQuery] = useState("");
+    const [searchResults, setSearchResults] = useState({
+        students: { data: [], total: 0 },
+        teachers: { data: [], total: 0 },
+        classes: { data: [], total: 0 }
+    });
+    const [isSearchFocused, setIsSearchFocused] = useState(false);
+    const [searchHistory, setSearchHistory] = useState(() => {
+        const saved = localStorage.getItem("search_history");
+        return saved ? JSON.parse(saved) : [];
+    });
+    const { request, loading } = useFetch();
 
     const isDarkMode = settings?.theme === "dark";
+
+    const addToHistory = (term) => {
+        if (!term.trim()) return;
+        const newHistory = [term, ...searchHistory.filter(h => h !== term)].slice(0, 10);
+        setSearchHistory(newHistory);
+        localStorage.setItem("search_history", JSON.stringify(newHistory));
+    };
+
+    const clearHistory = () => {
+        setSearchHistory([]);
+        localStorage.removeItem("search_history");
+    };
+
+    const removeHistoryItem = (term) => {
+        const newHistory = searchHistory.filter(h => h !== term);
+        setSearchHistory(newHistory);
+        localStorage.setItem("search_history", JSON.stringify(newHistory));
+    };
+
+    const debounce = (func, wait) => {
+        let timeout;
+        return (...args) => {
+            clearTimeout(timeout);
+            timeout = setTimeout(() => func.apply(this, args), wait);
+        };
+    };
+
+    const debounceSearch = useMemo(() => debounce(async (term) => {
+        if (!term || term.length < 3) {
+            setSearchResults({
+                students: { data: [], total: 0 },
+                teachers: { data: [], total: 0 },
+                classes: { data: [], total: 0 }
+            });
+            return;
+        }
+
+        try {
+            const response = await request(`search?q=${term}`);
+            if (response.success && response.data) {
+                setSearchResults({
+                    students: response.data.estudiantes || { data: [], total: 0 },
+                    teachers: response.data.profesores || { data: [], total: 0 },
+                    classes: response.data.clases || { data: [], total: 0 }
+                });
+            }
+        } catch (error) {
+            console.error("Search error:", error);
+            message.error(t("search.error") || "Error al realizar la búsqueda");
+        }
+    }, 500), [request, t]);
 
     // Scroll effect listener
     useEffect(() => {
@@ -106,17 +174,225 @@ const HeaderComponent = ({ searchRef, profileRef, onRestartTour }) => {
                 borderBottom: `1px solid ${isDarkMode ? "#2D2D2D" : "#E0E0E0"}`,
             }}
         >
+            {/* Backdrop */}
+            {isSearchFocused && (
+                <div
+                    style={{
+                        position: "fixed",
+                        top: 0,
+                        left: 0,
+                        width: "100%",
+                        height: "100%",
+                        backgroundColor: "rgba(0, 0, 0, 0.45)",
+                        zIndex: 9,
+                        backdropFilter: "blur(2px)",
+                    }}
+                    onClick={() => setIsSearchFocused(false)}
+                />
+            )}
+
             {/* Search Bar */}
-            <div ref={searchRef} style={{ width: 400 }}>
+            <div
+                ref={searchRef}
+                style={{
+                    width: isSearchFocused ? 600 : 400,
+                    transition: "width 0.3s ease",
+                    zIndex: 11,
+                    position: "relative"
+                }}
+            >
                 <Input
                     placeholder={t("menu.search")}
-                    suffix={<SearchOutlined />}
+                    suffix={loading ? <LoadingOutlined spin /> : <SearchOutlined />}
                     allowClear
+                    value={searchQuery}
+                    onFocus={() => setIsSearchFocused(true)}
+                    onChange={(e) => {
+                        const term = e.target.value;
+                        setSearchQuery(term);
+                        debounceSearch(term);
+                    }}
+                    onKeyDown={(e) => {
+                        if (e.key === "Enter" && searchQuery.trim()) {
+                            addToHistory(searchQuery);
+                            // Optional: navigate to a general search page
+                        }
+                    }}
                     style={{
                         width: "100%",
                         borderRadius: 8,
+                        height: 40,
+                        backgroundColor: isDarkMode ? "#2D2D2D" : "#f5f5f5",
+                        border: isSearchFocused ? "2px solid #0A84FF" : "1px solid transparent",
                     }}
                 />
+
+                {/* Search Results Dropdown */}
+                {isSearchFocused && (
+                    <div
+                        style={{
+                            position: "absolute",
+                            top: 56,
+                            left: 0,
+                            width: "100%",
+                            backgroundColor: isDarkMode ? "#1E1E1E" : "#fff",
+                            borderRadius: 16,
+                            boxShadow: isDarkMode ? "0 8px 32px rgba(0,0,0,0.4)" : "0 8px 32px rgba(0,0,0,0.12)",
+                            maxHeight: "80vh",
+                            overflowY: "auto",
+                            padding: "12px 0",
+                            border: `1px solid ${isDarkMode ? "#333" : "#f0f0f0"}`,
+                            zIndex: 100
+                        }}
+                    >
+                        {searchQuery.length < 3 && (
+                            <>
+                                {searchQuery.length === 0 && searchHistory.length > 0 ? (
+                                    <div style={{ padding: "0 20px 20px" }}>
+                                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
+                                            <span style={{ fontSize: 13, fontWeight: 400, color: isDarkMode ? "#fff" : "#111" }}>
+                                                {t("search.recent")}
+                                            </span>
+                                            <span
+                                                onClick={clearHistory}
+                                                style={{
+                                                    color: "#0A84FF",
+                                                    cursor: "pointer",
+                                                    fontSize: 12,
+                                                    fontWeight: 400
+                                                }}
+                                            >
+                                                {t("search.clear")}
+                                            </span>
+                                        </div>
+                                        <div style={{ display: "flex", flexWrap: "wrap", gap: 10 }}>
+                                            {searchHistory.map((item, index) => (
+                                                <div
+                                                    key={index}
+                                                    onClick={() => {
+                                                        setSearchQuery(item);
+                                                        debounceSearch(item);
+                                                    }}
+                                                    style={{
+                                                        padding: "6px 12px",
+                                                        backgroundColor: isDarkMode ? "#2D2D2D" : "#f0f2f5",
+                                                        borderRadius: 20,
+                                                        cursor: "pointer",
+                                                        display: "flex",
+                                                        alignItems: "center",
+                                                        gap: 6,
+                                                        fontSize: 12,
+                                                        fontWeight: 400,
+                                                        color: isDarkMode ? "#D9D9D9" : "#333",
+                                                        transition: "all 0.2s cubic-bezier(0.4, 0, 0.2, 1)",
+                                                        border: "1px solid transparent"
+                                                    }}
+                                                    onMouseEnter={(e) => {
+                                                        e.currentTarget.style.backgroundColor = isDarkMode ? "#3D3D3D" : "#e6e8eb";
+                                                        e.currentTarget.style.transform = "translateY(-1px)";
+                                                    }}
+                                                    onMouseLeave={(e) => {
+                                                        e.currentTarget.style.backgroundColor = isDarkMode ? "#2D2D2D" : "#f0f2f5";
+                                                        e.currentTarget.style.transform = "translateY(0)";
+                                                    }}
+                                                >
+                                                    <ClockCircleOutlined style={{ fontSize: 13, color: "#888" }} />
+                                                    {item}
+                                                    <CloseOutlined
+                                                        style={{ fontSize: 11, marginLeft: 6, color: "#888" }}
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            removeHistoryItem(item);
+                                                        }}
+                                                    />
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <div style={{ padding: "30px 20px", textAlign: "center" }}>
+                                        <SearchOutlined style={{ fontSize: 48, color: isDarkMode ? "#333" : "#f0f0f0", marginBottom: 12 }} />
+                                        <div style={{ fontSize: 16, fontWeight: 400, color: isDarkMode ? "#fff" : "#111", marginBottom: 4 }}>
+                                            {t("search.welcomeTitle")}
+                                        </div>
+                                        <div style={{ fontSize: 13, color: "#888", maxWidth: 280, margin: "0 auto" }}>
+                                            {t("search.welcomeDesc")}
+                                        </div>
+                                    </div>
+                                )}
+                            </>
+                        )}
+
+                        {searchQuery.length >= 3 && (
+                            <>
+                                {searchResults.students.total === 0 &&
+                                    searchResults.teachers.total === 0 &&
+                                    searchResults.classes.total === 0 && !loading ? (
+                                    <div style={{ padding: "30px 20px", textAlign: "center" }}>
+                                        <CloseCircleOutlined style={{ fontSize: 48, color: isDarkMode ? "#333" : "#f0f0f0", marginBottom: 12 }} />
+                                        <div style={{ fontSize: 16, fontWeight: 400, color: isDarkMode ? "#fff" : "#111", marginBottom: 4 }}>
+                                            {t("search.noResults")}
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <>
+                                        <SearchResultSection
+                                            title={t("menu.students")}
+                                            items={searchResults.students.data}
+                                            totalItems={searchResults.students.total}
+                                            type="student"
+                                            onSelect={(item) => {
+                                                addToHistory(searchQuery);
+                                                navigate(`/students/${item.id}/history`);
+                                                setIsSearchFocused(false);
+                                            }}
+                                            onViewAll={() => {
+                                                navigate(`/students?search=${searchQuery}`);
+                                                setIsSearchFocused(false);
+                                            }}
+                                            isDarkMode={isDarkMode}
+                                            t={t}
+                                        />
+                                        <SearchResultSection
+                                            title={t("menu.teachers")}
+                                            items={searchResults.teachers.data}
+                                            totalItems={searchResults.teachers.total}
+                                            type="teacher"
+                                            onSelect={(item) => {
+                                                addToHistory(searchQuery);
+                                                navigate(`/teachers`);
+                                                setIsSearchFocused(false);
+                                            }}
+                                            onViewAll={() => {
+                                                navigate(`/teachers?search=${searchQuery}`);
+                                                setIsSearchFocused(false);
+                                            }}
+                                            isDarkMode={isDarkMode}
+                                            t={t}
+                                        />
+                                        <SearchResultSection
+                                            title={t("menu.classes")}
+                                            items={searchResults.classes.data}
+                                            totalItems={searchResults.classes.total}
+                                            type="class"
+                                            onSelect={(item) => {
+                                                addToHistory(searchQuery);
+                                                navigate(`/classes`);
+                                                setIsSearchFocused(false);
+                                            }}
+                                            onViewAll={() => {
+                                                navigate(`/classes?search=${searchQuery}`);
+                                                setIsSearchFocused(false);
+                                            }}
+                                            isDarkMode={isDarkMode}
+                                            t={t}
+                                        />
+                                    </>
+                                )}
+                            </>
+                        )}
+                    </div>
+                )}
             </div>
 
             <Space style={{ marginRight: 0, fontSize: 18 }} size={24}>
@@ -140,7 +416,7 @@ const HeaderComponent = ({ searchRef, profileRef, onRestartTour }) => {
                             border: `1px solid ${isPlanActiveAndVigent ? "#91d5ff" : "#ffa39e"
                                 }`,
                             fontSize: 14,
-                            fontWeight: 600,
+                            fontWeight: 500,
                             lineHeight: "20px",
                             cursor: "default",
                             color: isDarkMode ? "rgba(255, 255, 255, 0.85)" : "inherit",
@@ -198,6 +474,82 @@ const HeaderComponent = ({ searchRef, profileRef, onRestartTour }) => {
                 </Dropdown>
             </Space>
         </Header>
+    );
+};
+
+const SearchResultSection = ({ title, items, totalItems, type, onSelect, onViewAll, isDarkMode, t }) => {
+    if (!items || items.length === 0) return null;
+
+    const displayItems = items.slice(0, 5);
+    const hasMore = totalItems > 5;
+
+    return (
+        <div style={{ marginBottom: 10 }}>
+            <div style={{
+                padding: "0 16px",
+                marginBottom: 4,
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center"
+            }}>
+                <span style={{
+                    fontSize: 10,
+                    fontWeight: 400,
+                    color: isDarkMode ? "#888" : "#8c8c8c",
+                    textTransform: "uppercase",
+                    letterSpacing: "0.5px"
+                }}>
+                    {title}
+                </span>
+                {hasMore && (
+                    <span
+                        style={{ color: "#0A84FF", cursor: "pointer", fontSize: 11, fontWeight: 400 }}
+                        onClick={onViewAll}
+                    >
+                        {t("search.viewAll") || "Ver todo"}
+                    </span>
+                )}
+            </div>
+            {displayItems.map((item) => (
+                <div
+                    key={item.id}
+                    onClick={() => onSelect(item)}
+                    style={{
+                        padding: "6px 16px",
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 10,
+                        cursor: "pointer",
+                        transition: "background-color 0.2s"
+                    }}
+                    onMouseEnter={(e) => e.currentTarget.style.backgroundColor = isDarkMode ? "#2D2D2D" : "#f5f5f5"}
+                    onMouseLeave={(e) => e.currentTarget.style.backgroundColor = "transparent"}
+                >
+                    <Avatar
+                        size={32}
+                        src={item.image || item.photo}
+                        icon={type === 'class' ? <ClockCircleOutlined /> : <UserOutlined />}
+                        style={{ backgroundColor: isDarkMode ? "#3D3D3D" : "#f0f2f5" }}
+                    />
+                    <div style={{ display: "flex", flexDirection: "column", gap: 0 }}>
+                        <span style={{
+                            fontSize: 13,
+                            fontWeight: 600,
+                            color: isDarkMode ? "#E0E0E0" : "#262626",
+                            lineHeight: "1.2"
+                        }}>
+                            {item.name || `${item.first_name} ${item.last_name}`}
+                        </span>
+                        {item.email && (
+                            <span style={{ fontSize: 11, color: "#888", lineHeight: "1.2" }}>{item.email}</span>
+                        )}
+                        {type === 'class' && item.schedule && (
+                            <span style={{ fontSize: 11, color: "#888", lineHeight: "1.2" }}>{item.schedule}</span>
+                        )}
+                    </div>
+                </div>
+            ))}
+        </div>
     );
 };
 
