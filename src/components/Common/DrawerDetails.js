@@ -70,15 +70,143 @@ const DrawerDetails = ({ visible, onClose, data }) => {
         );
     }
 
-    // Extracción de datos para el encabezado
+    // --- Normalización de Datos ---
+    const normalizeData = (inputData) => {
+        // 1. Caso ESTUDIANTE (identificado por role: 'student')
+        if (inputData.role === 'student' || (inputData.data && inputData.data.role === 'student')) {
+            const d = inputData.data || inputData; // Manejar si viene envuelto en "data" o plano
+            return {
+                title: `${d.first_name} ${d.last_name}`,
+                subtitle: t('roles.student') || "Estudiante", // Traducir si es posible
+                email: d.email,
+                avatarChar: d.first_name ? d.first_name.charAt(0).toUpperCase() : 'S',
+                sections: [
+                    {
+                        label: "Información Personal",
+                        items: [
+                            { name: "Email", value: d.email },
+                            { name: "Verificado", value: d.email_verified ? "Sí" : "No" },
+                            { name: "Registrado", value: new Date(d.created_at).toLocaleDateString() },
+                            { name: "Último Acceso", value: d.last_login ? new Date(d.last_login).toLocaleString() : "-" },
+                        ]
+                    },
+                    d.plan ? {
+                        label: "Plan Activo",
+                        items: [
+                            { name: "Nombre", value: d.plan.name },
+                            { name: "Estado", value: d.plan.status === 'active' ? "Activo" : "Inactivo" },
+                            { name: "Clases Usadas", value: `${d.plan.classes_used} / ${d.plan.classes_total}` },
+                            { name: "Vence", value: new Date(d.plan.end_date).toLocaleDateString() },
+                        ]
+                    } : null
+                ].filter(Boolean)
+            };
+        }
+
+        // 2. Caso PROFESOR (identificado por header.role_label: 'teacher')
+        if (inputData.header && inputData.header.role_label === 'teacher') {
+            const h = inputData.header;
+            const stats = inputData.stats || {};
+            const payment = inputData.payment_summary || {};
+            const classes = inputData.weekly_classes || [];
+
+            return {
+                title: h.full_name,
+                subtitle: t('roles.teacher') || "Profesor",
+                email: h.email,
+                avatarChar: h.full_name ? h.full_name.charAt(0).toUpperCase() : 'P',
+                sections: [
+                    {
+                        label: "Estadísticas",
+                        items: [
+                            { name: "Clases", value: stats.classes_count },
+                            { name: "Alumnos", value: stats.students_count },
+                            { name: "Rating", value: stats.rating ? `${stats.rating} ⭐` : "-" },
+                        ]
+                    },
+                    {
+                        label: "Resumen de Pagos",
+                        items: [
+                            { name: "Pendiente", value: `$${payment.pending_amount}` },
+                            { name: "Pagado", value: `$${payment.paid_amount}` },
+                            { name: "Próx. Corte", value: payment.next_cutoff_date },
+                        ]
+                    },
+                    classes.length > 0 ? {
+                        label: "Clases Semanales",
+                        items: classes.map(c => ({
+                            name: c.name,
+                            value: `${c.schedule} (${c.location})`
+                        }))
+                    } : null
+                ].filter(Boolean)
+            };
+        }
+
+        // 3. Caso CLASE (identificado por header.genre o estructura específica de clase)
+        if (inputData.header && inputData.session_details) {
+            const h = inputData.header;
+            const session = inputData.session_details;
+            const stats = inputData.stats || [];
+            const students = inputData.students || [];
+
+            return {
+                title: h.title,
+                subtitle: h.level_tag,
+                email: null, // Clases no tienen email principal
+                avatarChar: h.title ? h.title.charAt(0).toUpperCase() : 'C',
+                sections: [
+                    {
+                        label: "Estadísticas",
+                        items: stats.map(s => ({ name: s.label, value: s.value }))
+                    },
+                    {
+                        label: "Detalles",
+                        items: [
+                            { name: "Horario", value: session.time_range },
+                            { name: "Duración", value: session.duration_label },
+                            { name: "Ubicación", value: `${session.location} - ${session.location_detail}` },
+                        ]
+                    },
+                    students.length > 0 ? {
+                        label: "Estudiantes Inscritos",
+                        items: students.map(s => ({
+                            name: s.full_name,
+                            value: (
+                                <div>
+                                    <div style={{ fontSize: '12px' }}>{s.plan_info}</div>
+                                    <div style={{ fontSize: '11px', color: s.has_attended ? 'green' : 'gray' }}>
+                                        {s.has_attended ? "Asistió" : "Pendiente"}
+                                    </div>
+                                </div>
+                            ),
+                            render: (val) => val // Renderizar el componente React directamente
+                        }))
+                    } : null
+                ].filter(Boolean)
+            };
+        }
+
+        // 4. Fallback: Datos planos (comportamiento anterior)
+        return {
+            title: inputData.title || t('global.detail'),
+            subtitle: inputData.subtitle || "",
+            email: inputData.email,
+            avatarChar: inputData.title ? inputData.title.charAt(0).toUpperCase() : '?',
+            sections: inputData.sections || []
+        };
+    };
+
+    const normalizedData = normalizeData(data);
+
+    // Extracción de datos normalizados
     const {
         title,
         subtitle,
         email,
-        sections = [] // Aseguramos que sections sea un array por defecto
-    } = data;
-
-    const avatarChar = title ? title.charAt(0).toUpperCase() : '?';
+        avatarChar,
+        sections
+    } = normalizedData;
 
     return (
         <Drawer
@@ -103,13 +231,13 @@ const DrawerDetails = ({ visible, onClose, data }) => {
                     <Avatar
                         size={80}
                         icon={<UserOutlined />}
-                        src={"avatar_female.png"} // Soporte para URL de avatar
-                        style={{ marginBottom: 8 }}
+                        src={"avatar_female.png"} // TODO: Manejar avatar dinámico si viene del backend
+                        style={{ marginBottom: 8, backgroundColor: token.colorPrimary }}
                     >
                         {avatarChar}
                     </Avatar>
                     <h2 style={{ margin: 0, fontWeight: 600, fontSize: '20px', color: token.colorText }}>
-                        {title || t('global.detail')}
+                        {title}
                     </h2>
                     <p style={{ color: token.colorTextSecondary, margin: '4px 0 8px 0', fontSize: '14px' }}>
                         {subtitle}
