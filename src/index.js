@@ -10,6 +10,7 @@ import en_US from "antd/locale/en_US";
 import { ConfigProvider, theme, App as AntdApp } from "antd";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider, AuthContext } from "./context/AuthContext";
+import { NotificationProvider } from "./context/NotificationContext";
 
 import LoadingScreen from "./components/Common/LoadingScreen";
 
@@ -24,6 +25,7 @@ import Teachers from "./views/Teachers/Teachers";
 import Plans from "./views/Plans/Plans";
 import Registrations from "./views/Registrations/Registrations";
 import Attendances from "./views/Attendances/Attendances";
+import Notifications from "./views/Notifications/Notifications";
 
 // Settings & Sub-rutas
 import SettingsLayout from "./views/Settings/SettingsLayouts";
@@ -83,6 +85,8 @@ const AppRoutes = () => {
         {hasPermission("settings:view") && (
           <Route path="settings/*" element={<SettingsLayout />}></Route>
         )}
+
+        <Route path="notifications" element={<Notifications />} />
 
         <Route path="*" element={<Navigate to="/" />} />
       </Route>
@@ -181,7 +185,9 @@ const AppContent = () => {
 
 const MainApp = () => (
   <AuthProvider>
-    <AppContent />
+    <NotificationProvider>
+      <AppContent />
+    </NotificationProvider>
   </AuthProvider>
 );
 

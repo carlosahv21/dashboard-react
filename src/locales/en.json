@@ -332,5 +332,13 @@
         "welcomeTitle": "Type at least 3 characters to start your search",
         "welcomeDesc": "Search students, classes or teachers",
         "viewAll": "View all"
+    },
+    "notifications": {
+        "title": "Notifications",
+        "markAllRead": "Mark all as read",
+        "loading": "Loading notifications...",
+        "viewAll": "View all",
+        "empty": "No notifications",
+        "emptyDescription": "All your notifications have been read"
     }
 }

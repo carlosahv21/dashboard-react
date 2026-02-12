@@ -341,5 +341,13 @@
         "welcomeTitle": "Escribe al menos 3 caracteres para comenzar tu búsqueda",
         "welcomeDesc": "Busca estudiantes, clases o profesores",
         "viewAll": "Ver todos"
+    },
+    "notifications": {
+        "title": "Notificaciones",
+        "markAllRead": "Marcar todas como leídas",
+        "loading": "Cargando notificaciones...",
+        "viewAll": "Ver todas",
+        "empty": "No hay notificaciones",
+        "emptyDescription": "Todas tus notificaciones han sido leídas"
     }
 }

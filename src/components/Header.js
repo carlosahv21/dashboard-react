@@ -1,5 +1,11 @@
 import React, { useContext, useMemo, useState, useEffect } from "react";
-import { Layout, Dropdown, Avatar, Space, Badge, Input, message } from "antd";
+import { Layout, Dropdown, Avatar, Space, Badge, Input, message, Popover, List, Typography, Button, Empty } from "antd";
+import { NotificationContext } from "../context/NotificationContext";
+import dayjs from "dayjs";
+import relativeTime from "dayjs/plugin/relativeTime";
+import "dayjs/locale/es"; // Import Spanish locale
+
+
 import {
     BellOutlined,
     MessageOutlined,
@@ -19,6 +25,9 @@ import { AuthContext } from "../context/AuthContext";
 import { useTranslation } from "react-i18next";
 import useFetch from "../hooks/useFetch";
 
+dayjs.extend(relativeTime);
+dayjs.locale("es"); // Set locale to Spanish by default (can be dynamic based on i18n)
+
 const { Header } = Layout;
 
 const isPlanVigent = (plan) => {
@@ -35,6 +44,7 @@ const HeaderComponent = ({ searchRef, profileRef, onRestartTour }) => {
     const { logout, hasPermission, user, settings } = useContext(AuthContext);
     const [scrolled, setScrolled] = useState(false);
     const { t } = useTranslation();
+    const { notifications, unreadCount, markAsRead, markAllAsRead, deleteNotification, loading: notificationsLoading, fetchNotifications } = useContext(NotificationContext);
     const [searchQuery, setSearchQuery] = useState("");
     const [searchResults, setSearchResults] = useState({
         students: { data: [], total: 0 },
@@ -440,13 +450,115 @@ const HeaderComponent = ({ searchRef, profileRef, onRestartTour }) => {
                     </div>
                 )}
 
-                <Badge count={0} size="small">
-                    <MessageOutlined style={{ fontSize: 18, cursor: "pointer" }} />
-                </Badge>
-
-                <Badge count={3} size="small">
-                    <BellOutlined style={{ fontSize: 18, cursor: "pointer" }} />
-                </Badge>
+                <Popover
+                    trigger="click"
+                    placement="bottomRight"
+                    title={
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: 500 }}>
+                            <Typography.Text strong>{t("notifications.title") || "Notificaciones"}</Typography.Text>
+                            {unreadCount > 0 && (
+                                <Button
+                                    type="link"
+                                    size="small"
+                                    onClick={markAllAsRead}
+                                    style={{ padding: 0 }}
+                                >
+                                    {t("notifications.markAllRead") || "Marcar todo leido"}
+                                </Button>
+                            )}
+                        </div>
+                    }
+                    content={
+                        <div style={{ width: 500, maxHeight: 400, overflowY: 'auto' }}>
+                            <List
+                                loading={notificationsLoading}
+                                itemLayout="horizontal"
+                                dataSource={notifications.slice(0, 10)}
+                                locale={{ emptyText: <Empty description={t("notifications.empty") || "No hay notificaciones"} image={Empty.PRESENTED_IMAGE_SIMPLE} /> }}
+                                footer={
+                                    notifications.length > 10 && (
+                                        <div style={{ textAlign: 'center', marginTop: 12, paddingBottom: 8 }}>
+                                            <Button
+                                                type="link"
+                                                onClick={() => {
+                                                    // Close popover logic would need state control here, but navigating works
+                                                    navigate("/notifications");
+                                                }}
+                                            >
+                                                {t("notifications.viewAll") || "Ver todas"}
+                                            </Button>
+                                        </div>
+                                    )
+                                }
+                                renderItem={(item) => (
+                                    <List.Item
+                                        actions={[
+                                            !item.is_read && <Button key="read" type="text" size="small" onClick={(e) => { e.stopPropagation(); markAsRead(item.id); }} icon={<div style={{ width: 8, height: 8, borderRadius: '50%', backgroundColor: '#1890ff' }} />} />,
+                                            <Button key="delete" type="text" size="small" danger onClick={(e) => { e.stopPropagation(); deleteNotification(item.id); }} icon={<CloseOutlined />} />
+                                        ]}
+                                        style={{
+                                            backgroundColor: item.is_read ? 'transparent' : (isDarkMode ? '#2a2a2a' : '#fff'),
+                                            padding: '8px 12px',
+                                            borderRadius: 4,
+                                            marginBottom: 4,
+                                            cursor: item.deep_link ? 'pointer' : 'default',
+                                            transition: 'background-color 0.2s'
+                                        }}
+                                        onClick={() => {
+                                            if (!item.is_read) markAsRead(item.id);
+                                            if (item.deep_link) {
+                                                navigate(item.deep_link);
+                                            }
+                                        }}
+                                        onMouseEnter={(e) => {
+                                            if (item.deep_link) {
+                                                e.currentTarget.style.backgroundColor = isDarkMode ? '#333' : '#fff';
+                                            }
+                                        }}
+                                        onMouseLeave={(e) => {
+                                            e.currentTarget.style.backgroundColor = item.is_read ? 'transparent' : (isDarkMode ? '#2a2a2a' : '#f0faff');
+                                        }}
+                                    >
+                                        <List.Item.Meta
+                                            avatar={
+                                                <Avatar
+                                                    icon={<BellOutlined />}
+                                                    style={{ backgroundColor: item.is_read ? (isDarkMode ? '#333' : '#ccc') : '#1890ff' }}
+                                                />
+                                            }
+                                            title={
+                                                <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
+                                                    <Typography.Text
+                                                        style={{
+                                                            fontSize: 13,
+                                                            fontWeight: item.is_read ? 'normal' : 'bold',
+                                                            color: isDarkMode ? '#fff' : 'inherit',
+                                                            marginBottom: 0
+                                                        }}
+                                                    >
+                                                        {item.title}
+                                                    </Typography.Text>
+                                                    <Typography.Text type="secondary" style={{ fontSize: 10, minWidth: 60, textAlign: 'right', marginLeft: 8 }}>
+                                                        {dayjs(item.created_at).fromNow()}
+                                                    </Typography.Text>
+                                                </div>
+                                            }
+                                            description={
+                                                <div>
+                                                    <div style={{ fontSize: 12, color: isDarkMode ? '#aaa' : '#666' }}>{item.body || item.message}</div>
+                                                </div>
+                                            }
+                                        />
+                                    </List.Item>
+                                )}
+                            />
+                        </div>
+                    }
+                >
+                    <Badge count={unreadCount} size="small">
+                        <BellOutlined style={{ fontSize: 18, cursor: "pointer" }} />
+                    </Badge>
+                </Popover>
 
                 <Dropdown
                     menu={{ items: menuItems }}
