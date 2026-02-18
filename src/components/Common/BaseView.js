@@ -366,6 +366,8 @@ const BaseView = ({
                 visible={drawerVisible}
                 onClose={handleDrawerClose}
                 data={drawerData}
+                onEdit={hasPermission(`${endpoint}:edit`) ? openModal : undefined}
+                onDelete={hasPermission(`${endpoint}:delete`) ? handleDelete : undefined}
             >
                 {drawerLoading && (
                     <div style={{ textAlign: "center", padding: "50px" }}>

@@ -10,7 +10,7 @@ import { useEngagementReport } from "../reports/useEngagementReport";
 import { useEfficiencyReport } from "../reports/useEfficiencyReport";
 import { useAuditReport } from "../reports/useAuditReport";
 
-export const useDashboardData = () => {
+export const useDashboardData = (settings) => {
     const { request } = useFetch();
 
     const {
@@ -18,7 +18,7 @@ export const useDashboardData = () => {
         kpiData,
     } = useKpisData(request);
 
-    const { 
+    const {
         userDistributionLoading,
         userDistributionOption,
     } = useUserDistributionReport(request);
@@ -41,22 +41,22 @@ export const useDashboardData = () => {
     const { retentionChurnLoading, heatmapOption, churnGaugeOption } =
         useRetentionChurnReport(request);
 
-    const { 
-        revenueLoading, 
-        donutOption, 
-        barComparisonOption 
-    } = useRevenueReport(request);
+    const {
+        revenueLoading,
+        donutOption,
+        barComparisonOption
+    } = useRevenueReport(request, settings);
 
-    const { 
-        engagementLoading, 
-        scatterOption, 
-        usersAtRisk 
+    const {
+        engagementLoading,
+        scatterOption,
+        usersAtRisk
     } = useEngagementReport(request);
 
-    const { 
-        efficiencyLoading, 
-        fillRateOption, 
-        teacherRadarOption 
+    const {
+        efficiencyLoading,
+        fillRateOption,
+        teacherRadarOption
     } = useEfficiencyReport(request);
 
     const {

@@ -25,6 +25,7 @@ import ReactECharts from "echarts-for-react";
 import { AuthContext } from "../../context/AuthContext";
 import { useDashboardData } from "../../hooks/useDashboardData";
 import { useTranslation } from "react-i18next";
+import { formatDate, formatCurrency } from "../../utils/formatters";
 
 const DashboardView = () => {
     const { settings } = useContext(AuthContext);
@@ -52,7 +53,7 @@ const DashboardView = () => {
         usersAtRisk,
         isSuspicious,
         auditData,
-    } = useDashboardData();
+    } = useDashboardData(settings);
 
     const occupancyOption = charts.occupancyDrilldown;
 
@@ -110,8 +111,7 @@ const DashboardView = () => {
                         <Spin spinning={kpiLoading}>
                             <Statistic
                                 title={t("dashboard.monthlyRevenue")}
-                                value={kpiData.monthlyRevenue}
-                                precision={2}
+                                value={formatCurrency(kpiData.monthlyRevenue, settings)}
                                 suffix={
                                     <DollarOutlined style={{ marginLeft: 8, color: token.colorPrimary }} />
                                 }
@@ -437,7 +437,7 @@ const DashboardView = () => {
                                                     <Typography.Text type="danger">
                                                         {user.last_attendance === null
                                                             ? t("stats.noAttendanceData")
-                                                            : t("stats.lastAttendance") + " " + user.last_attendance}
+                                                            : t("stats.lastAttendance") + " " + formatDate(user.last_attendance, settings)}
                                                     </Typography.Text>
                                                 </>
                                             }

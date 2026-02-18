@@ -1,21 +1,18 @@
-import React, { useState, useEffect, useCallback, useContext } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { Typography, Space, Select, Table, Button, Modal, Input, App, theme, Divider, Empty, Tooltip } from "antd";
 import { UndoOutlined, DeleteOutlined, ExclamationCircleOutlined } from "@ant-design/icons";
 import useFetch from "../../../hooks/useFetch";
 import FormHeader from "../../../components/Common/FormHeader";
-import dayjs from "dayjs";
-import { AuthContext } from "../../../context/AuthContext";
 import { useTranslation } from "react-i18next";
 import useFormatting from "../../../hooks/useFormatting";
 
-const { Title, Text } = Typography;
+const { Text } = Typography;
 
 const RecycleBin = () => {
     const { t } = useTranslation();
     const { request } = useFetch();
     const { message, modal } = App.useApp();
     const { token } = theme.useToken();
-    const { hasPermission } = useContext(AuthContext);
     const { formatDate } = useFormatting();
 
     const [modules, setModules] = useState([]);

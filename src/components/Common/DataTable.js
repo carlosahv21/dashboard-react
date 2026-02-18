@@ -1,5 +1,5 @@
 import React from "react";
-import { Table, Space, Button, App } from "antd";
+import { Table, Space, Button, App, Popover } from "antd";
 import { EditOutlined, DeleteOutlined } from "@ant-design/icons";
 import { useTranslation } from "react-i18next";
 
@@ -44,28 +44,32 @@ const DataTable = ({
                     return (
                         <Space size="middle">
                             {onEdit && (
-                                <Button
-                                    type="link"
-                                    icon={<EditOutlined />}
-                                    style={{ color: "#13a8a8" }}
-                                    onClick={(e) => {
-                                        e.stopPropagation();
-                                        !editDisabled && onEdit(record.id);
-                                    }}
-                                    disabled={editDisabled}
-                                />
+                                <Popover content={t('global.edit')} placement="bottom">
+                                    <Button
+                                        type="link"
+                                        icon={<EditOutlined />}
+                                        style={{ color: "#13a8a8" }}
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            !editDisabled && onEdit(record.id);
+                                        }}
+                                        disabled={editDisabled}
+                                    />
+                                </Popover>
                             )}
                             {onDelete && (
-                                <Button
-                                    type="link"
-                                    danger
-                                    icon={<DeleteOutlined />}
-                                    onClick={(e) => {
-                                        e.stopPropagation();
-                                        !deleteDisabled && handleDeleteConfirm(record.id, record);
-                                    }}
-                                    disabled={deleteDisabled}
-                                />
+                                <Popover content={t('global.delete')} placement="bottom">
+                                    <Button
+                                        type="link"
+                                        danger
+                                        icon={<DeleteOutlined />}
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            !deleteDisabled && handleDeleteConfirm(record.id, record);
+                                        }}
+                                        disabled={deleteDisabled}
+                                    />
+                                </Popover>
                             )}
                         </Space>
                     );

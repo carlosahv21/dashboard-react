@@ -38,13 +38,6 @@ const StudentCard = ({
     return (
         <Card
             title={`${record.first_name} ${record.last_name}`}
-            extra={
-                <EyeOutlined
-                    key="view"
-                    style={{ color: "#1668dc" }}
-                    onClick={() => onRowClick(record)}
-                />
-            }
             actions={[
                 <HistoryOutlined
                     key="history"
@@ -65,6 +58,11 @@ const StudentCard = ({
                         onClick={() => handleDeleteConfirm(record.id)}
                     />
                 ),
+                <EyeOutlined
+                    key="view"
+                    style={{ color: "#1668dc" }}
+                    onClick={() => onRowClick(record)}
+                />
             ].filter(Boolean)}
         >
             <Meta

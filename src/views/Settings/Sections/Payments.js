@@ -1,7 +1,6 @@
 import React from "react";
 import { Tag } from "antd";
 import BaseCrudView from "../../../components/Common/BaseView";
-import dayjs from "dayjs";
 import { useTranslation } from "react-i18next";
 import useFormatting from "../../../hooks/useFormatting";
 

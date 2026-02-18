@@ -328,7 +328,12 @@
         "show": "Mostrar",
         "searchPlaceholder": "Buscar {{title}}",
         "massiveActions": "Acciones masivas",
-        "exportExcel": "Exportar a Excel"
+        "exportExcel": "Exportar a Excel",
+        "deleteKeyword": "eliminar",
+        "delete": "Eliminar",
+        "detail": "Detalle",
+        "edit": "Editar",
+        "view": "Ver"
     },
     "search": {
         "title": "Resultados de la búsqueda",

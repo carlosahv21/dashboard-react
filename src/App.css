@@ -1,18 +1,20 @@
-body, html, #root {
-  height: 100%;
-  width: 100%;
-  margin: 0;
-  padding: 0;
+body,
+html,
+#root {
+    height: 100%;
+    width: 100%;
+    margin: 0;
+    padding: 0;
 }
 
 .site-layout {
-  width: 100% !important;
+    width: 100% !important;
 }
 
 .ant-form-item-required::before {
-  content: "*";
-  margin-right: 4px;
-  color: red; /* Cambia el color del asterisco a rojo */
+    content: "*";
+    margin-right: 4px;
+    color: red; /* Cambia el color del asterisco a rojo */
 }
 
 .fc-timegrid-slot {
@@ -41,4 +43,15 @@ body, html, #root {
 
 .custom-scroll::-webkit-scrollbar-thumb:hover {
     background-color: rgba(128, 128, 128, 0.6);
+}
+
+/* Table Hover Effect */
+.ant-table-tbody > tr:hover > td.ant-table-cell {
+    background-color: rgba(0, 0, 0, 0.04) !important;
+    cursor: pointer;
+}
+
+.ant-table-row-selected {
+    background-color: #0A84FF !important;
+    color: #fff !important;
 }

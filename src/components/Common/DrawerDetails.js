@@ -1,6 +1,6 @@
 import React from "react";
-import { Drawer, Descriptions, Avatar, Divider, theme } from "antd";
-import { UserOutlined, MailOutlined, InfoCircleOutlined, CalendarOutlined, SolutionOutlined } from "@ant-design/icons";
+import { Drawer, Descriptions, Avatar, Divider, theme, Button, Space, App, Popover } from "antd";
+import { UserOutlined, MailOutlined, InfoCircleOutlined, CalendarOutlined, SolutionOutlined, EditOutlined, DeleteOutlined } from "@ant-design/icons";
 import { useTranslation } from "react-i18next";
 import useFormatting from "../../hooks/useFormatting";
 
@@ -8,8 +8,11 @@ import useFormatting from "../../hooks/useFormatting";
 
 const getIconForLabel = (label) => {
     const lowerLabel = label.toLowerCase();
-    if (lowerLabel.includes("información")) return <SolutionOutlined style={{ marginRight: 8, color: '#1890ff' }} />;
-    if (lowerLabel.includes("registro") || lowerLabel.includes("metadata")) return <CalendarOutlined style={{ marginRight: 8, color: '#40a9ff' }} />;
+
+    if (lowerLabel.includes("información"))
+        return <SolutionOutlined style={{ marginRight: 8, color: '#1890ff' }} />;
+    if (lowerLabel.includes("registro") || lowerLabel.includes("metadata"))
+        return <CalendarOutlined style={{ marginRight: 8, color: '#40a9ff' }} />;
     return <InfoCircleOutlined style={{ marginRight: 8, color: '#40a9ff' }} />;
 };
 
@@ -20,7 +23,7 @@ const DetailSection = ({ label, items }) => {
     if (!items || items.length === 0) return null;
 
     // Estilo para asegurar que todas las etiquetas Descriptions.Item tengan el mismo ancho
-    const labelStyle = { fontWeight: 600, width: 105, color: token.colorTextSecondary };
+    const labelStyle = { fontWeight: 600, width: 200, color: token.colorTextSecondary };
 
     return (
         <div style={{ background: token.colorBgContainer, padding: '16px 24px', marginBottom: 8, borderBottom: `1px solid ${token.colorBorderSecondary}` }}>
@@ -50,10 +53,11 @@ const DetailSection = ({ label, items }) => {
 
 // --- Componente principal: DrawerDetails ---
 
-const DrawerDetails = ({ visible, onClose, data }) => {
+const DrawerDetails = ({ visible, onClose, data, onEdit, onDelete }) => {
     const { token } = theme.useToken();
     const { t } = useTranslation();
     const { formatDate, formatCurrency } = useFormatting();
+    const { modal } = App.useApp();
 
     if (!data) {
         return (
@@ -71,6 +75,29 @@ const DrawerDetails = ({ visible, onClose, data }) => {
             </Drawer>
         );
     }
+
+    const handleDeleteConfirm = () => {
+        const id = data.id || (data.data && data.data.id);
+        modal.confirm({
+            title: t('global.deleteTitle'),
+            content: t('global.deleteConfirm'),
+            okText: t('global.yes'),
+            okType: "danger",
+            cancelText: t('global.cancel'),
+            onOk: () => {
+                if (onDelete) onDelete(id, data);
+                onClose(); // Cerrar el drawer después de borrar
+            },
+        });
+    };
+
+    const handleEdit = () => {
+        const id = data.id || (data.data && data.data.id);
+        if (onEdit) {
+            onEdit(id, data);
+            onClose(); // Opcional: Cerrar el drawer al editar si se abre un modal
+        }
+    };
 
     // --- Normalización de Datos ---
     const normalizeData = (inputData) => {
@@ -101,7 +128,8 @@ const DrawerDetails = ({ visible, onClose, data }) => {
                             { name: "Vence", value: formatDate(d.plan.end_date) },
                         ]
                     } : null
-                ].filter(Boolean)
+                ].filter(Boolean),
+                avatar: d.avatar || d.profile_picture || null
             };
         }
 
@@ -141,7 +169,8 @@ const DrawerDetails = ({ visible, onClose, data }) => {
                             value: `${c.schedule} (${c.location})`
                         }))
                     } : null
-                ].filter(Boolean)
+                ].filter(Boolean),
+                avatar: h.avatar || h.profile_picture || null
             };
         }
 
@@ -189,6 +218,119 @@ const DrawerDetails = ({ visible, onClose, data }) => {
             };
         }
 
+        // 4. Caso PAGO (identificado por payment_method)
+        if (inputData.payment_method && inputData.amount !== undefined) {
+            return {
+                title: `Pago #${inputData.id}`,
+                subtitle: inputData.status === 'completed' ? 'Completado' : inputData.status,
+                email: inputData.user?.email,
+                avatarChar: '$',
+                sections: [
+                    {
+                        label: "Resumen de Pago",
+                        items: [
+                            { name: "Monto", value: formatCurrency(inputData.amount) },
+                            { name: "Monto Original", value: inputData.amount !== inputData.original_amount ? formatCurrency(inputData.original_amount) : null },
+                            { name: "Método", value: inputData.payment_method },
+                            { name: "Fecha", value: formatDate(inputData.payment_date) },
+                            { name: "Estado", value: inputData.status === 'completed' ? "Completado" : inputData.status },
+                        ].filter(item => item.value !== null)
+                    },
+                    inputData.user ? {
+                        label: "Usuario",
+                        items: [
+                            { name: "Nombre", value: inputData.user.full_name },
+                            { name: "Email", value: inputData.user.email },
+                        ]
+                    } : null,
+                    inputData.plan ? {
+                        label: "Detalles del Plan",
+                        items: [
+                            { name: "Plan", value: inputData.plan.name },
+                            { name: "Inicio", value: formatDate(inputData.plan.start_date) },
+                            { name: "Fin", value: formatDate(inputData.plan.end_date) },
+                        ]
+                    } : null,
+                    (inputData.discount && inputData.discount.value > 0) ? {
+                        label: "Descuento",
+                        items: [
+                            { name: "Tipo", value: inputData.discount.type },
+                            { name: "Valor", value: inputData.discount.value },
+                            { name: "Notas", value: inputData.discount.notes },
+                        ]
+                    } : null,
+                    inputData.notes ? {
+                        label: "Notas",
+                        items: [
+                            { name: "Detalle", value: inputData.notes }
+                        ]
+                    } : null
+                ].filter(Boolean)
+            };
+        }
+
+        // 5. Caso PLAN (identificado por name, price, y type)
+        if (inputData.price !== undefined && inputData.type && inputData.name) {
+            return {
+                title: inputData.name,
+                subtitle: inputData.active ? 'Activo' : 'Inactivo',
+                email: null,
+                avatarChar: inputData.name ? inputData.name.charAt(0).toUpperCase() : 'P',
+                sections: [
+                    {
+                        label: "Resumen",
+                        items: [
+                            { name: "Precio", value: formatCurrency(inputData.price) },
+                            { name: "Tipo", value: inputData.type === 'monthly' ? "Mensual" : inputData.type }, // Traducir si es necesario
+                            { name: "Días Prueba", value: inputData.trial_period_days > 0 ? `${inputData.trial_period_days} días` : "No aplica" },
+                            { name: "Estado", value: inputData.active ? "Activo" : "Inactivo" },
+                        ]
+                    },
+                    {
+                        label: "Límites",
+                        items: [
+                            { name: "Máx. Sesiones", value: inputData.max_sessions || "Ilimitadas" },
+                            { name: "Máx. Clases", value: inputData.max_classes || "Ilimitadas" },
+                        ]
+                    },
+                    {
+                        label: "Información",
+                        items: [
+                            { name: "Descripción", value: inputData.description },
+                            { name: "Creado", value: formatDate(inputData.created_at) },
+                            { name: "Actualizado", value: formatDate(inputData.updated_at) },
+                        ]
+                    }
+                ].filter(Boolean)
+            };
+        }
+
+        // 6. Caso ROL (identificado por name y description, sin precio)
+        if (inputData.name && inputData.description && inputData.price === undefined && !inputData.email) {
+            return {
+                title: inputData.name.charAt(0).toUpperCase() + inputData.name.slice(1),
+                subtitle: t('settings.role') || "Rol",
+                email: null,
+                avatarChar: inputData.name.charAt(0).toUpperCase(),
+                sections: [
+                    {
+                        label: "Detalles",
+                        items: [
+                            { name: "Nombre", value: inputData.name },
+                            { name: "Descripción", value: inputData.description },
+                        ]
+                    },
+                    {
+                        label: "Metadatos",
+                        items: [
+                            { name: "Creado", value: formatDate(inputData.created_at) },
+                            { name: "Actualizado", value: formatDate(inputData.updated_at) },
+                        ]
+                    }
+                ].filter(Boolean)
+            };
+        }
+
         // 4. Fallback: Datos planos (comportamiento anterior)
         return {
             title: inputData.title || t('global.detail'),
@@ -207,7 +349,8 @@ const DrawerDetails = ({ visible, onClose, data }) => {
         subtitle,
         email,
         avatarChar,
-        sections
+        sections,
+        avatar
     } = normalizedData;
 
     return (
@@ -216,8 +359,35 @@ const DrawerDetails = ({ visible, onClose, data }) => {
             placement="right"
             onClose={onClose}
             open={visible}
-            size={400}
+            size={500}
             styles={{ body: { padding: 0 } }}
+            extra={
+                <Space>
+                    {onEdit && (
+                        <Popover content={t('global.edit')} placement="bottom">
+                            <Button
+                                type="link"
+                                style={{ color: "#13a8a8"}}
+                                onClick={handleEdit}
+                            >
+                                <EditOutlined />
+                            </Button>
+                        </Popover>
+                    )}
+                    {onDelete && (
+                        <Popover content={t('global.delete')} placement="bottom">
+                            <Button
+                            type="link"
+                                danger
+                                onClick={handleDeleteConfirm}
+                                
+                            >
+                                <DeleteOutlined />
+                            </Button>
+                        </Popover>
+                    )}
+                </Space>
+            }
         >
             <div style={{ height: '100%', overflowY: 'auto', background: token.colorBgLayout }}>
 
@@ -230,14 +400,14 @@ const DrawerDetails = ({ visible, onClose, data }) => {
                     alignItems: "center",
                     textAlign: "center"
                 }}>
-                    <Avatar
-                        size={80}
-                        icon={<UserOutlined />}
-                        src={"avatar_female.png"} // TODO: Manejar avatar dinámico si viene del backend
-                        style={{ marginBottom: 8, backgroundColor: token.colorPrimary }}
-                    >
-                        {avatarChar}
-                    </Avatar>
+                    {avatar && (
+                        <Avatar
+                            size={80}
+                            icon={<UserOutlined />}
+                            src={avatar}
+                            style={{ marginBottom: 8, backgroundColor: token.colorPrimary }}
+                        />
+                    )}
                     <h2 style={{ margin: 0, fontWeight: 600, fontSize: '20px', color: token.colorText }}>
                         {title}
                     </h2>

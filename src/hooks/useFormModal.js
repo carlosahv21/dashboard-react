@@ -75,6 +75,21 @@ export const useFormModal = (request, endpoint, moduleFieldId, titleSingular, fi
     const handleSubmit = async (values) => {
         const transformedValues = { ...values, ...fixedValues };
 
+        // Convert string numbers to actual numbers for fields with type "number"
+        if (moduleData && moduleData.blocks) {
+            moduleData.blocks.forEach(block => {
+                block.fields.forEach(field => {
+                    if (field.type === 'number' && field.name in transformedValues) {
+                        const value = transformedValues[field.name];
+                        // Check if it's a valid number string and not empty, and not a special string like "Ilimitadas"
+                        if (typeof value === 'string' && value.trim() !== '' && !isNaN(Number(value))) {
+                            transformedValues[field.name] = Number(value);
+                        }
+                    }
+                });
+            });
+        }
+
         if ('hour' in values && values.hour) {
             transformedValues.hour = dayjs(values.hour).format("HH:mm");
         }

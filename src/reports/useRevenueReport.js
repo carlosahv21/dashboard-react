@@ -1,7 +1,8 @@
 import { useState, useEffect, useMemo } from "react";
 import { theme } from "antd";
+import { formatCurrency } from "../utils/formatters";
 
-export const useRevenueReport = (request) => {
+export const useRevenueReport = (request, settings) => {
     const { token } = theme.useToken();
     const [loading, setLoading] = useState(true);
     const [data, setData] = useState({ arpu: "0", paymentMethodAnalysis: [] });
@@ -30,8 +31,15 @@ export const useRevenueReport = (request) => {
             name: item.payment_method,
         }));
 
+        const formattedARPU = formatCurrency(arpu, settings);
+
         return {
-            tooltip: { trigger: "item", formatter: "{b}: ${c} ({d}%)" },
+            tooltip: {
+                trigger: "item",
+                formatter: (params) => {
+                    return `${params.name}: ${formatCurrency(params.value, settings)} (${params.percent}%)`;
+                }
+            },
             backgroundColor: "transparent",
             legend: { orient: "vertical", left: "left" },
             graphic: {
@@ -39,7 +47,7 @@ export const useRevenueReport = (request) => {
                 left: "center",
                 top: "middle",
                 style: {
-                    text: `ARPU\n$${arpu}`,
+                    text: `ARPU\n${formattedARPU}`,
                     textAlign: "center",
                     fill: token.colorText,
                     fontSize: 16,
@@ -72,14 +80,28 @@ export const useRevenueReport = (request) => {
                 },
             ],
         };
-    }, [data]);
+    }, [data, token.colorText, settings]);
 
     const barComparisonOption = useMemo(() => {
         const { paymentMethodAnalysis } = data;
         return {
             backgroundColor: "transparent",
-            tooltip: { trigger: "axis", axisPointer: { type: "shadow" } },
-            legend: { data: ["Transacciones", "Promedio ($)"] },
+            tooltip: {
+                trigger: "axis",
+                axisPointer: { type: "shadow" },
+                formatter: (params) => {
+                    let result = params[0].name + '<br/>';
+                    params.forEach(item => {
+                        let value = item.value;
+                        if (item.seriesName.includes("Promedio")) {
+                            value = formatCurrency(value, settings);
+                        }
+                        result += `${item.marker} ${item.seriesName}: ${value}<br/>`;
+                    });
+                    return result;
+                }
+            },
+            legend: { data: ["Transacciones", "Promedio"] },
             xAxis: {
                 type: "category",
                 data: paymentMethodAnalysis.map((i) => i.payment_method),
@@ -97,8 +119,10 @@ export const useRevenueReport = (request) => {
                 },
                 {
                     type: "value",
-                    name: "USD",
-                    axisLabel: { formatter: "${value}" },
+                    name: settings?.currency || "Monto",
+                    axisLabel: {
+                        formatter: (value) => formatCurrency(value, settings, false) // Show number, symbol might be redundant on axis if name has it
+                    },
                     splitLine: {
                         show: false,
                     },
@@ -112,7 +136,7 @@ export const useRevenueReport = (request) => {
                     itemStyle: { color: "#0A84FF" },
                 },
                 {
-                    name: "Promedio ($)",
+                    name: "Promedio",
                     type: "bar",
                     yAxisIndex: 1,
                     data: paymentMethodAnalysis.map((i) => parseFloat(i.avg_transaction)),
@@ -120,7 +144,7 @@ export const useRevenueReport = (request) => {
                 },
             ],
         };
-    }, [data]);
+    }, [data, settings]);
 
     return { revenueLoading: loading, donutOption, barComparisonOption };
 };

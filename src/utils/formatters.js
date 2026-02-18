@@ -125,8 +125,8 @@ export const formatCurrency = (amount, settings, showSymbol = true) => {
         const formatted = new Intl.NumberFormat(locale, {
             style: "currency",
             currency: currency,
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2,
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 0,
         }).format(amount);
 
         // If showSymbol is false, remove the currency symbol and return just the number
@@ -139,7 +139,7 @@ export const formatCurrency = (amount, settings, showSymbol = true) => {
         console.error("Error formatting currency:", error);
         // Fallback to simple format
         const symbol = getCurrencySymbol(settings?.currency);
-        return `${symbol}${Number(amount).toFixed(2)}`;
+        return `${symbol}${Number(amount).toFixed(0)}`;
     }
 };
 
