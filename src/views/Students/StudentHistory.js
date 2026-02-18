@@ -32,6 +32,7 @@ import dayGridPlugin from "@fullcalendar/daygrid";
 
 import useFetch from "../../hooks/useFetch";
 import { useFormModal } from "../../hooks/useFormModal";
+import useFormatting from "../../hooks/useFormatting";
 import FormHeader from "../../components/Common/FormHeader";
 import FormFooter from "../../components/Common/FormFooter";
 import FormSection from "../../components/Common/FormSection";
@@ -46,6 +47,7 @@ const StudentHistory = () => {
     const { request } = useFetch();
     const { token } = theme.useToken();
     const { message } = App.useApp(); // Get message instance
+    const { formatDate, formatCurrency, formatDateShort } = useFormatting();
 
     const [student, setStudent] = useState(null);
     const [attendances, setAttendances] = useState([]);
@@ -147,7 +149,7 @@ const StudentHistory = () => {
             title: t('students.date'),
             dataIndex: "date",
             key: "date",
-            render: (d) => dayjs(d).format("DD/MM/YYYY"),
+            render: (d) => formatDate(d),
         },
         { title: t('students.class'), dataIndex: "class_name", key: "class_name" },
         {
@@ -168,14 +170,14 @@ const StudentHistory = () => {
             title: t('students.date'),
             dataIndex: "payment_date",
             key: "payment_date",
-            render: (d) => dayjs(d).format("DD/MM/YYYY"),
+            render: (d) => formatDate(d),
         },
         { title: t('students.method'), dataIndex: "payment_method", key: "payment_method" },
         {
             title: t('students.amount'),
             dataIndex: "amount",
             key: "amount",
-            render: (amount) => `$${amount}`,
+            render: (amount) => formatCurrency(amount),
         },
         {
             title: t('students.status'),
@@ -256,7 +258,7 @@ const StudentHistory = () => {
                                                 ? t('students.present')
                                                 : t('students.absent')}{" "}
                                             <br />
-                                            {dayjs(eventInfo.event.start).format("DD/MM/YYYY")}
+                                            {formatDate(eventInfo.event.start)}
                                         </div>
                                     }
                                 >
@@ -442,9 +444,9 @@ const StudentHistory = () => {
                                             <Typography.Text>
                                                 {t('students.type')}: {activePlan.type || t('students.unknownType')}. <br />
                                                 {t('students.start')}:{" "}
-                                                {dayjs(activePlan.start_date).format("DD MMM YYYY")} -
+                                                {formatDateShort(activePlan.start_date)} -
                                                 {t('students.expires')}:{" "}
-                                                {dayjs(activePlan.end_date).format("DD MMM YYYY")}
+                                                {formatDateShort(activePlan.end_date)}
                                             </Typography.Text>
                                         </div>
                                         <Row gutter={16}>
@@ -469,8 +471,7 @@ const StudentHistory = () => {
                                             <Col span={12} style={{ textAlign: "center" }}>
                                                 <Statistic
                                                     title={t('students.nextPayment')}
-                                                    value={activePlan.price || 0}
-                                                    prefix="$"
+                                                    value={formatCurrency(activePlan.price || 0)}
                                                     style={{ fontSize: 16 }}
                                                 />
                                             </Col>

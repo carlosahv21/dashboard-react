@@ -24,9 +24,7 @@ import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 import { useTranslation } from "react-i18next";
 import useFetch from "../hooks/useFetch";
-
-dayjs.extend(relativeTime);
-dayjs.locale("es"); // Set locale to Spanish by default (can be dynamic based on i18n)
+import useFormatting from "../hooks/useFormatting";
 
 const { Header } = Layout;
 
@@ -57,6 +55,7 @@ const HeaderComponent = ({ searchRef, profileRef, onRestartTour }) => {
         return saved ? JSON.parse(saved) : [];
     });
     const { request, loading } = useFetch();
+    const { formatRelativeTime } = useFormatting();
 
     const isDarkMode = settings?.theme === "dark";
 
@@ -539,7 +538,7 @@ const HeaderComponent = ({ searchRef, profileRef, onRestartTour }) => {
                                                         {item.title}
                                                     </Typography.Text>
                                                     <Typography.Text type="secondary" style={{ fontSize: 10, minWidth: 60, textAlign: 'right', marginLeft: 8 }}>
-                                                        {dayjs(item.created_at).fromNow()}
+                                                        {formatRelativeTime(item.created_at)}
                                                     </Typography.Text>
                                                 </div>
                                             }

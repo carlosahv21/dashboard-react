@@ -6,6 +6,7 @@ import FormHeader from "../../../components/Common/FormHeader";
 import dayjs from "dayjs";
 import { AuthContext } from "../../../context/AuthContext";
 import { useTranslation } from "react-i18next";
+import useFormatting from "../../../hooks/useFormatting";
 
 const { Title, Text } = Typography;
 
@@ -15,6 +16,7 @@ const RecycleBin = () => {
     const { message, modal } = App.useApp();
     const { token } = theme.useToken();
     const { hasPermission } = useContext(AuthContext);
+    const { formatDate } = useFormatting();
 
     const [modules, setModules] = useState([]);
     const [selectedModule, setSelectedModule] = useState(null);
@@ -121,7 +123,7 @@ const RecycleBin = () => {
             title: t('settings.deletedDate'),
             dataIndex: "updated_at",
             key: "updated_at",
-            render: (date) => date ? dayjs(date).format("DD/MM/YYYY HH:mm") : "-"
+            render: (date) => date ? formatDate(date, true) : "-"
         },
         {
             title: t('global.actions'),

@@ -3,9 +3,11 @@ import { Tag } from "antd";
 import BaseCrudView from "../../../components/Common/BaseView";
 import dayjs from "dayjs";
 import { useTranslation } from "react-i18next";
+import useFormatting from "../../../hooks/useFormatting";
 
 const Payments = () => {
     const { t } = useTranslation();
+    const { formatDate, formatCurrency } = useFormatting();
     const columns = [
         {
             title: t('students.name_singular'),
@@ -19,14 +21,14 @@ const Payments = () => {
             key: "payment_date",
             sorter: true,
             defaultSortOrder: "ascend",
-            render: (text, record) => dayjs(record.payment_date).format("DD/MM/YYYY")
+            render: (text, record) => formatDate(record.payment_date)
         },
         {
             title: t('students.amount'),
             dataIndex: "amount",
             key: "amount",
             sorter: true,
-            render: (text, record) => `$` + record.amount
+            render: (text, record) => formatCurrency(record.amount)
         },
         {
             title: t('students.status'),

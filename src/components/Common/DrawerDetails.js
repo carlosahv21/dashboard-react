@@ -2,6 +2,7 @@ import React from "react";
 import { Drawer, Descriptions, Avatar, Divider, theme } from "antd";
 import { UserOutlined, MailOutlined, InfoCircleOutlined, CalendarOutlined, SolutionOutlined } from "@ant-design/icons";
 import { useTranslation } from "react-i18next";
+import useFormatting from "../../hooks/useFormatting";
 
 // --- Componente Auxiliar: Renderiza una sección ---
 
@@ -52,6 +53,7 @@ const DetailSection = ({ label, items }) => {
 const DrawerDetails = ({ visible, onClose, data }) => {
     const { token } = theme.useToken();
     const { t } = useTranslation();
+    const { formatDate, formatCurrency } = useFormatting();
 
     if (!data) {
         return (
@@ -86,8 +88,8 @@ const DrawerDetails = ({ visible, onClose, data }) => {
                         items: [
                             { name: "Email", value: d.email },
                             { name: "Verificado", value: d.email_verified ? "Sí" : "No" },
-                            { name: "Registrado", value: new Date(d.created_at).toLocaleDateString() },
-                            { name: "Último Acceso", value: d.last_login ? new Date(d.last_login).toLocaleString() : "-" },
+                            { name: "Registrado", value: formatDate(d.created_at) },
+                            { name: "Último Acceso", value: d.last_login ? formatDate(d.last_login, true) : "-" },
                         ]
                     },
                     d.plan ? {
@@ -96,7 +98,7 @@ const DrawerDetails = ({ visible, onClose, data }) => {
                             { name: "Nombre", value: d.plan.name },
                             { name: "Estado", value: d.plan.status === 'active' ? "Activo" : "Inactivo" },
                             { name: "Clases Usadas", value: `${d.plan.classes_used} / ${d.plan.classes_total}` },
-                            { name: "Vence", value: new Date(d.plan.end_date).toLocaleDateString() },
+                            { name: "Vence", value: formatDate(d.plan.end_date) },
                         ]
                     } : null
                 ].filter(Boolean)
@@ -127,8 +129,8 @@ const DrawerDetails = ({ visible, onClose, data }) => {
                     {
                         label: "Resumen de Pagos",
                         items: [
-                            { name: "Pendiente", value: `$${payment.pending_amount}` },
-                            { name: "Pagado", value: `$${payment.paid_amount}` },
+                            { name: "Pendiente", value: formatCurrency(payment.pending_amount) },
+                            { name: "Pagado", value: formatCurrency(payment.paid_amount) },
                             { name: "Próx. Corte", value: payment.next_cutoff_date },
                         ]
                     },

@@ -4,12 +4,7 @@ import { BellOutlined, CloseOutlined, CheckOutlined } from "@ant-design/icons";
 import { NotificationContext } from "../../context/NotificationContext";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
-import dayjs from "dayjs";
-import relativeTime from "dayjs/plugin/relativeTime";
-import "dayjs/locale/es";
-
-dayjs.extend(relativeTime);
-dayjs.locale("es");
+import useFormatting from "../../hooks/useFormatting";
 
 const { Title, Text } = Typography;
 
@@ -18,15 +13,11 @@ const Notifications = () => {
     const { notifications, loading, markAsRead, markAllAsRead, deleteNotification, fetchNotifications } = useContext(NotificationContext);
     const navigate = useNavigate();
     const isDarkMode = localStorage.getItem("theme") === "dark"; // Or get from context if available
+    const { formatRelativeTime } = useFormatting();
 
     useEffect(() => {
         fetchNotifications();
     }, [fetchNotifications]);
-
-    // Force locale update when language changes
-    useEffect(() => {
-        dayjs.locale(i18n.language.startsWith('en') ? 'en' : 'es');
-    }, [i18n.language]);
 
     return (
         <div style={{ padding: "24px" }}>
@@ -136,7 +127,7 @@ const Notifications = () => {
                                             {item.title}
                                         </Text>
                                         <Text type="secondary" style={{ fontSize: 12 }}>
-                                            {dayjs(item.created_at).fromNow()}
+                                            {formatRelativeTime(item.created_at)}
                                         </Text>
                                     </div>
                                 }
