@@ -6,6 +6,7 @@ import { useTranslation } from "react-i18next";
 
 const { Option } = Select;
 const { TextArea } = Input;
+const { RangePicker } = DatePicker;
 
 // Utility function to debounce API calls, crucial for searchable selects
 const debounce = (func, delay) => {
@@ -91,6 +92,12 @@ const parseValidationRules = (required, type, t) => {
                 rules.push({
                     required: true,
                     message: t('forms.invalidRelation'),
+                });
+                break;
+            case "range": // Rango de fechas
+                rules.push({
+                    type: "array",
+                    message: t('forms.invalidDateRange'),
                 });
                 break;
             default:
@@ -231,6 +238,8 @@ const DynamicInput = ({
             case "date": return <DatePicker format="YYYY-MM-DD" placeholder={placeholder} />;
             case "time": return <TimePicker format="HH:mm" placeholder={placeholder} needConfirm={false} minuteStep={15} use12Hours />;
             case "textarea": return <TextArea placeholder={p} style={{ resize: "none" }} />;
+            case "range":
+                return <RangePicker format="YYYY-MM-DD" />;
             case "image":
                 return (
                     <Upload

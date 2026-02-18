@@ -40,7 +40,11 @@ export const useFormModal = (request, endpoint, moduleFieldId, titleSingular, fi
                 }
 
                 if (itemData.payment_date) {
-                    itemData.payment_date = dayjs(itemData.payment_date);
+                    if (Array.isArray(itemData.payment_date)) {
+                        itemData.payment_date = itemData.payment_date.map(date => dayjs(date));
+                    } else {
+                        itemData.payment_date = dayjs(itemData.payment_date);
+                    }
                 }
 
                 form.setFieldsValue(itemData);
@@ -76,13 +80,17 @@ export const useFormModal = (request, endpoint, moduleFieldId, titleSingular, fi
         }
 
         if ('payment_date' in values && values.payment_date) {
-            transformedValues.payment_date = dayjs(values.payment_date).format("YYYY-MM-DD");
+            if (Array.isArray(values.payment_date)) {
+                transformedValues.payment_date = values.payment_date.map(date => dayjs(date).format("YYYY-MM-DD"));
+            } else {
+                transformedValues.payment_date = dayjs(values.payment_date).format("YYYY-MM-DD");
+            }
         }
 
         if ('password' in transformedValues && !transformedValues.password) {
             delete transformedValues.password;
         }
-
+        console.log(transformedValues);
         try {
             if (editingId) {
                 await request(`${endpoint}/${editingId}`, 'PUT', transformedValues);
