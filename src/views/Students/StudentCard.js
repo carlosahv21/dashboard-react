@@ -1,5 +1,5 @@
 import React from "react";
-import { Card, Avatar, App } from "antd";
+import { Card, Avatar, App, Popover } from "antd";
 import {
     EditOutlined,
     EyeOutlined,
@@ -39,30 +39,38 @@ const StudentCard = ({
         <Card
             title={`${record.first_name} ${record.last_name}`}
             actions={[
-                <HistoryOutlined
-                    key="history"
-                    style={{ color: "#696969" }}
-                    onClick={() => navigate(`/students/${record.id}/history`)}
-                />,
-                canEdit && (
-                    <EditOutlined
-                        key="edit"
-                        style={{ color: "#13a8a8" }}
-                        onClick={() => onEdit(record.id)}
+                <Popover content={t('global.history')} placement="top">
+                    <HistoryOutlined
+                        key="history"
+                        style={{ color: "#696969" }}
+                        onClick={() => navigate(`/students/${record.id}/history`)}
                     />
+                </Popover>,
+                canEdit && (
+                    <Popover content={t('global.edit')} placement="top">
+                        <EditOutlined
+                            key="edit"
+                            style={{ color: "#13a8a8" }}
+                            onClick={() => onEdit(record.id)}
+                        />
+                    </Popover>
                 ),
                 canDelete && (
-                    <DeleteOutlined
-                        key="delete"
-                        style={{ color: "#d32029" }}
-                        onClick={() => handleDeleteConfirm(record.id)}
-                    />
+                    <Popover content={t('global.delete')} placement="top">
+                        <DeleteOutlined
+                            key="delete"
+                            style={{ color: "#d32029" }}
+                            onClick={() => handleDeleteConfirm(record.id)}
+                        />
+                    </Popover>
                 ),
-                <EyeOutlined
-                    key="view"
-                    style={{ color: "#1668dc" }}
-                    onClick={() => onRowClick(record)}
-                />
+                <Popover content={t('global.view')} placement="top">
+                    <EyeOutlined
+                        key="view"
+                        style={{ color: "#1668dc" }}
+                        onClick={() => onRowClick(record)}
+                    />
+                </Popover>
             ].filter(Boolean)}
         >
             <Meta

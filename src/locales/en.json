@@ -319,7 +319,13 @@
         "show": "Show",
         "searchPlaceholder": "Search {{title}}",
         "massiveActions": "Bulk actions",
-        "exportExcel": "Export to Excel"
+        "exportExcel": "Export to Excel",
+        "deleteKeyword": "delete",
+        "delete": "Delete",
+        "detail": "Detail",
+        "edit": "Edit",
+        "view": "View",
+        "history": "History"
     },
     "search": {
         "title": "Search results",

@@ -333,7 +333,8 @@
         "delete": "Eliminar",
         "detail": "Detalle",
         "edit": "Editar",
-        "view": "Ver"
+        "view": "Ver",
+        "history": "Historial"
     },
     "search": {
         "title": "Resultados de la búsqueda",

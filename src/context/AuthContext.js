@@ -62,11 +62,22 @@ export const AuthProvider = ({ children }) => {
         }
     }, [request]);
 
-    const toggleTheme = () => {
-        setSettings(prev => {
-            const newTheme = prev?.theme === 'dark' ? 'light' : 'dark';
-            return { ...prev, theme: newTheme };
-        });
+    const toggleTheme = async () => {
+        const newTheme = settings?.theme === 'dark' ? 'light' : 'dark';
+
+        // Optimistic update
+        setSettings(prev => ({ ...prev, theme: newTheme }));
+
+        try {
+            const payload = { ...(settings || {}), theme: newTheme };
+            
+            delete payload.created_at;
+            delete payload.updated_at;
+            
+            await request("settings", "PUT", payload);
+        } catch (error) {
+            console.error("Failed to persist theme preference:", error);
+        }
     };
 
     // Sincronizar idioma y díajs con el settings
