@@ -58,12 +58,12 @@ const Login = () => {
         setError("");
         try {
             const response = await request("auth/login", "POST", values);
-            if (!response.data.token) {
+            if (!response.data || !response.data.token) {
                 message.error(t('auth.invalidCredentials'));
                 setError(t('auth.invalidCredentials'));
                 return;
             }
-            login(response.data.token);
+            login(response.data);
             navigate("/");
         } catch (err) {
             const msg = err.message || t('auth.genericError');

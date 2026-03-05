@@ -136,6 +136,20 @@
         "dateFormat": "Date Format",
         "theme": "Theme",
         "language": "Language",
+        "profile": "Profile",
+        "gender": "Gender",
+        "birthDate": "Birth Date",
+        "address": "Address",
+        "joined": "Joined",
+        "lastLogin": "Last Login",
+        "changePassword": "Change Password",
+        "currentPassword": "Current Password",
+        "newPassword": "New Password",
+        "confirmPassword": "Confirm Password",
+        "changePhoto": "Change Photo",
+        "updatePasswordSuccess": "Password updated successfully",
+        "updatePasswordError": "Error updating password",
+        "passwordMismatch": "Passwords do not match",
         "updateSuccess": "Settings updated successfully",
         "updateError": "Could not update settings",
         "roles": "Roles",
@@ -346,5 +360,11 @@
         "viewAll": "View all",
         "empty": "No notifications",
         "emptyDescription": "All your notifications have been read"
+    },
+    "roles": {
+        "admin": "Administrator",
+        "student": "Student",
+        "teacher": "Teacher",
+        "receptionist": "Receptionist"
     }
 }

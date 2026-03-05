@@ -14,22 +14,35 @@ export const AuthProvider = ({ children }) => {
 
     const [user, setUser] = useState(null);
     const [settings, setSettings] = useState(null);
-    const [permissions, setPermissions] = useState([]);
+    const [permissions, setPermissions] = useState({});
+    const [modules, setModules] = useState([]);
     const [token, setToken] = useState(localStorage.getItem("token") || null);
     const [loading, setLoading] = useState(true);
 
     const logout = () => {
         localStorage.removeItem("token");
+        localStorage.removeItem("user");
+        localStorage.removeItem("permissions");
+        localStorage.removeItem("modules");
         setUser(null);
         setSettings(null);
-        setPermissions([]);
+        setPermissions({});
+        setModules([]);
         setToken(null);
         modalShownRef.current = false;
     };
 
-    const login = (newToken) => {
-        localStorage.setItem("token", newToken);
-        setToken(newToken);
+    const login = (data) => {
+        localStorage.setItem("token", data.token);
+        localStorage.setItem("user", JSON.stringify(data.user));
+        localStorage.setItem("permissions", JSON.stringify(data.permissions || {}));
+        localStorage.setItem("modules", JSON.stringify(data.modules || []));
+
+        setToken(data.token);
+        setUser(data.user);
+        setSettings(data.academy);
+        setPermissions(data.permissions || {});
+        setModules(data.modules || []);
     };
 
     const fetchUserData = useCallback(async (storedToken) => {
@@ -39,10 +52,13 @@ export const AuthProvider = ({ children }) => {
             });
 
             setUser(response.data.user);
-            setSettings(response.data.settings);
+            setSettings(response.data.academy || response.data.settings);
 
             if (response.data.permissions) {
                 setPermissions(response.data.permissions);
+            }
+            if (response.data.modules) {
+                setModules(response.data.modules);
             }
         } catch (err) {
             if (err.message === "Sesión expirada o token inválido" && !modalShownRef.current) {
@@ -70,10 +86,10 @@ export const AuthProvider = ({ children }) => {
 
         try {
             const payload = { ...(settings || {}), theme: newTheme };
-            
+
             delete payload.created_at;
             delete payload.updated_at;
-            
+
             await request("settings", "PUT", payload);
         } catch (error) {
             console.error("Failed to persist theme preference:", error);
@@ -104,7 +120,16 @@ export const AuthProvider = ({ children }) => {
         };
 
         if (token) {
-            if (!user) {
+            // Rehydrate state from localStorage if it exists so we don't flash empty UI
+            const storedUser = localStorage.getItem("user");
+            const storedPermissions = localStorage.getItem("permissions");
+            const storedModules = localStorage.getItem("modules");
+
+            if (storedUser && !user) setUser(JSON.parse(storedUser));
+            if (storedPermissions && Object.keys(permissions).length === 0) setPermissions(JSON.parse(storedPermissions));
+            if (storedModules && modules.length === 0) setModules(JSON.parse(storedModules));
+
+            if (!user && !storedUser) {
                 setLoading(true);
                 fetchUserData(token).then(() => {
                     // Si el backend no devuelve settings, usamos los iniciales
@@ -119,13 +144,29 @@ export const AuthProvider = ({ children }) => {
         }
     }, [token, fetchUserData]);
 
-    const hasPermission = (permName) => permissions.includes(permName);
+    const hasPermission = (permString) => {
+        if (!permString) return true; // If no permission required, allow access
+
+        const [module, action] = permString.split(":");
+
+        // If the module doesn't exist in permissions, deny
+        if (!permissions || !permissions[module]) return false;
+
+        // If action is requested, check if the module has that action
+        if (action) {
+            return permissions[module].actions?.includes(action) || false;
+        }
+
+        // If only module was tested, just return if it's there
+        return true;
+    };
 
     return (
         <AuthContext.Provider
             value={{
                 user, setUser, settings, setSettings,
                 permissions, hasPermission, token, setToken,
+                modules, setModules,
                 logout, login, toggleTheme,
                 loading
             }}

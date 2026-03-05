@@ -145,6 +145,21 @@
         "dateFormat": "Formato de fecha",
         "theme": "Tema",
         "language": "Idioma",
+        "profile": "Perfil",
+        "gender": "Género",
+        "email": "Email",
+        "birthDate": "Fecha de Nacimiento",
+        "address": "Dirección",
+        "joined": "Miembro desde",
+        "lastLogin": "Último Acceso",
+        "changePassword": "Cambiar Contraseña",
+        "currentPassword": "Contraseña Actual",
+        "newPassword": "Nueva Contraseña",
+        "confirmPassword": "Confirmar Contraseña",
+        "changePhoto": "Cambiar Foto",
+        "updatePasswordSuccess": "Contraseña actualizada correctamente",
+        "updatePasswordError": "Error al actualizar la contraseña",
+        "passwordMismatch": "Las contraseñas no coinciden",
         "updateSuccess": "Configuración actualizada correctamente",
         "updateError": "No se pudo actualizar la configuración",
         "roles": "Roles",
@@ -355,5 +370,11 @@
         "viewAll": "Ver todas",
         "empty": "No hay notificaciones",
         "emptyDescription": "Todas tus notificaciones han sido leídas"
+    },
+    "roles": {
+        "admin": "Administrador",
+        "student": "Estudiante",
+        "teacher": "Profesor",
+        "receptionist": "Recepcionista"
     }
 }

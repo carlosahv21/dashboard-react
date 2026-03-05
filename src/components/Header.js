@@ -148,11 +148,20 @@ const HeaderComponent = ({ searchRef, profileRef, onRestartTour }) => {
 
     const allMenuItems = [
         {
+            key: "profile",
+            label: t("settings.profile") || "Perfil", // Fallback text
+            icon: <UserOutlined />,
+            onClick: () => navigate("/profile"),
+        },
+        {
             key: "settings",
             label: t("menu.settings"),
             permission: "settings:view",
             icon: <SettingOutlined />,
             onClick: () => navigate("/settings"),
+        },
+        {
+            type: 'divider',
         },
         {
             key: "logout",

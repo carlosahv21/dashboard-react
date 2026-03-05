@@ -29,6 +29,7 @@ import Notifications from "./views/Notifications/Notifications";
 
 // Settings & Sub-rutas
 import SettingsLayout from "./views/Settings/SettingsLayouts";
+import Profile from "./views/Profile/Profile";
 
 import "./App.css";
 
@@ -81,6 +82,8 @@ const AppRoutes = () => {
         {hasPermission("attendances:view") && (
           <Route path="attendances" element={<Attendances />} />
         )}
+
+        <Route path="profile" element={<Profile />} />
 
         {hasPermission("settings:view") && (
           <Route path="settings/*" element={<SettingsLayout />}></Route>
