@@ -129,15 +129,11 @@ export const AuthProvider = ({ children }) => {
             if (storedPermissions && Object.keys(permissions).length === 0) setPermissions(JSON.parse(storedPermissions));
             if (storedModules && modules.length === 0) setModules(JSON.parse(storedModules));
 
-            if (!user && !storedUser) {
-                setLoading(true);
-                fetchUserData(token).then(() => {
-                    // Si el backend no devuelve settings, usamos los iniciales
-                    setSettings(prev => prev || initialSettings);
-                });
-            } else {
-                setLoading(false);
-            }
+            // We always fetch user data to verify the token with the backend
+            setLoading(true);
+            fetchUserData(token).then(() => {
+                setSettings(prev => prev || initialSettings);
+            });
         } else {
             setSettings(initialSettings);
             setLoading(false);

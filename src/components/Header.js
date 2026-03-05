@@ -18,6 +18,9 @@ import {
     CloseOutlined,
     ClockCircleOutlined,
     CloseCircleOutlined,
+    CheckCircleFilled,
+    WalletFilled,
+    InfoCircleFilled,
 } from "@ant-design/icons";
 
 import { useNavigate } from "react-router-dom";
@@ -461,109 +464,114 @@ const HeaderComponent = ({ searchRef, profileRef, onRestartTour }) => {
                 <Popover
                     trigger="click"
                     placement="bottomRight"
+                    overlayInnerStyle={{ padding: 0 }}
                     title={
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: 500 }}>
-                            <Typography.Text strong>{t("notifications.title") || "Notificaciones"}</Typography.Text>
-                            {unreadCount > 0 && (
-                                <Button
-                                    type="link"
-                                    size="small"
-                                    onClick={markAllAsRead}
-                                    style={{ padding: 0 }}
-                                >
-                                    {t("notifications.markAllRead") || "Marcar todo leido"}
-                                </Button>
-                            )}
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: 360, padding: "16px 16px 8px" }}>
+                            <Typography.Text strong style={{ fontSize: 18 }}>{t("notifications.title") || "Notificaciones"}</Typography.Text>
+                            <Button
+                                type="link"
+                                size="small"
+                                onClick={markAllAsRead}
+                                style={{ padding: 0, fontSize: 13 }}
+                            >
+                                {t("notifications.markAllRead") || "Marcar todas como leidas"}
+                            </Button>
                         </div>
                     }
                     content={
-                        <div style={{ width: 500, maxHeight: 400, overflowY: 'auto' }}>
+                        <div style={{ width: 400, maxHeight: 480, overflowY: 'auto' }}>
                             <List
                                 loading={notificationsLoading}
                                 itemLayout="horizontal"
                                 dataSource={notifications.slice(0, 10)}
                                 locale={{ emptyText: <Empty description={t("notifications.empty") || "No hay notificaciones"} image={Empty.PRESENTED_IMAGE_SIMPLE} /> }}
                                 footer={
-                                    notifications.length > 10 && (
-                                        <div style={{ textAlign: 'center', marginTop: 12, paddingBottom: 8 }}>
-                                            <Button
-                                                type="link"
-                                                onClick={() => {
-                                                    // Close popover logic would need state control here, but navigating works
-                                                    navigate("/notifications");
-                                                }}
-                                            >
-                                                {t("notifications.viewAll") || "Ver todas"}
-                                            </Button>
-                                        </div>
-                                    )
+                                    <div style={{ textAlign: 'center' }}>
+                                        <Button
+                                            type="link"
+                                            onClick={() => navigate("/notifications")}
+                                            style={{ fontWeight: 600 }}
+                                        >
+                                            {t("notifications.viewAll") || "Ver todas las notificaciones"}
+                                        </Button>
+                                    </div>
                                 }
-                                renderItem={(item) => (
-                                    <List.Item
-                                        actions={[
-                                            !item.is_read && <Button key="read" type="text" size="small" onClick={(e) => { e.stopPropagation(); markAsRead(item.id); }} icon={<div style={{ width: 8, height: 8, borderRadius: '50%', backgroundColor: '#1890ff' }} />} />,
-                                            <Button key="delete" type="text" size="small" danger onClick={(e) => { e.stopPropagation(); deleteNotification(item.id); }} icon={<CloseOutlined />} />
-                                        ]}
-                                        style={{
-                                            backgroundColor: item.is_read ? 'transparent' : (isDarkMode ? '#2a2a2a' : '#fff'),
-                                            padding: '8px 12px',
-                                            borderRadius: 4,
-                                            marginBottom: 4,
-                                            cursor: item.deep_link ? 'pointer' : 'default',
-                                            transition: 'background-color 0.2s'
-                                        }}
-                                        onClick={() => {
-                                            if (!item.is_read) markAsRead(item.id);
-                                            if (item.deep_link) {
-                                                navigate(item.deep_link);
-                                            }
-                                        }}
-                                        onMouseEnter={(e) => {
-                                            if (item.deep_link) {
-                                                e.currentTarget.style.backgroundColor = isDarkMode ? '#333' : '#fff';
-                                            }
-                                        }}
-                                        onMouseLeave={(e) => {
-                                            e.currentTarget.style.backgroundColor = item.is_read ? 'transparent' : (isDarkMode ? '#2a2a2a' : '#f0faff');
-                                        }}
-                                    >
-                                        <List.Item.Meta
-                                            avatar={
-                                                <Avatar
-                                                    icon={<BellOutlined />}
-                                                    style={{ backgroundColor: item.is_read ? (isDarkMode ? '#333' : '#ccc') : '#1890ff' }}
-                                                />
-                                            }
-                                            title={
-                                                <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
-                                                    <Typography.Text
-                                                        style={{
-                                                            fontSize: 13,
-                                                            fontWeight: item.is_read ? 'normal' : 'bold',
-                                                            color: isDarkMode ? '#fff' : 'inherit',
-                                                            marginBottom: 0
-                                                        }}
-                                                    >
-                                                        {item.title}
-                                                    </Typography.Text>
-                                                    <Typography.Text type="secondary" style={{ fontSize: 10, minWidth: 60, textAlign: 'right', marginLeft: 8 }}>
-                                                        {formatRelativeTime(item.created_at)}
-                                                    </Typography.Text>
-                                                </div>
-                                            }
-                                            description={
-                                                <div>
-                                                    <div style={{ fontSize: 12, color: isDarkMode ? '#aaa' : '#666' }}>{item.body || item.message}</div>
-                                                </div>
-                                            }
-                                        />
-                                    </List.Item>
-                                )}
+                                renderItem={(item) => {
+                                    const getIcon = () => {
+                                        const title = (item.title || "").toLowerCase();
+                                        if (title.includes("calificaci") || title.includes("nota")) {
+                                            return { icon: <CheckCircleFilled />, color: "#52c41a", bg: "#f6ffed" };
+                                        }
+                                        if (title.includes("pago") || title.includes("cuota") || title.includes("wallet")) {
+                                            return { icon: <WalletFilled />, color: "#faad14", bg: "#fff7e6" };
+                                        }
+                                        return { icon: <InfoCircleFilled />, color: "#1890ff", bg: "#e6f7ff" };
+                                    };
+                                    const { icon, color, bg } = getIcon();
+
+                                    return (
+                                        <List.Item
+                                            style={{
+                                                padding: '12px 16px',
+                                                borderBottom: `1px solid ${isDarkMode ? "#333" : "#f0f0f0"}`,
+                                                cursor: 'pointer',
+                                                transition: 'background-color 0.2s',
+                                                backgroundColor: item.is_read ? 'transparent' : (isDarkMode ? '#2a2a2a' : '#f0f7ff')
+                                            }}
+                                            onClick={() => {
+                                                if (!item.is_read) markAsRead(item.id);
+                                                if (item.deep_link) navigate(item.deep_link);
+                                            }}
+                                        >
+                                            <List.Item.Meta
+                                                avatar={
+                                                    <Avatar
+                                                        icon={icon}
+                                                        style={{ backgroundColor: bg, color: color }}
+                                                    />
+                                                }
+                                                title={
+                                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                                                        <Typography.Text
+                                                            strong={!item.is_read}
+                                                            style={{
+                                                                fontSize: 14,
+                                                                color: isDarkMode ? '#fff' : '#262626',
+                                                                paddingRight: 8
+                                                            }}
+                                                        >
+                                                            {item.title}
+                                                        </Typography.Text>
+                                                        {!item.is_read && (
+                                                            <div style={{
+                                                                width: 8,
+                                                                height: 8,
+                                                                borderRadius: '50%',
+                                                                backgroundColor: '#1890ff',
+                                                                marginTop: 6
+                                                            }} />
+                                                        )}
+                                                    </div>
+                                                }
+                                                description={
+                                                    <div style={{ marginTop: 4 }}>
+                                                        <div style={{ fontSize: 13, color: isDarkMode ? '#aaa' : '#595959', lineHeight: '1.4' }}>
+                                                            {item.body || item.message}
+                                                        </div>
+                                                        <div style={{ fontSize: 11, color: '#8c8c8c', marginTop: 4 }}>
+                                                            {formatRelativeTime(item.created_at)}
+                                                        </div>
+                                                    </div>
+                                                }
+                                            />
+                                        </List.Item>
+                                    );
+                                }}
                             />
                         </div>
                     }
                 >
-                    <Badge count={unreadCount} size="small">
+                    <Badge count={unreadCount} size="small" overflowCount={10}>
                         <BellOutlined style={{ fontSize: 18, cursor: "pointer" }} />
                     </Badge>
                 </Popover>
