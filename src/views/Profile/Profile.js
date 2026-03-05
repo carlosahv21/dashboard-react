@@ -124,39 +124,44 @@ const Profile = () => {
         <Content style={{ margin: "24px 16px 0", overflow: "initial" }}>
             <div style={{ maxWidth: 1200, margin: "0 auto" }}>
                 <Row gutter={[24, 24]}>
+                    {/* Main Section */}
                     <Col xs={24} lg={16}>
+                        {/* Header Card */}
                         <Card
                             bordered={false}
                             style={{
-                                borderRadius: 8,
-                                boxShadow: token.boxShadowTertiary,
-                                position: "relative"
+                                borderRadius: 16,
+                                boxShadow: "0 4px 20px rgba(0,0,0,0.05)",
+                                overflow: "hidden",
+                                marginBottom: 24
                             }}
                             bodyStyle={{ padding: 0 }}
                         >
                             <div style={{
                                 height: 160,
-                                background: `linear-gradient(135deg, ${token.colorPrimary} 0%, ${token.colorPrimaryActive} 100%)`,
-                                borderRadius: "8px 8px 0 0",
+                                background: "#007bff", // Bright blue banner
+                                position: "relative",
+                                zIndex: 1
                             }} />
 
-                            <div style={{ padding: "0 32px 32px", marginTop: -60 }}>
-                                <div style={{ display: "flex", alignItems: "flex-end", marginBottom: 24, flexWrap: 'wrap', gap: 24 }}>
+                            <div style={{ padding: "0 32px 32px", marginTop: -60, position: "relative", zIndex: 2 }}>
+                                <div style={{ display: "flex", alignItems: "flex-end", flexWrap: 'wrap', gap: 24, marginBottom: 16 }}>
                                     <div style={{ position: "relative", flexShrink: 0 }}>
                                         <div style={{
-                                            padding: 4,
-                                            background: token.colorBgContainer,
+                                            padding: 5,
+                                            background: "#fff",
                                             borderRadius: "50%",
-                                            display: "inline-block"
+                                            display: "inline-block",
+                                            boxShadow: "0 4px 10px rgba(0,0,0,0.1)"
                                         }}>
                                             <Avatar
                                                 size={120}
                                                 src={data.photo || data.avatar}
                                                 icon={<UserOutlined />}
-                                                style={{ backgroundColor: token.colorPrimaryBg, color: token.colorPrimary }}
+                                                style={{ backgroundColor: "#f0f2f5" }}
                                             />
                                         </div>
-                                        <div style={{ position: "absolute", bottom: 0, right: 0 }}>
+                                        <div style={{ position: "absolute", bottom: 5, right: 5, zIndex: 10 }}>
                                             <Upload
                                                 customRequest={handleCustomUpload}
                                                 showUploadList={false}
@@ -166,40 +171,38 @@ const Profile = () => {
                                                     shape="circle"
                                                     icon={<UploadOutlined />}
                                                     type="primary"
+                                                    size="middle"
                                                     loading={uploading}
                                                     title={t('settings.changePhoto')}
+                                                    style={{ boxShadow: "0 2px 8px rgba(0,0,0,0.15)" }}
                                                 />
                                             </Upload>
                                         </div>
                                     </div>
-
-                                    <div style={{ flex: 1, minWidth: 200, paddingBottom: 16 }}>
-                                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: 16 }}>
+                                    <div style={{ flex: 1, minWidth: 200, paddingBottom: 10 }}>
+                                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 16 }}>
                                             <div>
-                                                <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
-                                                    <h1 style={{ margin: 0, fontSize: 28, fontWeight: "bold", color: token.colorText }}>
+                                                <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                                                    <h1 style={{ margin: 0, fontSize: 32, fontWeight: "bold", color: "#fff" }}>
                                                         {data.first_name} {data.last_name}
                                                     </h1>
-                                                    <Tag color="blue" icon={<SafetyCertificateOutlined />} style={{ margin: 0, fontSize: 13, padding: "2px 10px", borderRadius: 12 }}>
-                                                        {roleLabel || "Usuario"}
+                                                    <Tag color="blue" style={{ borderRadius: 12, padding: "2px 12px" }}>
+                                                        <SafetyCertificateOutlined /> {roleLabel || "Estudiante"}
                                                     </Tag>
                                                 </div>
-
-                                                <p style={{ margin: "4px 0 0", color: token.colorTextSecondary, fontSize: 16 }}>
-                                                    {data.email}
-                                                    {data.email_verified !== undefined && (
-                                                        <Tag color={data.email_verified ? "success" : "warning"} style={{ marginLeft: 8, border: 'none' }}>
-                                                            {data.email_verified ? "Verificado" : "No Verificado"}
-                                                        </Tag>
-                                                    )}
+                                                <p style={{ margin: "4px 0", color: "#666", fontSize: 16 }}>
+                                                    <MailOutlined /> {data.email}
                                                 </p>
+                                                <Tag color={data.email_verified ? "success" : "orange"} style={{ borderRadius: 12, border: 'none', background: data.email_verified ? '#e6f4ea' : '#fff7e6', color: data.email_verified ? '#1e8e3e' : '#d48806' }}>
+                                                    {data.email_verified ? "Verificado" : "No Verificado"}
+                                                </Tag>
                                             </div>
-
                                             <div style={{ display: 'flex', gap: 8 }}>
                                                 {!isEditing ? (
                                                     <Button
                                                         icon={<EditOutlined />}
                                                         onClick={() => setIsEditing(true)}
+                                                        style={{ borderRadius: 8 }}
                                                     >
                                                         {t('global.edit')}
                                                     </Button>
@@ -212,6 +215,7 @@ const Profile = () => {
                                                                 setIsEditing(false);
                                                                 profileForm.resetFields();
                                                             }}
+                                                            style={{ borderRadius: 8 }}
                                                         >
                                                             {t('global.cancel')}
                                                         </Button>
@@ -219,6 +223,7 @@ const Profile = () => {
                                                             type="primary"
                                                             icon={<SaveOutlined />}
                                                             onClick={() => profileForm.submit()}
+                                                            style={{ borderRadius: 8 }}
                                                         >
                                                             {t('global.save')}
                                                         </Button>
@@ -228,114 +233,135 @@ const Profile = () => {
                                         </div>
                                     </div>
                                 </div>
+                            </div>
+                        </Card>
 
-                                <Divider style={{ margin: '0 0 24px 0' }} />
+                        {/* Details Card */}
+                        <Card
+                            title={<span style={{ fontWeight: "bold" }}><UserOutlined style={{ color: "#007bff", marginRight: 8 }} /> Detalle del Perfil</span>}
+                            bordered={false}
+                            style={{ borderRadius: 16, boxShadow: "0 4px 20px rgba(0,0,0,0.05)", marginBottom: 24 }}
+                        >
+                            {isEditing ? (
+                                <Form
+                                    form={profileForm}
+                                    layout="vertical"
+                                    onFinish={handleProfileUpdate}
+                                    initialValues={{
+                                        ...data,
+                                        birth_date: data.birth_date ? dayjs(data.birth_date) : null
+                                    }}
+                                >
+                                    <Row gutter={16}>
+                                        <Col span={12}>
+                                            <Form.Item label={t('students.firstName')} name="first_name" rules={[{ required: true }]}>
+                                                <Input style={{ borderRadius: 8 }} />
+                                            </Form.Item>
+                                        </Col>
+                                        <Col span={12}>
+                                            <Form.Item label={t('students.lastName')} name="last_name" rules={[{ required: true }]}>
+                                                <Input style={{ borderRadius: 8 }} />
+                                            </Form.Item>
+                                        </Col>
+                                        <Col span={12}>
+                                            <Form.Item label={t('settings.phoneNumber')} name="phone">
+                                                <Input prefix={<PhoneOutlined />} style={{ borderRadius: 8 }} />
+                                            </Form.Item>
+                                        </Col>
+                                        <Col span={12}>
+                                            <Form.Item label={t('settings.email')} name="email">
+                                                <Input prefix={<MailOutlined />} style={{ borderRadius: 8 }} />
+                                            </Form.Item>
+                                        </Col>
+                                        <Col span={12}>
+                                            <Form.Item label={t('settings.gender')} name="gender">
+                                                <Select style={{ borderRadius: 8 }}>
+                                                    <Option value="male">Masculino</Option>
+                                                    <Option value="female">Femenino</Option>
+                                                    <Option value="other">Otro</Option>
+                                                </Select>
+                                            </Form.Item>
+                                        </Col>
+                                        <Col span={12}>
+                                            <Form.Item label={t('settings.birthDate')} name="birth_date">
+                                                <DatePicker style={{ width: '100%', borderRadius: 8 }} format="YYYY-MM-DD" />
+                                            </Form.Item>
+                                        </Col>
+                                    </Row>
+                                </Form>
+                            ) : (
+                                <Descriptions
+                                    column={2}
+                                    labelStyle={{ color: "#8c8c8c", fontWeight: "normal", textTransform: "uppercase", fontSize: 12 }}
+                                    contentStyle={{ color: "#000", fontWeight: "500", fontSize: 15, paddingBottom: 16 }}
+                                >
+                                    <Descriptions.Item label="Número de Teléfono">{data.phone || "N/A"}</Descriptions.Item>
+                                    <Descriptions.Item label="Género">
+                                        {data.gender ? (data.gender === 'M' || data.gender === 'male' ? "Masculino" : "Femenino") : "N/A"}
+                                    </Descriptions.Item>
+                                    <Descriptions.Item label="Fecha de Nacimiento">
+                                        {data.birth_date ? formatDate(data.birth_date) : "N/A"}
+                                    </Descriptions.Item>
+                                    <Descriptions.Item label="Email">{data.email || "N/A"}</Descriptions.Item>
+                                    <Descriptions.Item label="Miembro desde">{formatDate(data.created_at)}</Descriptions.Item>
+                                    <Descriptions.Item label="Último acceso">{data.last_login ? formatDate(data.last_login, true) : "Nunca"}</Descriptions.Item>
+                                </Descriptions>
+                            )}
+                        </Card>
 
-                                {isEditing ? (
-                                    <Form
-                                        form={profileForm}
-                                        layout="vertical"
-                                        onFinish={handleProfileUpdate}
-                                        initialValues={{
-                                            ...data,
-                                            birth_date: data.birth_date ? dayjs(data.birth_date) : null
-                                        }}
-                                    >
-                                        <Row gutter={16}>
-                                            <Col span={12}>
-                                                <Form.Item label={t('students.firstName')} name="first_name" rules={[{ required: true }]}>
-                                                    <Input />
-                                                </Form.Item>
+                        {/* Plan Card */}
+                        <Card
+                            bordered={false}
+                            style={{ borderRadius: 16, boxShadow: "0 4px 20px rgba(0,0,0,0.05)" }}
+                        >
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 20 }}>
+                                <SafetyCertificateOutlined style={{ color: "#007bff", fontSize: 18 }} />
+                                <span style={{ fontWeight: "bold", fontSize: 16 }}>Plan Actual</span>
+                            </div>
+
+                            <Card
+                                style={{ backgroundColor: "#f0f7ff", borderRadius: 12, border: "1px solid #e6f7ff" }}
+                                bodyStyle={{ padding: 24 }}
+                            >
+                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                                    <div>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 8 }}>
+                                            <h3 style={{ margin: 0, fontSize: 20, fontWeight: "bold" }}>{data.plan.name}</h3>
+                                            <Tag color="success" style={{ borderRadius: 12, border: 'none' }}>{data.plan.status}</Tag>
+                                        </div>
+                                        <p style={{ color: "#666", marginBottom: 20 }}>Acceso a clases grupales presenciales y material de apoyo.</p>
+
+                                        <Row gutter={32}>
+                                            <Col>
+                                                <div style={{ fontSize: 12, color: "#8c8c8c", textTransform: "uppercase" }}>Vigencia</div>
+                                                <div style={{ fontWeight: "500" }}>{formatDate(data.plan.start_date)} - {formatDate(data.plan.end_date)}</div>
                                             </Col>
-                                            <Col span={12}>
-                                                <Form.Item label={t('students.lastName')} name="last_name" rules={[{ required: true }]}>
-                                                    <Input />
-                                                </Form.Item>
-                                            </Col>
-                                            <Col span={12}>
-                                                <Form.Item label={t('settings.phoneNumber')} name="phone">
-                                                    <Input prefix={<PhoneOutlined />} />
-                                                </Form.Item>
-                                            </Col>
-                                            <Col span={12}>
-                                                <Form.Item label={t('settings.email')} name="email">
-                                                    <Input prefix={<MailOutlined />} />
-                                                </Form.Item>
-                                            </Col>
-                                            <Col span={12}>
-                                                <Form.Item label={t('settings.gender')} name="gender">
-                                                    <Select>
-                                                        <Option value="male">Masculino</Option>
-                                                        <Option value="female">Femenino</Option>
-                                                        <Option value="other">Otro</Option>
-                                                    </Select>
-                                                </Form.Item>
-                                            </Col>
-                                            <Col span={12}>
-                                                <Form.Item label={t('settings.birthDate')} name="birth_date">
-                                                    <DatePicker style={{ width: '100%' }} format="YYYY-MM-DD" />
-                                                </Form.Item>
+                                            <Col>
+                                                <div style={{ fontSize: 12, color: "#8c8c8c", textTransform: "uppercase" }}>Progreso Clases</div>
+                                                <div style={{ fontWeight: "500" }}>{data.plan.classes_used} de {data.plan.classes_total} Usadas</div>
                                             </Col>
                                         </Row>
-                                    </Form>
-                                ) : (
-                                    <Descriptions title={t('global.detail')} column={{ xxl: 2, xl: 2, lg: 2, md: 1, sm: 1, xs: 1 }} labelStyle={{ fontWeight: "bold" }}>
-                                        <Descriptions.Item label={t('settings.phoneNumber')}>{data.phone || "N/A"}</Descriptions.Item>
-                                        <Descriptions.Item label={t('settings.gender')}>
-                                            {data.gender ? (data.gender === 'M' ? "Masculino" : data.gender === 'F' ? "Femenino" : data.gender) : "N/A"}
-                                        </Descriptions.Item>
-                                        <Descriptions.Item label={t('settings.birthDate')}>
-                                            {data.birth_date ? formatDate(data.birth_date) : "N/A"}
-                                        </Descriptions.Item>
-                                        <Descriptions.Item label={t('settings.email')}>{data.email || "N/A"}</Descriptions.Item>
-                                        <Descriptions.Item label={t('settings.joined')}>
-                                            {formatDate(data.created_at)}
-                                        </Descriptions.Item>
-                                        <Descriptions.Item label={t('settings.lastLogin')}>
-                                            {data.last_login ? formatDate(data.last_login, true) : "Nunca"}
-                                        </Descriptions.Item>
-                                    </Descriptions>
-                                )}
-
-                                {data.plan && (
-                                    <>
-                                        <Divider />
-                                        <div style={{ marginTop: 24 }}>
-                                            <h3 style={{ fontSize: 16, fontWeight: "bold", marginBottom: 16 }}>Plan Actual</h3>
-                                            <Card
-                                                type="inner"
-                                                title={data.plan.name}
-                                                extra={<Tag color={data.plan.status === 'active' ? 'green' : 'red'}>{data.plan.status === 'active' ? "Activo" : "Inactivo"}</Tag>}
-                                                style={{ backgroundColor: token.colorBgLayout }}
-                                            >
-                                                <Descriptions column={2}>
-                                                    {data.plan.description && (
-                                                        <Descriptions.Item label="Descripción" span={2}>
-                                                            {data.plan.description}
-                                                        </Descriptions.Item>
-                                                    )}
-                                                    <Descriptions.Item label="Inicio">{formatDate(data.plan.start_date)}</Descriptions.Item>
-                                                    <Descriptions.Item label="Fin">{formatDate(data.plan.end_date)}</Descriptions.Item>
-                                                    <Descriptions.Item label="Clases">{data.plan.classes_used} / {data.plan.classes_total}</Descriptions.Item>
-                                                    <Descriptions.Item label="Precio">${data.plan.price}</Descriptions.Item>
-                                                </Descriptions>
-                                            </Card>
-                                        </div>
-                                    </>
-                                )}
-                            </div>
+                                    </div>
+                                    <div style={{ textAlign: "right" }}>
+                                        <div style={{ fontSize: 32, fontWeight: "bold", color: "#007bff" }}>${data.plan.price}</div>
+                                        <div style={{ color: "#8c8c8c", fontSize: 12 }}>Facturado mensual</div>
+                                    </div>
+                                </div>
+                                <div style={{ marginTop: 20 }}>
+                                    <div style={{ height: 8, background: "#e6f7ff", borderRadius: 4, overflow: "hidden" }}>
+                                        <div style={{ width: `${(data.plan.classes_used / data.plan.classes_total) * 100}%`, height: "100%", background: "#007bff" }} />
+                                    </div>
+                                </div>
+                            </Card>
                         </Card>
                     </Col>
 
+                    {/* Sidebar */}
                     <Col xs={24} lg={8}>
                         <Card
-                            title={<span><LockOutlined /> {t('settings.changePassword')}</span>}
+                            title={<span><LockOutlined style={{ color: "#007bff", marginRight: 8 }} /> Cambiar Contraseña</span>}
                             bordered={false}
-                            style={{
-                                borderRadius: 8,
-                                boxShadow: token.boxShadowTertiary,
-                                height: "fit-content"
-                            }}
+                            style={{ borderRadius: 16, boxShadow: "0 4px 20px rgba(0,0,0,0.05)", marginBottom: 24 }}
                         >
                             <Form
                                 form={passwordForm}
@@ -343,26 +369,26 @@ const Profile = () => {
                                 onFinish={handlePasswordChange}
                             >
                                 <Form.Item
-                                    label={t('settings.currentPassword')}
+                                    label="Contraseña Actual"
                                     name="currentPassword"
                                     rules={[{ required: true, message: t('forms.requiredField') }]}
                                 >
-                                    <Input.Password placeholder="********" />
+                                    <Input.Password placeholder="********" style={{ borderRadius: 8 }} />
                                 </Form.Item>
 
                                 <Form.Item
-                                    label={t('settings.newPassword')}
+                                    label="Nueva Contraseña"
                                     name="newPassword"
                                     rules={[
                                         { required: true, message: t('forms.requiredField') },
                                         { min: 6, message: t('auth.passwordMinLength') }
                                     ]}
                                 >
-                                    <Input.Password placeholder="********" />
+                                    <Input.Password placeholder="********" style={{ borderRadius: 8 }} />
                                 </Form.Item>
 
                                 <Form.Item
-                                    label={t('settings.confirmPassword')}
+                                    label="Confirmar Contraseña"
                                     name="confirmPassword"
                                     dependencies={['newPassword']}
                                     rules={[
@@ -377,15 +403,51 @@ const Profile = () => {
                                         }),
                                     ]}
                                 >
-                                    <Input.Password placeholder="********" />
+                                    <Input.Password placeholder="********" style={{ borderRadius: 8 }} />
                                 </Form.Item>
 
-                                <Form.Item>
-                                    <Button type="primary" htmlType="submit" block>
-                                        {t('settings.changePassword')}
+                                <Form.Item style={{ marginBottom: 0 }}>
+                                    <Button type="primary" htmlType="submit" icon={<LockOutlined />} block style={{ borderRadius: 8, height: 45, fontWeight: "500" }}>
+                                        Cambiar Contraseña
                                     </Button>
                                 </Form.Item>
                             </Form>
+                        </Card>
+
+                        {/* Support Card */}
+                        <Card
+                            bordered={false}
+                            style={{
+                                borderRadius: 16,
+                                boxShadow: "0 4px 20px rgba(0,0,0,0.05)",
+                                background: "linear-gradient(135deg, #f0f7ff 0%, #e6f7ff 100%)",
+                                border: "1px solid #bae7ff"
+                            }}
+                        >
+                            <div style={{ display: 'flex', gap: 16 }}>
+                                <div style={{
+                                    width: 40,
+                                    height: 40,
+                                    borderRadius: "50%",
+                                    background: "#007bff",
+                                    display: "flex",
+                                    alignItems: "center",
+                                    justifyContent: "center",
+                                    color: "#fff",
+                                    fontSize: 20
+                                }}>
+                                    ?
+                                </div>
+                                <div>
+                                    <h4 style={{ margin: 0, fontWeight: "bold", fontSize: 16 }}>¿Necesitas ayuda?</h4>
+                                    <p style={{ margin: "8px 0 16px", color: "#666", fontSize: 14 }}>
+                                        Si tienes problemas con tu cuenta, contacta a soporte técnico.
+                                    </p>
+                                    <Button type="link" style={{ padding: 0, color: "#007bff", fontWeight: "600" }}>
+                                        Contactar Soporte →
+                                    </Button>
+                                </div>
+                            </div>
                         </Card>
                     </Col>
                 </Row>
