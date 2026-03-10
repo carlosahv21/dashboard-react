@@ -59,6 +59,7 @@ const HeaderComponent = ({ searchRef, profileRef, onRestartTour }) => {
     });
     const { request, loading } = useFetch();
     const { formatRelativeTime } = useFormatting();
+    const [notificationsOpen, setNotificationsOpen] = useState(false);
 
     const isDarkMode = settings?.theme === "dark";
 
@@ -464,6 +465,8 @@ const HeaderComponent = ({ searchRef, profileRef, onRestartTour }) => {
                 <Popover
                     trigger="click"
                     placement="bottomRight"
+                    open={notificationsOpen}
+                    onOpenChange={setNotificationsOpen}
                     overlayInnerStyle={{ padding: 0 }}
                     title={
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: 360, padding: "16px 16px 8px" }}>
@@ -489,7 +492,10 @@ const HeaderComponent = ({ searchRef, profileRef, onRestartTour }) => {
                                     <div style={{ textAlign: 'center' }}>
                                         <Button
                                             type="link"
-                                            onClick={() => navigate("/notifications")}
+                                            onClick={() => {
+                                                navigate("/notifications");
+                                                setNotificationsOpen(false);
+                                            }}
                                             style={{ fontWeight: 600 }}
                                         >
                                             {t("notifications.viewAll") || "Ver todas las notificaciones"}
@@ -520,7 +526,10 @@ const HeaderComponent = ({ searchRef, profileRef, onRestartTour }) => {
                                             }}
                                             onClick={() => {
                                                 if (!item.is_read) markAsRead(item.id);
-                                                if (item.deep_link) navigate(item.deep_link);
+                                                if (item.deep_link) {
+                                                    navigate(item.deep_link);
+                                                    setNotificationsOpen(false);
+                                                }
                                             }}
                                         >
                                             <List.Item.Meta
