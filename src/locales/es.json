@@ -120,6 +120,10 @@
         "pauseSuccess": "El plan ha sido pausado correctamente.",
         "pauseError": "Error al pausar el plan."
     },
+    "teachers": {
+        "name_plural": "Profesores",
+        "name_singular": "Profesor"
+    },
     "classes": {
         "name_plural": "Clases",
         "name_singular": "Clase",

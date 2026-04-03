@@ -161,7 +161,7 @@ const CustomFields = () => {
                 setModules(modulesWithFields);
 
                 if (modulesWithFields.length > 0) {
-                    await changeModule(modulesWithFields[0].id);
+                    await changeModule(modulesWithFields[0].name);
                 }
             } catch (err) {
                 message.error(err.message || t('settings.loadModulesError'));
@@ -354,7 +354,7 @@ const CustomFields = () => {
                             value={selectedModule}
                         >
                             {modules.map(module => (
-                                <Select.Option key={module.id} value={module.id}>
+                                <Select.Option key={module.name} value={module.name}>
                                     {module.name}
                                 </Select.Option>
                             ))}

@@ -46,7 +46,7 @@ const Payments = () => {
             <BaseCrudView
                 breadcrumb={false}
                 endpoint="payments"
-                moduleFieldId={13}
+                moduleFieldId="payments"
                 columns={columns}
                 titleSingular={t('settings.payment')}
                 titlePlural={t('settings.payments_title')}

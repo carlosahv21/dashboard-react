@@ -1,7 +1,15 @@
 import React from "react";
 import BaseCrudView from "../../components/Common/BaseView";
+import { useTranslation } from "react-i18next";
 
 const Teachers = () => {
+    const { t } = useTranslation();
+    const endpoint = "teachers";
+    const titleSingular = t('teachers.name_singular');
+    const titlePlural = t('teachers.name_plural');
+    const moduleFieldId = "teachers";
+    const hiddenFields = ["role"];
+
     const columns = [
         {
             title: "Nombre",
@@ -23,14 +31,14 @@ const Teachers = () => {
 
     return (
         <BaseCrudView
-            endpoint="teachers"
-            moduleFieldId={16}
+            endpoint={endpoint}
+            moduleFieldId={moduleFieldId}
             columns={columns}
-            titleSingular="Profesor"
-            titlePlural="Profesores"
-            filters={{ role_id: "3" }}
-            fixedValues={{ role_id: "3" }}
-            hiddenFields={["role_id"]}
+            hiddenFields={hiddenFields}
+            titleSingular={titleSingular}
+            titlePlural={titlePlural}
+            fixedValues={{ role: "teacher" }}
+            filters={{ role: "teacher" }}
         />
 
     );

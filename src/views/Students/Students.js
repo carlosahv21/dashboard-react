@@ -8,8 +8,8 @@ const Students = () => {
     const endpoint = "students";
     const titleSingular = t('students.name_singular');
     const titlePlural = t('students.name_plural');
-    const moduleFieldId = 15;
-    const hiddenFields = ["role_id"];
+    const moduleFieldId = "students";
+    const hiddenFields = ["role"];
 
     const columns = [
         { title: t('students.firstName'), dataIndex: "first_name", key: "first_name", sorter: true, defaultSortOrder: "ascend" },
@@ -26,8 +26,8 @@ const Students = () => {
             moduleFieldId={moduleFieldId}
             columns={columns}
             hiddenFields={hiddenFields}
-            fixedValues={{ role_id: "2" }}
-            filters={{ role_id: "2" }}
+            fixedValues={{ role: "student" }} 
+            filters={{ role: "student" }}
             viewOptions={["card", "table"]}
             cardComponent={StudentCard}
         />

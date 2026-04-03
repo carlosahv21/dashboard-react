@@ -77,7 +77,7 @@
         "lastName": "Last Name",
         "email": "Email",
         "role": "Role",
-        "history": "{{name}}'s History",
+        "history": "{{name}} History",
         "paymentsHistory": "Payment History",
         "attendances": "Attendance",
         "back": "Back",
@@ -110,6 +110,10 @@
         "pauseNoteRequired": "Please enter a note explaining the reason for the pause.",
         "pauseSuccess": "The plan has been successfully paused.",
         "pauseError": "Error pausing the plan."
+    },
+    "teachers": {
+        "name_plural": "Teachers",
+        "name_singular": "Teacher"
     },
     "classes": {
         "name_plural": "Classes",

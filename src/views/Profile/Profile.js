@@ -427,7 +427,7 @@ const Profile = () => {
                         >
                             <div style={{ display: 'flex', gap: 16 }}>
                                 <div style={{
-                                    width: 40,
+                                    width: 50,
                                     height: 40,
                                     borderRadius: "50%",
                                     background: "#007bff",

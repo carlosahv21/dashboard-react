@@ -9,7 +9,7 @@ dayjs.locale("es");
 
 // Función auxiliar para obtener el día actual en inglés (para el filtro de API/DB)
 const getCurrentDayEnglish = () =>
-    dayjs().locale("en").format("dddd").toLowerCase();
+    dayjs().locale("en").format("dddd");
 
 // Función auxiliar para obtener la fecha actual en formato YYYY-MM-DD (para la asistencia diaria)
 const getCurrentDate = () => dayjs().format("YYYY-MM-DD");

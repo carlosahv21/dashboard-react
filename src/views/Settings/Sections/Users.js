@@ -29,7 +29,7 @@ const Users = () => {
             <BaseCrudView
                 breadcrumb={false}
                 endpoint="users"
-                moduleFieldId={3}
+                moduleFieldId="users"
                 columns={columns}
                 titleSingular={t('settings.user')}
                 titlePlural={t('settings.users_title')}

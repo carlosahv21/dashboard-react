@@ -31,7 +31,7 @@ const Registration = () => {
         }
 
         try {
-            let url = `students?role_id=2&limit=50&search=${searchTerm}&order_by=first_name&order_direction=asc`;
+            let url = `students?role=student&limit=50&search=${searchTerm}&order_by=first_name&order_direction=asc`;
 
             const response = await request(url, "GET");
             setStudents(response.data || []);
