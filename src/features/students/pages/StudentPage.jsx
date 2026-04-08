@@ -1,9 +1,10 @@
 import React from "react";
-import BaseView from "../../components/Common/BaseView";
-import StudentCard from "./StudentCard";
+import BaseView from "../../../components/Common/BaseView";
+import StudentCard from "../components/StudentCard";
+import { useStudentColumns } from "../hooks/useStudentColumns";
 import { useTranslation } from "react-i18next";
 
-const Students = () => {
+const StudentPage = () => {
     const { t } = useTranslation();
     const endpoint = "students";
     const titleSingular = t('students.name_singular');
@@ -11,12 +12,7 @@ const Students = () => {
     const moduleFieldId = "students";
     const hiddenFields = ["role"];
 
-    const columns = [
-        { title: t('students.firstName'), dataIndex: "first_name", key: "first_name", sorter: true, defaultSortOrder: "ascend" },
-        { title: t('students.lastName'), dataIndex: "last_name", key: "last_name", sorter: true },
-        { title: t('students.email'), dataIndex: "email", key: "email", sorter: true },
-        { title: t('students.role'), dataIndex: "role_name", key: "role_name", render: (text) => text ? text.charAt(0).toUpperCase() + text.slice(1) : "" },
-    ];
+    const columns = useStudentColumns();
 
     return (
         <BaseView
@@ -26,7 +22,7 @@ const Students = () => {
             moduleFieldId={moduleFieldId}
             columns={columns}
             hiddenFields={hiddenFields}
-            fixedValues={{ role: "student" }} 
+            fixedValues={{ role: "student" }}
             filters={{ role: "student" }}
             viewOptions={["card", "table"]}
             cardComponent={StudentCard}
@@ -34,4 +30,4 @@ const Students = () => {
     );
 };
 
-export default Students;
+export default StudentPage;

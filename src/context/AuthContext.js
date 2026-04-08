@@ -1,36 +1,34 @@
-import React, { createContext, useState, useEffect, useRef, useCallback } from "react";
-import { Modal } from "antd";
-import useFetch from "../hooks/useFetch";
+import React, { createContext, useState, useEffect, useCallback } from "react";
+import { authService } from "../features/auth/services/authService";
 import i18n from "i18next";
 import dayjs from "dayjs";
-import "dayjs/locale/es";
-import "dayjs/locale/en";
 
 export const AuthContext = createContext();
 
-export const AuthProvider = ({ children }) => {
-    const { request } = useFetch();
-    const modalShownRef = useRef(false);
+const safeParseItem = (key, fallback) => {
+    try {
+        const item = localStorage.getItem(key);
+        return item && item !== "undefined" ? JSON.parse(item) : fallback;
+    } catch (error) {
+        return fallback;
+    }
+};
 
-    const [user, setUser] = useState(null);
-    const [settings, setSettings] = useState(null);
-    const [permissions, setPermissions] = useState({});
-    const [modules, setModules] = useState([]);
-    const [token, setToken] = useState(localStorage.getItem("token") || null);
+export const AuthProvider = ({ children }) => {
+    const [user, setUser] = useState(() => safeParseItem("user", null));
+    const [settings, setSettings] = useState(() => safeParseItem("settings", { theme: 'light', language: 'es' }));
+    const [permissions, setPermissions] = useState(() => safeParseItem("permissions", {}));
+    const [modules, setModules] = useState(() => safeParseItem("modules", []));
     const [loading, setLoading] = useState(true);
 
-    const logout = () => {
-        localStorage.removeItem("token");
-        localStorage.removeItem("user");
-        localStorage.removeItem("permissions");
-        localStorage.removeItem("modules");
+    const logout = useCallback(() => {
+        localStorage.clear();
         setUser(null);
-        setSettings(null);
+        setSettings({ theme: 'light', language: 'es' });
         setPermissions({});
         setModules([]);
-        setToken(null);
-        modalShownRef.current = false;
-    };
+        setLoading(false);
+    }, []);
 
     const login = (data) => {
         localStorage.setItem("token", data.token);
@@ -38,135 +36,93 @@ export const AuthProvider = ({ children }) => {
         localStorage.setItem("permissions", JSON.stringify(data.permissions || {}));
         localStorage.setItem("modules", JSON.stringify(data.modules || []));
 
-        setToken(data.token);
         setUser(data.user);
-        setSettings(data.academy);
         setPermissions(data.permissions || {});
         setModules(data.modules || []);
+        if (data.academy) setSettings(data.academy);
     };
 
-    const fetchUserData = useCallback(async (storedToken) => {
+    const fetchUserData = useCallback(async () => {
         try {
-            const response = await request(`auth/me`, "GET", null, {
-                Authorization: `Bearer ${storedToken}`,
-            });
-
-            setUser(response.data.user);
-            setSettings(response.data.academy || response.data.settings);
-
-            if (response.data.permissions) {
-                setPermissions(response.data.permissions);
+            const { data } = await authService.me();
+            
+            // Dependiendo de si la API devuelve { user, permissions } o solo el modelo de usuario { id, email }
+            const userData = data.user || (data.id ? data : null);
+            
+            if (userData) {
+                setUser(userData);
+                localStorage.setItem("user", JSON.stringify(userData));
             }
-            if (response.data.modules) {
-                setModules(response.data.modules);
+            
+            if (data.permissions) {
+                setPermissions(data.permissions);
+                localStorage.setItem("permissions", JSON.stringify(data.permissions));
+            }
+            
+            if (data.modules) {
+                setModules(data.modules);
+                localStorage.setItem("modules", JSON.stringify(data.modules));
+            }
+            
+            if (data.academy || data.settings) {
+                const newSettings = data.academy || data.settings;
+                setSettings(newSettings);
             }
         } catch (err) {
-            if (err.message === "Sesión expirada o token inválido" && !modalShownRef.current) {
-                modalShownRef.current = true;
-                Modal.confirm({
-                    title: "Sesión expirada o token inválido",
-                    content: "Tu sesión ha expirado. Debes iniciar sesión nuevamente.",
-                    okText: "Aceptar",
-                    onOk: () => logout(),
-                    cancelButtonProps: { style: { display: "none" } }
-                });
-            } else {
+            console.error("Auth verify failed", err);
+            // Only logout if the error is an unauthenticated response, 
+            // otherwise keep the cached user session (e.g. for 500 backend errors)
+            if (err.response?.status === 401 || err.response?.status === 403) {
+                console.log("Auth verify failed", err);
                 logout();
             }
         } finally {
             setLoading(false);
         }
-    }, [request]);
+    }, [logout]);
 
-    const toggleTheme = async () => {
-        const newTheme = settings?.theme === 'dark' ? 'light' : 'dark';
-
-        // Optimistic update
-        setSettings(prev => ({ ...prev, theme: newTheme }));
-
-        try {
-            const payload = { ...(settings || {}), theme: newTheme };
-
-            delete payload.created_at;
-            delete payload.updated_at;
-
-            await request("settings", "PUT", payload);
-        } catch (error) {
-            console.error("Failed to persist theme preference:", error);
-        }
-    };
-
-    // Sincronizar idioma y díajs con el settings
+    // Sincronización de UI (Idioma/Fechas)
     useEffect(() => {
         if (settings?.language) {
             i18n.changeLanguage(settings.language);
             dayjs.locale(settings.language);
         }
-    }, [settings?.language]);
-
-    // Persistencia centralizada de settings
-    useEffect(() => {
-        if (settings) {
-            localStorage.setItem("settings", JSON.stringify(settings));
-            if (settings.theme) localStorage.setItem("theme", settings.theme);
-        }
+        localStorage.setItem("settings", JSON.stringify(settings));
     }, [settings]);
 
     useEffect(() => {
-        const storedSettings = localStorage.getItem("settings");
-        const initialSettings = storedSettings ? JSON.parse(storedSettings) : {
-            theme: localStorage.getItem("theme") || 'light',
-            language: i18n.language || 'es'
-        };
-
+        const token = localStorage.getItem("token");
         if (token) {
-            // Rehydrate state from localStorage if it exists so we don't flash empty UI
-            const storedUser = localStorage.getItem("user");
-            const storedPermissions = localStorage.getItem("permissions");
-            const storedModules = localStorage.getItem("modules");
-
-            if (storedUser && !user) setUser(JSON.parse(storedUser));
-            if (storedPermissions && Object.keys(permissions).length === 0) setPermissions(JSON.parse(storedPermissions));
-            if (storedModules && modules.length === 0) setModules(JSON.parse(storedModules));
-
-            // We always fetch user data to verify the token with the backend
-            setLoading(true);
-            fetchUserData(token).then(() => {
-                setSettings(prev => prev || initialSettings);
-            });
+            fetchUserData();
         } else {
-            setSettings(initialSettings);
             setLoading(false);
         }
-    }, [token, fetchUserData]);
+    }, [fetchUserData]);
 
     const hasPermission = (permString) => {
-        if (!permString) return true; // If no permission required, allow access
-
+        if (!permString) return true;
         const [module, action] = permString.split(":");
-
-        // If the module doesn't exist in permissions, deny
         if (!permissions || !permissions[module]) return false;
-
-        // If action is requested, check if the module has that action
-        if (action) {
-            return permissions[module].actions?.includes(action) || false;
-        }
-
-        // If only module was tested, just return if it's there
+        if (action) return permissions[module].actions?.includes(action) || false;
         return true;
     };
 
+    const toggleTheme = async () => {
+        const newTheme = settings?.theme === 'dark' ? 'light' : 'dark';
+        setSettings(prev => ({ ...prev, theme: newTheme })); // Optimistic update
+        try {
+            const { created_at, updated_at, ...payload } = settings;
+            await authService.updateSettings({ ...payload, theme: newTheme });
+        } catch (error) {
+            console.error("Error saving theme", error);
+        }
+    };
+
     return (
-        <AuthContext.Provider
-            value={{
-                user, setUser, settings, setSettings,
-                permissions, hasPermission, token, setToken,
-                modules, setModules,
-                logout, login, toggleTheme,
-                loading
-            }}
-        >
+        <AuthContext.Provider value={{
+            user, settings, permissions, modules, loading,
+            login, logout, hasPermission, toggleTheme
+        }}>
             {children}
         </AuthContext.Provider>
     );

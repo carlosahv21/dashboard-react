@@ -32,7 +32,7 @@
 /* Light Mode Override */
 .dance-login-container[data-theme="light"] {
     --primary: #0a84ff;
-    --background: #f8f9fa;
+    --background: #F8F9FA;
     --container: #ffffff;
     --text-primary: #2d3436;
     --text-secondary: #6c757d;

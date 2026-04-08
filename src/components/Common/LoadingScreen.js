@@ -16,7 +16,6 @@ const LoadingScreen = ({ fullscreen = true }) => {
                     justifyContent: "center",
                     alignItems: "center",
                     zIndex: 9999,
-                    backgroundColor: "rgba(255, 255, 255, 0.7)",
                 }}
             />
         );

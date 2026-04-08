@@ -1,6 +1,6 @@
 import React, { useContext, useMemo, useState, useEffect } from "react";
 import { Layout, Dropdown, Avatar, Space, Badge, Input, message, Popover, List, Typography, Button, Empty } from "antd";
-import { NotificationContext } from "../context/NotificationContext";
+import { NotificationContext } from "../../context/NotificationContext";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import "dayjs/locale/es"; // Import Spanish locale
@@ -24,10 +24,10 @@ import {
 } from "@ant-design/icons";
 
 import { useNavigate } from "react-router-dom";
-import { AuthContext } from "../context/AuthContext";
+import { AuthContext } from "../../context/AuthContext";
 import { useTranslation } from "react-i18next";
-import useFetch from "../hooks/useFetch";
-import useFormatting from "../hooks/useFormatting";
+import useFetch from "../../hooks/useFetch";
+import useFormatting from "../../hooks/useFormatting";
 
 const { Header } = Layout;
 

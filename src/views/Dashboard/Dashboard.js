@@ -1,13 +1,15 @@
 import React, { useContext } from "react";
 import { Layout } from "antd";
-import Sidebar from "../../components/Sidebar";
-import HeaderComponent from "../../components/Header";
-import Footer from "../../components/Footer";
 import { Outlet } from "react-router-dom";
+
+import Sidebar from "../../components/layout/Sidebar";
+import HeaderComponent from "../../components/layout/Header";
+import Footer from "../../components/layout/Footer";
+
 import { AuthContext } from "../../context/AuthContext";
-import AppOnboarding from "../../components/Common/AppOnboarding";
 import { OnboardingProvider } from "../../context/OnboardingContext";
 import OnboardingWidget from "../../components/Common/OnboardingWidget";
+import AppOnboarding from "../../components/Common/AppOnboarding";
 
 const { Content } = Layout;
 

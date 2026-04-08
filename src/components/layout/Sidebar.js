@@ -1,6 +1,6 @@
 import React, { useContext, forwardRef } from "react";
 import { Layout, Menu, Tooltip, Switch } from "antd";
-import { AuthContext } from "../context/AuthContext";
+import { AuthContext } from "../../context/AuthContext";
 import { useNavigate, useLocation } from "react-router-dom";
 import * as Icons from "@ant-design/icons";
 import { MoonOutlined, SunOutlined } from "@ant-design/icons";

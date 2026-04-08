@@ -1,0 +1,117 @@
+/* Event Styles */
+.fc-event {
+    border: 0 !important;
+    border-radius: 5px;
+}
+.fc-custom-event.present{
+    margin-left: 5px;
+    transition: all 0.3s;
+}
+.event-present:hover, .event-present:hover .fc-event-main {
+    background-color: #306317 !important;
+    border-color: #306317 !important;
+}
+
+.event-absent, .event-absent .fc-event-main {
+    background-color: #cf1322 !important;
+    border-color: #cf1322 !important;
+    transition: all 0.3s;
+}
+.event-absent:hover, .event-absent:hover .fc-event-main {
+    background-color: #820014 !important; /* Darker red for hover */
+    border-color: #820014 !important;
+}
+
+.fc-col-header-cell-cushion, 
+.fc-timegrid-slot-label-cushion {
+    color: var(--ant-color-text, rgba(0, 0, 0, 0.88)) !important;
+}
+.fc-theme-standard td, .fc-theme-standard th {
+    border-color: var(--ant-color-border-secondary, #f0f0f0) !important;
+}
+/* Header background to match theme */
+.fc-scrollgrid-section-header > td {
+    background-color: var(--ant-color-bg-container, #ffffff) !important;
+}
+/* Navigation icons (arrows) */
+.fc-icon {
+    color: var(--ant-color-text, rgba(0, 0, 0, 0.88)) !important;
+}
+/* Toolbar title */
+.fc-toolbar-title {
+    color: var(--ant-color-text, rgba(0, 0, 0, 0.88)) !important;
+}
+/* More link for overflow events */
+.fc-more-link {
+    color: var(--ant-color-primary, #1677ff) !important;
+}
+/* Popover for overflow events */
+.fc-popover {
+    background-color: var(--ant-color-bg-elevated, #ffffff) !important;
+    border-color: var(--ant-color-border, #d9d9d9) !important;
+}
+.fc-popover-header {
+    background-color: var(--ant-color-bg-elevated, #ffffff) !important;
+    color: var(--ant-color-text, rgba(0, 0, 0, 0.88)) !important;
+}
+.fc-popover-body {
+    background-color: var(--ant-color-bg-elevated, #ffffff) !important;
+}
+.fc-timegrid-event-harness-inset .fc-timegrid-event, .fc-timegrid-event.fc-event-mirror, .fc-timegrid-more-link {
+    box-shadow: none !important;
+}
+.fc-direction-ltr .fc-timegrid-col-events {
+    margin: 0 !important;
+}
+.fc-timegrid-axis, .fc-scrollgrid-sync-inner {
+    background-color: var(--ant-color-bg-elevated, #ffffff) !important;
+}
+.fc-theme-standard .fc-scrollgrid {
+    border-color: var(--ant-color-border-secondary, #f0f0f0) !important;
+}
+.fc-daygrid-day-number {
+    color: var(--ant-color-text, rgba(0, 0, 0, 0.88)) !important;
+    cursor: default !important;
+}
+.fc-daygrid-day-number:hover {
+    color: var(--ant-color-primary, #1677ff) !important;
+}
+.fc-today-button.fc-button.fc-button-primary,
+.fc-prev-button.fc-button.fc-button-primary,
+.fc-next-button.fc-button.fc-button-primary {
+    background-color: var(--ant-color-bg-base, #ffffff) !important;
+    color: var(--ant-color-text, rgba(0, 0, 0, 0.88)) !important;
+    border-color: var(--ant-color-border, #d9d9d9) !important;
+    outline: none !important;
+    box-shadow: none !important;
+}
+.fc-today-button.fc-button.fc-button-primary:hover,
+.fc-prev-button.fc-button.fc-button-primary:hover,
+.fc-next-button.fc-button.fc-button-primary:hover {
+    background-color: var(--ant-color-bg-container, #f5f5f5) !important;
+}
+.fc-today-button.fc-button.fc-button-primary:focus, 
+.fc-today-button.fc-button.fc-button-primary:active,
+.fc-prev-button.fc-button.fc-button-primary:focus, 
+.fc-prev-button.fc-button.fc-button-primary:active,
+.fc-next-button.fc-button.fc-button-primary:focus, 
+.fc-next-button.fc-button.fc-button-primary:active {
+    background-color: var(--ant-color-bg-container, #ffffff) !important;
+    border-color: var(--ant-color-border, #d9d9d9) !important;
+    box-shadow: none !important;
+    outline: none !important;
+}
+
+.fc-dayGridMonth-button.fc-button.fc-button-primary.fc-button-active {
+    background-color: var(--ant-color-bg-container, #ffffff) !important;
+    color: var(--ant-color-text, rgba(0, 0, 0, 0.88)) !important;
+    border-color: var(--ant-color-border, #d9d9d9) !important;
+    outline: none !important;
+    box-shadow: none !important;
+}
+.fc-dayGridMonth-button.fc-button.fc-button-primary.fc-button-active:hover {
+    background-color: var(--ant-color-bg-container, #f5f5f5) !important;
+}
+.fc-dayGridMonth-button.fc-button.fc-button-primary.fc-button-active:focus {
+    box-shadow: none !important;
+}

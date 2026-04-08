@@ -12,3 +12,6 @@ Thumbs.db
 
 # Dependencias (asegurar)
 package-lock.json
+
+estructura.txt
+gem-script.js
