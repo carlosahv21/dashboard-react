@@ -1,19 +1,29 @@
 import React, { createContext, useState, useEffect, useCallback } from "react";
-import { authService } from "../features/auth/services/authService";
+import { authService } from "../features/auth/services/authService.jsx";
 import i18n from "i18next";
 import dayjs from "dayjs";
 
 export const AuthContext = createContext();
 
+/**
+ * Helper to safely parse localStorage items
+ */
 const safeParseItem = (key, fallback) => {
     try {
         const item = localStorage.getItem(key);
-        return item && item !== "undefined" ? JSON.parse(item) : fallback;
+        // Strict check to avoid "undefined" string breaking JSON.parse
+        if (!item || item === "undefined" || item === "null") return fallback;
+        return JSON.parse(item);
     } catch (error) {
+        console.error(`Error parsing localStorage key "${key}":`, error);
         return fallback;
     }
 };
 
+/**
+ * AuthProvider component
+ * Manages user session, permissions, academy settings, and themes.
+ */
 export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(() => safeParseItem("user", null));
     const [settings, setSettings] = useState(() => safeParseItem("settings", { theme: 'light', language: 'es' }));
@@ -30,7 +40,9 @@ export const AuthProvider = ({ children }) => {
         setLoading(false);
     }, []);
 
-    const login = (data) => {
+    const login = useCallback((data) => {
+        if (!data.token) return;
+
         localStorage.setItem("token", data.token);
         localStorage.setItem("user", JSON.stringify(data.user));
         localStorage.setItem("permissions", JSON.stringify(data.permissions || {}));
@@ -39,14 +51,19 @@ export const AuthProvider = ({ children }) => {
         setUser(data.user);
         setPermissions(data.permissions || {});
         setModules(data.modules || []);
-        if (data.academy) setSettings(data.academy);
-    };
+        
+        if (data.academy || data.settings) {
+            const newSettings = data.academy || data.settings;
+            setSettings(newSettings);
+            localStorage.setItem("settings", JSON.stringify(newSettings));
+        }
+    }, []);
 
     const fetchUserData = useCallback(async () => {
         try {
             const { data } = await authService.me();
             
-            // Dependiendo de si la API devuelve { user, permissions } o solo el modelo de usuario { id, email }
+            // Normalize user data from API response
             const userData = data.user || (data.id ? data : null);
             
             if (userData) {
@@ -67,13 +84,12 @@ export const AuthProvider = ({ children }) => {
             if (data.academy || data.settings) {
                 const newSettings = data.academy || data.settings;
                 setSettings(newSettings);
+                localStorage.setItem("settings", JSON.stringify(newSettings));
             }
         } catch (err) {
-            console.error("Auth verify failed", err);
-            // Only logout if the error is an unauthenticated response, 
-            // otherwise keep the cached user session (e.g. for 500 backend errors)
+            console.error("Auth verification failed:", err);
+            // Automatic logout only on explicit auth failures
             if (err.response?.status === 401 || err.response?.status === 403) {
-                console.log("Auth verify failed", err);
                 logout();
             }
         } finally {
@@ -81,15 +97,7 @@ export const AuthProvider = ({ children }) => {
         }
     }, [logout]);
 
-    // Sincronización de UI (Idioma/Fechas)
-    useEffect(() => {
-        if (settings?.language) {
-            i18n.changeLanguage(settings.language);
-            dayjs.locale(settings.language);
-        }
-        localStorage.setItem("settings", JSON.stringify(settings));
-    }, [settings]);
-
+    // Handle initial auth check
     useEffect(() => {
         const token = localStorage.getItem("token");
         if (token) {
@@ -99,22 +107,39 @@ export const AuthProvider = ({ children }) => {
         }
     }, [fetchUserData]);
 
-    const hasPermission = (permString) => {
+    // Global UI Sync (Language, Locale, Settings persistence)
+    useEffect(() => {
+        if (settings?.language) {
+            i18n.changeLanguage(settings.language);
+            dayjs.locale(settings.language);
+        }
+        // Sync theme with document for CSS-level styling if needed
+        document.documentElement.setAttribute('data-theme', settings?.theme || 'light');
+        localStorage.setItem("settings", JSON.stringify(settings));
+    }, [settings]);
+
+    /**
+     * Permission checker
+     * Format: "module:action" (e.g. "students:create")
+     */
+    const hasPermission = useCallback((permString) => {
         if (!permString) return true;
         const [module, action] = permString.split(":");
         if (!permissions || !permissions[module]) return false;
         if (action) return permissions[module].actions?.includes(action) || false;
         return true;
-    };
+    }, [permissions]);
 
     const toggleTheme = async () => {
         const newTheme = settings?.theme === 'dark' ? 'light' : 'dark';
         setSettings(prev => ({ ...prev, theme: newTheme })); // Optimistic update
+        
         try {
+            // Remove meta timestamps for API payload
             const { created_at, updated_at, ...payload } = settings;
             await authService.updateSettings({ ...payload, theme: newTheme });
         } catch (error) {
-            console.error("Error saving theme", error);
+            console.error("Failed to persist theme setting:", error);
         }
     };
 

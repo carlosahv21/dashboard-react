@@ -1,9 +1,13 @@
 import React, { createContext, useState, useEffect, useContext, useCallback } from 'react';
 import useFetch from '../hooks/useFetch';
-import { AuthContext } from './AuthContext';
+import { AuthContext } from './AuthContext.jsx';
 
 export const NotificationContext = createContext();
 
+/**
+ * NotificationProvider Component
+ * Manages the global notification state, unread counts, and real-time polling.
+ */
 export const NotificationProvider = ({ children }) => {
     const { user } = useContext(AuthContext);
     const { request } = useFetch();
@@ -11,6 +15,9 @@ export const NotificationProvider = ({ children }) => {
     const [unreadCount, setUnreadCount] = useState(0);
     const [loading, setLoading] = useState(false);
 
+    /**
+     * Fetch current user notifications from API
+     */
     const fetchNotifications = useCallback(async () => {
         if (!user) return;
 
@@ -18,10 +25,11 @@ export const NotificationProvider = ({ children }) => {
             setLoading(true);
             const response = await request('notifications');
             const data = response.data || [];
+            
             setNotifications(data);
             setUnreadCount(data.filter(n => !n.is_read).length);
         } catch (error) {
-            console.error('Error fetching notifications:', error);
+            console.error('Failed to fetch notifications:', error);
         } finally {
             setLoading(false);
         }
@@ -31,25 +39,21 @@ export const NotificationProvider = ({ children }) => {
         try {
             await request(`notifications/${id}/read`, 'PATCH');
             setNotifications(prev =>
-                prev.map(n =>
-                    n.id === id ? { ...n, is_read: true } : n
-                )
+                prev.map(n => n.id === id ? { ...n, is_read: true } : n)
             );
             setUnreadCount(prev => Math.max(0, prev - 1));
         } catch (error) {
-            console.error('Error marking notification as read:', error);
+            console.error('Failed to mark notification as read:', error);
         }
     };
 
     const markAllAsRead = async () => {
         try {
             await request('notifications/read-all', 'PATCH');
-            setNotifications(prev =>
-                prev.map(n => ({ ...n, is_read: true }))
-            );
+            setNotifications(prev => prev.map(n => ({ ...n, is_read: true })));
             setUnreadCount(0);
         } catch (error) {
-            console.error('Error marking all notifications as read:', error);
+            console.error('Failed to mark all notifications as read:', error);
         }
     };
 
@@ -62,17 +66,20 @@ export const NotificationProvider = ({ children }) => {
                 return newNotifications;
             });
         } catch (error) {
-            console.error('Error deleting notification:', error);
+            console.error('Failed to delete notification:', error);
         }
     };
 
+    // Effect for initial fetch and polling
     useEffect(() => {
         if (user) {
             fetchNotifications();
-            // Optional: Set up polling or websocket here
-            const interval = setInterval(fetchNotifications, 60000); // Poll every minute
+            
+            // Notification polling every 60 seconds
+            const interval = setInterval(fetchNotifications, 60000);
             return () => clearInterval(interval);
         } else {
+            // Reset state on logout
             setNotifications([]);
             setUnreadCount(0);
         }
