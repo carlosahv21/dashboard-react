@@ -1,4 +1,5 @@
 import axios from "axios";
+import { Modal } from "antd";
 
 const api = axios.create({
     baseURL: process.env.REACT_APP_BACKEND_URL || "http://localhost:3000/api",
@@ -13,12 +14,23 @@ api.interceptors.request.use((config) => {
     return config;
 });
 
+let isSessionExpiredShown = false;
+
 api.interceptors.response.use(
     (response) => response,
     (error) => {
-        if (error.response?.status === 401) {
-            localStorage.clear();
-            window.location.href = "/login";
+        if (error.response?.status === 401 && !isSessionExpiredShown) {
+            isSessionExpiredShown = true;
+            Modal.warning({
+                title: 'Sesión Expirada',
+                content: 'Tu sesión ha expirado o el token es inválido. Por favor, inicia sesión nuevamente.',
+                okText: 'Entendido',
+                onOk: () => {
+                    isSessionExpiredShown = false;
+                    localStorage.clear();
+                    window.location.href = "/login";
+                }
+            });
         }
         return Promise.reject(error);
     }

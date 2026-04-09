@@ -8,14 +8,14 @@ const profileService = {
    * Fetches student details.
    * @param {string} userId
    */
-  getProfile: (userId) => api.get(`students/details/${userId}`),
+  getProfile: (userId) => api.get(`users/details/${userId}`),
 
   /**
    * Updates student profile information.
    * @param {string} userId
    * @param {Object} data
    */
-  updateProfile: (userId, data) => api.put(`students/${userId}`, data),
+  updateProfile: (userId, data) => api.put(`users/${userId}`, data),
 
   /**
    * Resets user password.
