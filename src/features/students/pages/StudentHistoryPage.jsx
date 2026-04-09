@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useMemo } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import {
     Row, Col, Card, Tabs, Button, Tag, Typography, 
@@ -23,7 +23,7 @@ import FormSection from "../../../components/Common/FormSection";
 import { useTranslation } from "react-i18next";
 
 // Lógica separada (La crearemos abajo)
-import { studentService } from "../services/studentService";
+import studentService from "../services/studentService";
 import { useHistoryColumns } from "../hooks/useHistoryColumns";
 import "../StudentHistory.css";
 
@@ -36,7 +36,7 @@ const StudentHistory = () => {
     const { request } = useFetch();
     const { token } = theme.useToken();
     const { message } = App.useApp();
-    const { formatDate, formatCurrency, formatDateShort } = useFormatting();
+    const { formatCurrency, formatDateShort } = useFormatting();
     
     // Columnas de tabla extraídas a un Hook para limpieza
     const { attendanceColumns, paymentColumns } = useHistoryColumns();
@@ -49,11 +49,10 @@ const StudentHistory = () => {
     const [pauseReason, setPauseReason] = useState("");
 
     const [form] = Form.useForm();
-    const service = useMemo(() => studentService(request), [request]);
 
     const fetchAllData = useCallback(async () => {
         try {
-            const data = await service.getFullHistory(id);
+            const data = await studentService.getFullHistory(id);
             setStudent(data.student);
             setActivePlan(data.activePlan);
             setAttendances(data.attendances);
@@ -61,7 +60,7 @@ const StudentHistory = () => {
         } catch (error) {
             message.error(t('global.error_fetching'));
         }
-    }, [id, service, t, message]);
+    }, [id, t, message]);
 
     useEffect(() => {
         if (id) fetchAllData();
@@ -78,7 +77,7 @@ const StudentHistory = () => {
     const handlePausePlan = async () => {
         if (!pauseReason.trim()) return message.error(t('students.pauseNoteRequired'));
         try {
-            await service.pausePlan(activePlan.id, pauseReason);
+            await studentService.pausePlan(activePlan.id, pauseReason);
             message.success(t('students.pauseSuccess'));
             setIsPauseModalOpen(false);
             setPauseReason("");

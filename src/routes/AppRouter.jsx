@@ -22,7 +22,7 @@ const Teachers = lazy(() => import("../views/Teachers/Teachers"));
 const Registrations = lazy(() => import("../views/Registrations/Registrations"));
 const Attendances = lazy(() => import("../views/Attendances/Attendances"));
 const Notifications = lazy(() => import("../views/Notifications/Notifications"));
-const Profile = lazy(() => import("../views/Profile/Profile"));
+const Profile = lazy(() => import("../features/profile/pages/ProfilePage"));
 
 // Configuración
 const SettingsLayout = lazy(() => import("../views/Settings/SettingsLayouts"));

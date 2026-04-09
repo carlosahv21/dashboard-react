@@ -1,29 +1,42 @@
+import api from "../../../api/axiosInstance";
+
 /**
- * Servicio especializado para la lógica de negocio de Estudiantes en Cadencia.
+ * Specialized service for Student business logic in Cadencia.
  */
-export const studentService = (request) => ({
-    // Obtener todo el perfil del estudiante (Historial completo)
-    getFullHistory: async (studentId) => {
-        const [student, plan, attendances, payments] = await Promise.all([
-            request(`students/${studentId}`),
-            request(`plans/student/${studentId}`),
-            request(`attendances?student_id=${studentId}`),
-            request(`payments?user_id=${studentId}`)
-        ]);
+const studentService = {
+  /**
+   * Fetches the complete history for a student (Profile, Plan, Attendances, Payments).
+   * @param {string} studentId
+   * @returns {Promise<Object>}
+   */
+  getFullHistory: async (studentId) => {
+    const [studentRes, planRes, attendancesRes, paymentsRes] = await Promise.all([
+      api.get(`students/${studentId}`),
+      api.get(`plans/student/${studentId}`),
+      api.get(`attendances?student_id=${studentId}`),
+      api.get(`payments?user_id=${studentId}`),
+    ]);
 
-        return {
-            student: student.data,
-            activePlan: plan.data,
-            attendances: attendances.data || [],
-            payments: payments.data || []
-        };
-    },
+    return {
+      student: studentRes.data?.data || studentRes.data,
+      activePlan: planRes.data?.data || planRes.data,
+      attendances: attendancesRes.data?.data || attendancesRes.data || [],
+      payments: paymentsRes.data?.data || paymentsRes.data || [],
+    };
+  },
 
-    // Pausar un plan (Lógica específica que mencionaste en tu código)
-    pausePlan: async (planId, reason) => {
-        return await request(`plans/${planId}`, "PUT", {
-            status: 'paused',
-            notes: reason
-        });
-    }
-});
+  /**
+   * Pauses an active plan.
+   * @param {string} planId
+   * @param {string} reason
+   * @returns {Promise<Object>}
+   */
+  pausePlan: async (planId, reason) => {
+    return await api.put(`plans/${planId}`, {
+      status: "paused",
+      notes: reason,
+    });
+  },
+};
+
+export default studentService;

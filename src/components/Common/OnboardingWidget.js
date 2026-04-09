@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Popover, Progress, List, Checkbox, Button, Typography, Space, Divider, Tooltip } from 'antd';
+import { Popover, Progress, List, Checkbox, Button, Typography, Space, Divider, Tooltip, theme } from 'antd';
 import { RocketOutlined, PlayCircleOutlined, RedoOutlined, RightOutlined, EyeInvisibleOutlined } from '@ant-design/icons';
 import { useOnboarding } from '../../context/OnboardingContext';
 import { useTranslation } from 'react-i18next';
@@ -17,6 +17,7 @@ const OnboardingWidget = () => {
     } = useOnboarding();
     const [popoverVisible, setPopoverVisible] = useState(false);
     const { t } = useTranslation();
+    const { token } = theme.useToken();
 
     // Do not show if manually hidden
     if (isWidgetHidden) return null;
@@ -114,10 +115,9 @@ const OnboardingWidget = () => {
                     style={{
                         borderRadius: 30,
                         padding: '6px 16px',
-                        boxShadow: '0 6px 16px rgba(0,0,0,0.12)',
-                        border: '1px solid #e8e8e8',
-                        background: 'rgba(255, 255, 255, 0.95)',
-                        backdropFilter: 'blur(8px)',
+                        boxShadow: token.boxShadowSecondary,
+                        border: `1px solid ${token.colorBorder}`,
+                        background: token.colorBgElevated,
                         cursor: 'pointer',
                         display: 'flex',
                         alignItems: 'center',
@@ -162,7 +162,7 @@ const OnboardingWidget = () => {
                             shape="circle"
                             size="small"
                             icon={<RightOutlined />}
-                            style={{ color: '#8c8c8c' }}
+                            style={{ color: token.colorTextSecondary }}
                         />
                     </Tooltip>
                 </div>
