@@ -11,15 +11,14 @@ const DashboardLayout = lazy(() => import("../features/dashboard/pages/Dashboard
 
 // Vistas de Negocio
 const DashboardView = lazy(() => import("../features/dashboard/pages/DashboardPage"));
-const Plans = lazy(() => import("../views/Plans/Plans"));
-const Classes = lazy(() => import("../views/Classes/Classes"));
-
+const Plans = lazy(() => import("../features/plans/pages/PlanPage"));
+const Classes = lazy(() => import("../features/classes/pages/ClassPage"));
+const Teachers = lazy(() => import("../features/teachers/pages/TeacherPage"));
 // Estudiantes
 const Students = lazy(() => import("../features/students/pages/StudentPage"));
 const StudentHistory = lazy(() => import("../features/students/pages/StudentHistoryPage"));
 
-const Teachers = lazy(() => import("../views/Teachers/Teachers"));
-const Registrations = lazy(() => import("../views/Registrations/Registrations"));
+const Registrations = lazy(() => import("../features/registrations/pages/RegistrationPage"));
 const Attendances = lazy(() => import("../views/Attendances/Attendances"));
 const Notifications = lazy(() => import("../features/notifications/pages/NotificationsPage"));
 const Profile = lazy(() => import("../features/profile/pages/ProfilePage"));
