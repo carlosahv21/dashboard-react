@@ -1,8 +1,9 @@
-// hooks/useDrawerDetail.js
 import { useState } from 'react';
 import { message } from 'antd';
+import useFetch from './useFetch';
 
-export const useDrawerDetail = (request, endpoint, titleSingular) => {
+export const useDrawerDetail = (endpoint, titleSingular) => {
+    const { request } = useFetch();
     const [drawerVisible, setDrawerVisible] = useState(false);
     const [selectedRecordId, setSelectedRecordId] = useState(null);
     const [drawerData, setDrawerData] = useState(null);

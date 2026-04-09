@@ -1,7 +1,7 @@
 import React, { useImperativeHandle, forwardRef, useEffect } from 'react';
 import { Tour, Button } from 'antd';
 import { useTranslation } from 'react-i18next';
-import { useOnboarding } from '../../context/OnboardingContext';
+import { useOnboarding } from '../context/OnboardingContext';
 
 /**
  * AppOnboarding Component

@@ -1,13 +1,16 @@
+import React from 'react';
 import { Row, Col, Divider, Typography } from 'antd';
 import DynamicInput from './DynamicInput';
 
 const FormSection = ({ title, fields, form, onImageUpload }) => (
-    <Row>
-        <Divider />
-        <Col span={6}>
-            <Typography.Text strong>{title}</Typography.Text>
+    <Row gutter={24} style={{ marginBottom: 16 }}>
+        <Col span={24}>
+            <Divider style={{ marginTop: 0, marginBottom: 24 }} />
         </Col>
-        <Col span={18}>
+        <Col xs={24} sm={24} md={6}>
+            <Typography.Text strong style={{ fontSize: '16px' }}>{title}</Typography.Text>
+        </Col>
+        <Col xs={24} sm={24} md={18}>
             {fields.map((field, index) => (
                 <DynamicInput
                     key={field.name || `${field.label}-${index}`}

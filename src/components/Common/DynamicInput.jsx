@@ -23,7 +23,6 @@ const debounce = (func, delay) => {
 const parseValidationRules = (required, type, t) => {
     const rules = [];
 
-    // ✅ Validar si el campo es obligatorio
     if (required) {
         rules.push({
             required: true,
@@ -31,7 +30,6 @@ const parseValidationRules = (required, type, t) => {
         });
     }
 
-    // ✅ Validar el tipo de dato
     if (type) {
         switch (type) {
             case "text":

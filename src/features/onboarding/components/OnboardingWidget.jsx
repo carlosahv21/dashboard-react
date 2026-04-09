@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { Popover, Progress, List, Checkbox, Button, Typography, Space, Divider, Tooltip, theme } from 'antd';
+import { Popover, Progress, List, Checkbox, Button, Typography, Divider, Tooltip, theme } from 'antd';
 import { RocketOutlined, PlayCircleOutlined, RedoOutlined, RightOutlined, EyeInvisibleOutlined } from '@ant-design/icons';
-import { useOnboarding } from '../../context/OnboardingContext';
+import { useOnboarding } from '../context/OnboardingContext';
 import { useTranslation } from 'react-i18next';
 
 const { Text } = Typography;

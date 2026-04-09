@@ -83,7 +83,7 @@ const AppRouter = () => {
 
                         {/* Configuración (Maneja sus propias sub-rutas internas)  */}
                         {hasPermission("settings:view") && (
-                                <Route path="settings/*" element={<Settings />} />
+                            <Route path="settings/*" element={<Settings />} />
                         )}
 
                         {/* Redirección por defecto si la ruta no existe  */}

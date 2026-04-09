@@ -1,7 +1,10 @@
 import { useState, useCallback } from "react";
+import api from "../api/axiosInstance";
 
-const API_BASE_URL = process.env.REACT_APP_BACKEND;
-
+/**
+ * useFetch Hook
+ * Refactored to use global axios instance with interceptors
+ */
 const useFetch = () => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
@@ -11,30 +14,18 @@ const useFetch = () => {
         setError(null);
 
         try {
-            const token = localStorage.getItem("token");
-
-            const options = {
+            const response = await api({
+                url: endpoint.startsWith('/') ? endpoint : `/${endpoint}`,
                 method,
-                headers: {
-                    ...(body && !(body instanceof FormData) && method !== "GET" && { "Content-Type": "application/json" }),
-                    ...(token && { Authorization: `Bearer ${token}` }),
-                    ...headers,
-                },
-                ...(method !== "GET" && method !== "HEAD" && { body: body instanceof FormData ? body : JSON.stringify(body) })
-            };
-            
-            const response = await fetch(`${API_BASE_URL}/api/${endpoint}`, options);
-            const isJson = response.headers.get("content-type")?.includes("application/json");
-            const data = isJson ? await response.json() : null;
+                data: body,
+                headers,
+            });
 
-            if (!response.ok) {
-                throw data || { message: `Failed to ${method} data` };
-            }
-
-            return data;
-        } catch (error) {
-            setError(error.message || "An error occurred");
-            throw error;
+            return response.data;
+        } catch (err) {
+            const errorMessage = err.response?.data?.message || err.message || "An error occurred";
+            setError(errorMessage);
+            throw err.response?.data || err;
         } finally {
             setLoading(false);
         }

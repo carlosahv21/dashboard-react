@@ -1,20 +1,20 @@
-// hooks/useFormModal.js
 import { useState } from 'react';
 import { message } from 'antd';
 import dayjs from 'dayjs';
 import { useTranslation } from 'react-i18next';
+import useFetch from './useFetch';
 
 /**
  * Hook para gestionar el estado, la apertura/cierre y el envío de datos de un formulario CRUD
  * dentro de un Modal.
- * @param {function} request - Función de useFetch para realizar peticiones.
  * @param {string} endpoint - Endpoint base (ej: 'students').
  * @param {number} moduleFieldId - ID para obtener la configuración de campos dinámicos.
  * @param {string} titleSingular - Título en singular para los mensajes (ej: 'Estudiante').
  * @param {object} fixedValues - Valores que se añaden al submit (ej: role_id).
  * @param {object} form - Instancia del formulario de Ant Design (obtenida de Form.useForm() en el componente padre).
  */
-export const useFormModal = (request, endpoint, moduleFieldId, titleSingular, fixedValues, form) => {
+export const useFormModal = (endpoint, moduleFieldId, titleSingular, fixedValues, form) => {
+    const { request } = useFetch();
     const { t } = useTranslation();
     const [modalVisible, setModalVisible] = useState(false);
     const [editingId, setEditingId] = useState(null);

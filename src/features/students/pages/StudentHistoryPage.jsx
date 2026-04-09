@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import {
-    Row, Col, Card, Tabs, Button, Tag, Typography, 
-    Table, Statistic, Tooltip, theme, Form, Modal, 
+    Row, Col, Card, Tabs, Button, Tag, Typography,
+    Table, Statistic, Tooltip, theme, Form, Modal,
     Spin, App, Input, Space
 } from "antd";
 import {
@@ -37,7 +37,7 @@ const StudentHistory = () => {
     const { token } = theme.useToken();
     const { message } = App.useApp();
     const { formatCurrency, formatDateShort } = useFormatting();
-    
+
     // Columnas de tabla extraídas a un Hook para limpieza
     const { attendanceColumns, paymentColumns } = useHistoryColumns();
 
@@ -97,15 +97,15 @@ const StudentHistory = () => {
     }));
 
     const tabItems = [
-        { 
-            key: "1", 
-            label: t('students.paymentsHistory'), 
-            children: <Table columns={paymentColumns} dataSource={payments} rowKey="id" size="small" pagination={{ pageSize: 5 }} /> 
+        {
+            key: "1",
+            label: t('students.paymentsHistory'),
+            children: <Table columns={paymentColumns} dataSource={payments} rowKey="id" size="small" pagination={{ pageSize: 5 }} />
         },
-        { 
-            key: "2", 
-            label: t('students.attendances'), 
-            children: <Table columns={attendanceColumns} dataSource={attendances} rowKey="id" size="small" pagination={{ pageSize: 5 }} /> 
+        {
+            key: "2",
+            label: t('students.attendances'),
+            children: <Table columns={attendanceColumns} dataSource={attendances} rowKey="id" size="small" pagination={{ pageSize: 5 }} />
         },
     ];
 
@@ -141,7 +141,7 @@ const StudentHistory = () => {
 
                 <Col xs={24} lg={8}>
                     <Space direction="vertical" size="large" style={{ width: '100%' }}>
-                        <Card 
+                        <Card
                             title={t('students.currentPlan')}
                             extra={<Tag color={activePlan?.status === "active" ? "green" : "red"}>{activePlan?.status || t('students.inactive')}</Tag>}
                             actions={[
@@ -186,10 +186,10 @@ const StudentHistory = () => {
                         <FormHeader title={t('students.createPayment')} onSave={() => form.submit()} onCancel={() => closeModal(false)} />
                         <Form form={form} layout="vertical" onFinish={handleFormSubmit} style={{ padding: 20 }}>
                             {moduleData.blocks?.map(block => (
-                                <FormSection 
-                                    key={block.block_id} 
-                                    title={block.block_name} 
-                                    fields={block.fields.filter(f => f.name !== 'user_id')} 
+                                <FormSection
+                                    key={block.block_id}
+                                    title={block.block_name}
+                                    fields={block.fields.filter(f => f.name !== 'user_id')}
                                 />
                             ))}
                             <FormFooter onCancel={() => closeModal(false)} onSave={() => form.submit()} />

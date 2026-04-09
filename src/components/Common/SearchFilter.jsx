@@ -34,19 +34,20 @@ const SearchFilter = ({
     const { t } = useTranslation();
     const masiveActions = [
         {
-            value: "export",
+            key: "export",
             label: t('global.exportExcel'),
-            onClick: () => onExport(),
+            onClick: () => onExport && onExport(),
             icon: <FileExcelOutlined />,
         },
         canDelete && {
-            value: "delete",
+            key: "delete",
             label: t('global.delete'),
-            onClick: () => onBulkDelete(),
+            onClick: () => onBulkDelete && onBulkDelete(),
             icon: <DeleteOutlined />,
             danger: true,
         },
-    ];
+    ].filter(Boolean); // Filtrar falsy values
+
     return (
         <div
             style={{
@@ -55,13 +56,15 @@ const SearchFilter = ({
                 justifyContent: "space-between",
                 width: "100%",
                 marginBottom: 16,
+                flexWrap: "wrap",
+                gap: "16px"
             }}
         >
             <Title level={2} style={{ marginBottom: 0, marginTop: 0 }}>
                 {titlePlural}
             </Title>
 
-            <Space>
+            <Space wrap>
                 <Space size={5}>
                     <Typography.Text type="secondary">{t('global.show')}</Typography.Text>
                     <Select
@@ -95,24 +98,22 @@ const SearchFilter = ({
                 </Dropdown>
 
                 {viewOptions && viewOptions.length > 1 && (
-                    <>
-                        <Space>
-                            {viewOptions.includes("table") && (
-                                <Button
-                                    type={currentView === "table" ? "primary" : "default"}
-                                    icon={<TableOutlined />}
-                                    onClick={() => onViewChange("table")}
-                                />
-                            )}
-                            {viewOptions.includes("card") && (
-                                <Button
-                                    type={currentView === "card" ? "primary" : "default"}
-                                    icon={<AppstoreOutlined />}
-                                    onClick={() => onViewChange("card")}
-                                />
-                            )}
-                        </Space>
-                    </>
+                    <Space>
+                        {viewOptions.includes("table") && (
+                            <Button
+                                type={currentView === "table" ? "primary" : "default"}
+                                icon={<TableOutlined />}
+                                onClick={() => onViewChange("table")}
+                            />
+                        )}
+                        {viewOptions.includes("card") && (
+                            <Button
+                                type={currentView === "card" ? "primary" : "default"}
+                                icon={<AppstoreOutlined />}
+                                onClick={() => onViewChange("card")}
+                            />
+                        )}
+                    </Space>
                 )}
 
                 {canCreate && (

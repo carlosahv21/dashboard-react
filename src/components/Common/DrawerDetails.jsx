@@ -348,7 +348,6 @@ const DrawerDetails = ({ visible, onClose, data, onEdit, onDelete }) => {
         title,
         subtitle,
         email,
-        avatarChar,
         sections,
         avatar
     } = normalizedData;

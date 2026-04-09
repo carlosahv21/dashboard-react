@@ -7,9 +7,9 @@ import HeaderComponent from "../../../components/layout/Header";
 import Footer from "../../../components/layout/Footer";
 
 import { AuthContext } from "../../../context/AuthContext";
-import { OnboardingProvider } from "../../../context/OnboardingContext";
-import OnboardingWidget from "../../../components/Common/OnboardingWidget";
-import AppOnboarding from "../../../components/Common/AppOnboarding";
+import { OnboardingProvider } from "../../onboarding/context/OnboardingContext";
+import OnboardingWidget from "../../onboarding/components/OnboardingWidget";
+import AppOnboarding from "../../onboarding/components/AppOnboarding";
 
 // Custom hook to manage layout logic
 const useDashboardLayout = (routes) => {

@@ -1,11 +1,12 @@
 import React from "react";
-import { Spin } from "antd";
+import { Spin, theme } from "antd";
 
 const LoadingScreen = ({ fullscreen = true }) => {
+    const { token } = theme.useToken();
+
     if (fullscreen) {
         return (
-            <Spin
-                size="large"
+            <div
                 style={{
                     position: "fixed",
                     top: 0,
@@ -15,14 +16,17 @@ const LoadingScreen = ({ fullscreen = true }) => {
                     display: "flex",
                     justifyContent: "center",
                     alignItems: "center",
+                    backgroundColor: token.colorBgMask,
                     zIndex: 9999,
                 }}
-            />
+            >
+                <Spin size="large" />
+            </div>
         );
     }
 
     return (
-        <div style={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
+        <div style={{ display: "flex", justifyContent: "center", alignItems: "center", padding: "40px" }}>
             <Spin size="large" />
         </div>
     );

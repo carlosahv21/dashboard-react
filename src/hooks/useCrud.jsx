@@ -1,5 +1,5 @@
 // hooks/useCrud.js
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { message } from "antd";
 import useFetch from "./useFetch";
 
@@ -23,7 +23,7 @@ export const useCrud = (
     const [selectedKeys, setSelectedKeys] = useState([]);
     const [isAllSelected, setIsAllSelected] = useState(false);
 
-    const fetchItems = async (
+    const fetchItems = useCallback(async (
         page = pagination.current,
         limit = pagination.pageSize,
         currentSort = sort
@@ -51,10 +51,10 @@ export const useCrud = (
 
             const response = await request(`${endpoint}/?${queryParams}`, "GET");
             const items = response.data;
-            const pagination = response.pagination;
+            const paginationData = response.pagination;
 
             setItems(items || []);
-            const total = pagination.total || 0;
+            const total = paginationData.total || 0;
             const lastPage = Math.max(1, Math.ceil(total / limit));
             const current = page > lastPage ? lastPage : page;
             setPagination((prev) => ({ ...prev, total, current, pageSize: limit }));
@@ -64,7 +64,7 @@ export const useCrud = (
         } finally {
             setLoading(false);
         }
-    };
+    }, [endpoint, titlePlural, filters, search, sort, pagination.current, pagination.pageSize, request]);
 
     useEffect(() => {
         const delay = setTimeout(
@@ -72,7 +72,7 @@ export const useCrud = (
             500
         );
         return () => clearTimeout(delay);
-    }, [search]);
+    }, [search, fetchItems, pagination.pageSize, sort]);
 
     useEffect(() => {
         if (isAllSelected) {
@@ -151,6 +151,61 @@ export const useCrud = (
         }
     };
 
+    const handleDelete = async (id, titleSingular) => {
+        try {
+            await request(`${endpoint}/${id}/bin`, "PATCH");
+            message.success(`Registro de ${titleSingular} eliminado correctamente`);
+            setItems((prev) => prev.filter((i) => i.id !== id));
+            setPagination((prev) => ({ ...prev, total: prev.total - 1 }));
+            return true;
+        } catch (error) {
+            message.error(error?.message || `Error al eliminar ${titleSingular}`);
+            return false;
+        }
+    };
+
+    const handleBulkDelete = (modal, t) => {
+        if (selectedKeys.length === 0) {
+            message.warning(t('global.noSelectionDelete'));
+            return;
+        }
+
+        modal.confirm({
+            title: t('global.bulkDeleteTitle', { count: isAllSelected ? t('global.all') : selectedKeys.length }),
+            content: t('global.bulkDeleteConfirm', { count: isAllSelected ? pagination.total : selectedKeys.length }),
+            okText: t('global.yesDelete'),
+            okType: "danger",
+            cancelText: t('global.cancel'),
+            onOk: async () => {
+                const hide = message.loading(t('global.deleting'), 0);
+                try {
+                    let idsToDelete = selectedKeys;
+                    if (isAllSelected) {
+                        const allItemsData = await getAllItems();
+                        idsToDelete = allItemsData.map(i => i.id);
+                    }
+
+                    for (let i = 0; i < idsToDelete.length; i += 5) {
+                        const chunk = idsToDelete.slice(i, i + 5);
+                        await Promise.all(
+                            chunk.map((id) => request(`${endpoint}/${id}`, "DELETE"))
+                        );
+                    }
+
+                    message.success(t('global.bulkDeleteSuccess'));
+                    fetchItems();
+                    setSelectedKeys([]);
+                    handleSelectAll(false);
+                } catch (error) {
+                    console.error(error);
+                    message.error(t('global.bulkDeleteError'));
+                } finally {
+                    hide();
+                }
+            },
+        });
+    };
+
     return {
         items,
         loading,
@@ -166,6 +221,8 @@ export const useCrud = (
         setPagination,
         request,
         getAllItems,
+        handleDelete,
+        handleBulkDelete,
         // Selection
         selectedKeys,
         setSelectedKeys,
