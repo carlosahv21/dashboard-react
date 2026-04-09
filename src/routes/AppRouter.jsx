@@ -4,13 +4,13 @@ import { AuthContext } from "../context/AuthContext";
 import LoadingScreen from "../components/Common/LoadingScreen";
 
 // Auth
-const Login = lazy(() => import("../views/Auth/Login"));
+const Login = lazy(() => import("../features/auth/pages/LoginPage"));
 
 // Layout Principal
-const DashboardLayout = lazy(() => import("../views/Dashboard/Dashboard"));
+const DashboardLayout = lazy(() => import("../features/dashboard/pages/DashboardLayout"));
 
 // Vistas de Negocio
-const DashboardView = lazy(() => import("../views/Dashboard/DashboardView"));
+const DashboardView = lazy(() => import("../features/dashboard/pages/DashboardPage"));
 const Plans = lazy(() => import("../views/Plans/Plans"));
 const Classes = lazy(() => import("../views/Classes/Classes"));
 

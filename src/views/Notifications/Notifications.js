@@ -65,7 +65,7 @@ const Notifications = () => {
                 {notifications.length > 0 && (
                     <Button
                         type="primary"
-                        size="large"
+                        size="medium"
                         onClick={markAllAsRead}
                         icon={<CheckOutlined />}
                         style={{ borderRadius: "10px" }}

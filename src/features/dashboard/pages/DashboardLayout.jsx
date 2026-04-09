@@ -2,14 +2,14 @@ import React, { useContext } from "react";
 import { Layout } from "antd";
 import { Outlet } from "react-router-dom";
 
-import Sidebar from "../../components/layout/Sidebar";
-import HeaderComponent from "../../components/layout/Header";
-import Footer from "../../components/layout/Footer";
+import Sidebar from "../../../components/layout/Sidebar";
+import HeaderComponent from "../../../components/layout/Header";
+import Footer from "../../../components/layout/Footer";
 
-import { AuthContext } from "../../context/AuthContext";
-import { OnboardingProvider } from "../../context/OnboardingContext";
-import OnboardingWidget from "../../components/Common/OnboardingWidget";
-import AppOnboarding from "../../components/Common/AppOnboarding";
+import { AuthContext } from "../../../context/AuthContext";
+import { OnboardingProvider } from "../../../context/OnboardingContext";
+import OnboardingWidget from "../../../components/Common/OnboardingWidget";
+import AppOnboarding from "../../../components/Common/AppOnboarding";
 
 const { Content } = Layout;
 
@@ -58,7 +58,7 @@ const DashboardContent = () => {
                         title: "¡Todo listo!",
                         description: "Ya puedes comenzar a usar la aplicación.",
                         target: null,
-                    }
+                    },
                 ]}
             />
 
@@ -81,7 +81,7 @@ const DashboardContent = () => {
                     style={{
                         minHeight: "calc(100vh - 64px)",
                         overflowY: "auto",
-                        padding: "24px"
+                        padding: "24px",
                     }}
                 >
                     <Outlet />
@@ -94,10 +94,10 @@ const DashboardContent = () => {
     );
 };
 
-const Dashboard = () => (
+const DashboardLayout = () => (
     <OnboardingProvider>
         <DashboardContent />
     </OnboardingProvider>
 );
 
-export default Dashboard;
+export default DashboardLayout;

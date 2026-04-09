@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useContext } from "react";
-import { Layout, Card, Avatar, Descriptions, Tag, Spin, Row, Col, theme, Divider, Button, Form, Input, message, Upload, DatePicker, Select } from "antd";
+import { Layout, Card, Avatar, Descriptions, Tag, Spin, Row, Col, theme, Divider, Button, Form, Input, message, Upload, DatePicker, Select, Typography } from "antd";
 import { UserOutlined, PhoneOutlined, MailOutlined, SafetyCertificateOutlined, UploadOutlined, LockOutlined, EditOutlined, SaveOutlined, CloseOutlined } from "@ant-design/icons";
 import { AuthContext } from "../../context/AuthContext";
 import useFetch from "../../hooks/useFetch";
@@ -9,9 +9,11 @@ import dayjs from "dayjs";
 
 const { Content } = Layout;
 const { Option } = Select;
+const { Title } = Typography;
 
 const Profile = () => {
-    const { user, setUser } = useContext(AuthContext);
+    const { user, setUser, settings } = useContext(AuthContext);
+    const isDarkMode = settings?.theme === "dark";
     const { request, loading } = useFetch();
     const { formatDate } = useFormatting();
     const { t } = useTranslation();
@@ -121,10 +123,20 @@ const Profile = () => {
     const address = [data.address, data.city, data.state, data.country].filter(Boolean).join(", ");
 
     return (
-        <Content style={{ margin: "24px 16px 0", overflow: "initial" }}>
-            <div style={{ maxWidth: 1200, margin: "0 auto" }}>
-                <Row gutter={[24, 24]}>
-                    {/* Main Section */}
+        <div style={{ minHeight: "100vh" }}>
+            <div style={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                marginBottom: 32
+            }}>
+                <Title level={2} style={{ marginBottom: 0, marginTop: 0 }}>
+                    {t("profile.title") || "Perfil"}
+                </Title>
+            </div>
+
+            <Row gutter={[24, 24]}>
+                {/* Main Section */}
                     <Col xs={24} lg={16}>
                         {/* Header Card */}
                         <Card
@@ -420,28 +432,29 @@ const Profile = () => {
                             bordered={false}
                             style={{
                                 borderRadius: 16,
-                                boxShadow: "0 4px 20px rgba(0,0,0,0.05)",
-                                background: "linear-gradient(135deg, #f0f7ff 0%, #e6f7ff 100%)",
-                                border: "1px solid #bae7ff"
+                                boxShadow: isDarkMode ? "0 4px 12px rgba(0,0,0,0.2)" : "0 4px 20px rgba(0,0,0,0.05)",
+                                background: isDarkMode ? "linear-gradient(135deg, #1e1e1e 0%, #2d2d2d 100%)" : "linear-gradient(135deg, #f0f7ff 0%, #e6f7ff 100%)",
+                                border: `1px solid ${isDarkMode ? "#333" : "#bae7ff"}`
                             }}
                         >
                             <div style={{ display: 'flex', gap: 16 }}>
                                 <div style={{
                                     width: 50,
-                                    height: 40,
+                                    height: 48,
                                     borderRadius: "50%",
-                                    background: "#007bff",
+                                    background: isDarkMode ? "#007bff40" : "#007bff",
                                     display: "flex",
                                     alignItems: "center",
                                     justifyContent: "center",
                                     color: "#fff",
-                                    fontSize: 20
+                                    fontSize: 20,
+                                    flexShrink: 0
                                 }}>
                                     ?
                                 </div>
                                 <div>
-                                    <h4 style={{ margin: 0, fontWeight: "bold", fontSize: 16 }}>¿Necesitas ayuda?</h4>
-                                    <p style={{ margin: "8px 0 16px", color: "#666", fontSize: 14 }}>
+                                    <h4 style={{ margin: 0, fontWeight: "bold", fontSize: 16, color: isDarkMode ? "#fff" : "inherit" }}>¿Necesitas ayuda?</h4>
+                                    <p style={{ margin: "8px 0 16px", color: isDarkMode ? "#aaa" : "#666", fontSize: 14 }}>
                                         Si tienes problemas con tu cuenta, contacta a soporte técnico.
                                     </p>
                                     <Button type="link" style={{ padding: 0, color: "#007bff", fontWeight: "600" }}>
@@ -452,8 +465,7 @@ const Profile = () => {
                         </Card>
                     </Col>
                 </Row>
-            </div>
-        </Content>
+        </div>
     );
 };
 

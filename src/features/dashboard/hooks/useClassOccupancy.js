@@ -1,0 +1,290 @@
+import { useState, useEffect, useMemo, useCallback } from "react";
+import dashboardService from "../services/dashboardService";
+
+/**
+ * Hook to manage Class Occupancy report data, including genre filtering and drilldown.
+ */
+const useClassOccupancy = () => {
+  const [loading, setLoading] = useState(true);
+  const [classOccupancyData, setClassOccupancyData] = useState([]);
+
+  // Available and selected genres
+  const [availableGenres, setAvailableGenres] = useState([]);
+  const [selectedGenre, setSelectedGenre] = useState(null);
+
+  // Current chart option (can be main or drilldown)
+  const [currentOption, setCurrentOption] = useState(null);
+
+  // Drilldown state
+  const [currentClassId, setCurrentClassId] = useState(null);
+
+  // Fetch data
+  useEffect(() => {
+    const fetchData = async () => {
+      setLoading(true);
+      try {
+        const response = await dashboardService.getClassOccupancy();
+        const result = response.data;
+        if (result?.success) {
+          const parsedData = result.data.map((item) => ({
+            ...item,
+            occupancy_rate: parseFloat(item.occupancy_rate),
+          }));
+          setClassOccupancyData(parsedData);
+
+          const uniqueGenres = [
+            ...new Set(parsedData.map((item) => item.genre)),
+          ].sort();
+          setAvailableGenres(uniqueGenres);
+
+          if (uniqueGenres.length > 0 && !selectedGenre) {
+            setSelectedGenre(uniqueGenres[0]);
+          }
+        } else {
+          setClassOccupancyData([]);
+          setAvailableGenres([]);
+          setSelectedGenre(null);
+        }
+      } catch (error) {
+        console.error("Error al cargar ocupación de clases:", error);
+        setClassOccupancyData([]);
+        setAvailableGenres([]);
+        setSelectedGenre(null);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Reset drilldown when genre changes
+  useEffect(() => {
+    setCurrentClassId(null);
+  }, [selectedGenre]);
+
+  // Generate main chart option
+  const { mainOption, classesMap } = useMemo(() => {
+    if (!selectedGenre || classOccupancyData.length === 0) {
+      return { mainOption: null, classesMap: {} };
+    }
+
+    const classesMap = {};
+    const filteredClasses = classOccupancyData.filter(
+      (item) => item.genre === selectedGenre
+    );
+
+    const chartData = filteredClasses
+      .map((item, index) => {
+        const classId = `${selectedGenre}-${index}`;
+        classesMap[classId] = {
+          name: item.name,
+          capacity: item.capacity,
+          enrolled: item.enrolled_count,
+          occupancy_rate: item.occupancy_rate,
+        };
+
+        return {
+          value: item.occupancy_rate,
+          name: item.name,
+          classId: classId,
+          itemStyle: { color: "#0A84FF" },
+        };
+      })
+      .sort((a, b) => b.value - a.value);
+
+    const option = {
+      backgroundColor: "transparent",
+      tooltip: {
+        trigger: "axis",
+        axisPointer: { type: "shadow" },
+        formatter: (params) => {
+          const data = params[0];
+          return `<b>${data.name}</b><br/>Ocupación: <b>${data.value}%</b><br/><i>Click para ver detalles</i>`;
+        },
+      },
+      grid: {
+        left: "3%",
+        right: "4%",
+        bottom: "15%",
+        top: "15%",
+        containLabel: true,
+      },
+      xAxis: {
+        type: "category",
+        data: chartData.map((item) => item.name),
+        axisLabel: { rotate: 45, interval: 0, fontSize: 11 },
+      },
+      yAxis: {
+        type: "value",
+        name: "Tasa de Ocupación (%)",
+        axisLabel: { formatter: "{value}%" },
+        splitLine: {
+          lineStyle: {
+            color: "rgba(0, 0, 0, 0.06)",
+            type: "dashed",
+          },
+        },
+      },
+      series: [
+        {
+          type: "bar",
+          data: chartData,
+          barMaxWidth: 50,
+          itemStyle: {
+            borderRadius: [6, 6, 0, 0],
+            color: (params) => params.data.itemStyle.color,
+          },
+          label: {
+            position: "top",
+            formatter: "{c}",
+            fontSize: 11,
+          },
+          emphasis: {
+            itemStyle: {
+              shadowBlur: 10,
+              shadowOffsetX: 0,
+              shadowColor: "rgba(0, 0, 0, 0.5)",
+            },
+          },
+        },
+      ],
+      graphic: [],
+    };
+
+    return { mainOption: option, classesMap };
+  }, [classOccupancyData, selectedGenre]);
+
+  // Generate drilldown chart option
+  const generateDrilldownOption = useCallback((classItem) => {
+    const data = [
+      { name: "Capacidad", value: classItem.capacity, color: "#0A84FF" },
+      {
+        name: "Inscritos",
+        value: classItem.enrolled,
+        color: "rgba(10, 132, 255, 0.6)",
+      },
+    ];
+
+    return {
+      title: {
+        text: classItem.name,
+        subtext: `Tasa de Ocupación: ${classItem.occupancy_rate.toFixed(2)}%`,
+        left: "center",
+        top: "2%",
+      },
+      tooltip: {
+        trigger: "axis",
+        axisPointer: { type: "shadow" },
+        formatter: (params) => {
+          const data = params[0];
+          return `<b>${data.name}</b><br/>Cantidad: <b>${data.value}</b>`;
+        },
+      },
+      grid: {
+        left: "3%",
+        right: "4%",
+        bottom: "15%",
+        top: "20%",
+        containLabel: true,
+      },
+      xAxis: {
+        type: "category",
+        data: data.map((d) => d.name),
+        splitLine: { show: false },
+      },
+      yAxis: {
+        type: "value",
+        name: "Cantidad de Personas",
+        splitLine: {
+          lineStyle: {
+            color: "rgba(0, 0, 0, 0.06)",
+            type: "dashed",
+          },
+        },
+      },
+      series: [
+        {
+          type: "bar",
+          data: data.map((d) => ({
+            value: d.value,
+            itemStyle: { color: d.color },
+          })),
+          barMaxWidth: 80,
+          itemStyle: { borderRadius: [6, 6, 0, 0] },
+          label: { position: "top", fontSize: 14, fontWeight: "bold" },
+        },
+      ],
+      graphic: [
+        {
+          type: "group",
+          left: 20,
+          top: 5,
+          children: [
+            {
+              type: "rect",
+              z: 100,
+              left: 0,
+              top: 0,
+              shape: { width: 80, height: 32, r: 6 },
+              style: { fill: "#1890ff", stroke: "#096dd9", lineWidth: 1 },
+              onclick: () => setCurrentClassId(null),
+              cursor: "pointer",
+            },
+            {
+              type: "text",
+              z: 100,
+              left: 16,
+              top: 9,
+              style: {
+                text: "← Atrás",
+                fontSize: 13,
+                fill: "#fff",
+                fontWeight: "bold",
+              },
+              onclick: () => setCurrentClassId(null),
+              cursor: "pointer",
+            },
+          ],
+        },
+      ],
+    };
+  }, []);
+
+  // Update currentOption
+  useEffect(() => {
+    if (!currentClassId && mainOption) {
+      setCurrentOption(mainOption);
+    } else if (currentClassId && classesMap[currentClassId]) {
+      const classItem = classesMap[currentClassId];
+      setCurrentOption(generateDrilldownOption(classItem));
+    }
+  }, [currentClassId, mainOption, classesMap, generateDrilldownOption]);
+
+  const onOccupancyChartClick = useCallback(
+    (event) => {
+      if (event.data && event.data.classId && !currentClassId) {
+        setCurrentClassId(event.data.classId);
+      }
+    },
+    [currentClassId]
+  );
+
+  const onOccupancyChartReady = useCallback(
+    (echartsInstance) => {
+      echartsInstance.off("click");
+      echartsInstance.on("click", onOccupancyChartClick);
+    },
+    [onOccupancyChartClick]
+  );
+
+  return {
+    classOccupancyLoading: loading,
+    availableGenres,
+    selectedGenre,
+    setSelectedGenre,
+    occupancyDrilldownOption: currentOption,
+    onOccupancyChartReady,
+  };
+};
+
+export default useClassOccupancy;
