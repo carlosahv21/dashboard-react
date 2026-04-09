@@ -21,7 +21,7 @@ const StudentHistory = lazy(() => import("../features/students/pages/StudentHist
 const Teachers = lazy(() => import("../views/Teachers/Teachers"));
 const Registrations = lazy(() => import("../views/Registrations/Registrations"));
 const Attendances = lazy(() => import("../views/Attendances/Attendances"));
-const Notifications = lazy(() => import("../views/Notifications/Notifications"));
+const Notifications = lazy(() => import("../features/notifications/pages/NotificationsPage"));
 const Profile = lazy(() => import("../features/profile/pages/ProfilePage"));
 
 // Configuración
