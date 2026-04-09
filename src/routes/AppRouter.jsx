@@ -19,12 +19,12 @@ const Students = lazy(() => import("../features/students/pages/StudentPage"));
 const StudentHistory = lazy(() => import("../features/students/pages/StudentHistoryPage"));
 
 const Registrations = lazy(() => import("../features/registrations/pages/RegistrationPage"));
-const Attendances = lazy(() => import("../views/Attendances/Attendances"));
+const Attendances = lazy(() => import("../features/attendances/pages/AttendancePage"));
 const Notifications = lazy(() => import("../features/notifications/pages/NotificationsPage"));
 const Profile = lazy(() => import("../features/profile/pages/ProfilePage"));
 
 // Configuración
-const SettingsLayout = lazy(() => import("../views/Settings/SettingsLayouts"));
+const Settings = lazy(() => import("../features/settings/pages/SettingsPage"));
 
 const AppRouter = () => {
     const { user, loading, hasPermission } = useContext(AuthContext);
@@ -83,7 +83,7 @@ const AppRouter = () => {
 
                         {/* Configuración (Maneja sus propias sub-rutas internas)  */}
                         {hasPermission("settings:view") && (
-                            <Route path="settings/*" element={<SettingsLayout />} />
+                                <Route path="settings/*" element={<Settings />} />
                         )}
 
                         {/* Redirección por defecto si la ruta no existe  */}

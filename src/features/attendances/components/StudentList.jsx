@@ -3,7 +3,7 @@ import React from 'react';
 import { Card, List, Empty, Typography, Input, Checkbox, Button, Avatar, Tag } from "antd";
 import { UserOutlined, SearchOutlined } from "@ant-design/icons";
 
-import PaginationControl from "./PaginationControl";
+import PaginationControl from "../../../components/Common/PaginationControl";
 
 const { Title, Text } = Typography;
 

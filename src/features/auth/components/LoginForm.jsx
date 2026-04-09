@@ -71,9 +71,18 @@ const LoginForm = ({ onFinish, loading, t }) => {
           <Form.Item name="remember" valuePropName="checked" noStyle>
             <Checkbox>{t("auth.rememberMe")}</Checkbox>
           </Form.Item>
-          <a className="forgot-password-link" href="javascript:void(0)">
+          <button
+            className="forgot-password-link"
+            style={{
+              background: "none",
+              border: "none",
+              cursor: "pointer",
+              padding: 0,
+              color: "#1890ff",
+            }}
+          >
             {t("auth.forgotPassword")}
-          </a>
+          </button>
         </div>
 
         <Form.Item>
@@ -91,7 +100,19 @@ const LoginForm = ({ onFinish, loading, t }) => {
 
       <div className="login-footer-text">
         <p>
-          <a href="javascript:void(0)">{t("auth.contactAdmin")}</a> {t("auth.accessHelp")}
+          <button
+            style={{
+              background: "none",
+              border: "none",
+              cursor: "pointer",
+              padding: 0,
+              color: "#1890ff",
+              textDecoration: "underline",
+            }}
+          >
+            {t("auth.contactAdmin")}
+          </button>{" "}
+          {t("auth.accessHelp")}
         </p>
       </div>
     </div>

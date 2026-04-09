@@ -131,7 +131,7 @@ export const formatCurrency = (amount, settings, showSymbol = true) => {
 
         // If showSymbol is false, remove the currency symbol and return just the number
         if (!showSymbol) {
-            return formatted.replace(/[^\d.,\-]/g, "").trim();
+            return formatted.replace(/[^\d.,-]/g, "").trim();
         }
 
         return formatted;

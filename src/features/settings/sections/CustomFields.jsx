@@ -171,7 +171,7 @@ const CustomFields = () => {
         };
 
         fetchFields();
-    }, [request, changeModule, t]);
+    }, [request, changeModule, t, message]);
 
     // Edit field
     const showModal = (field, blockId) => {

@@ -3,7 +3,8 @@ import React from 'react';
 import { Card, List, Spin, Empty, Typography, Space, Avatar, theme } from "antd"; // 💡 Importar Pagination
 import { ClockCircleOutlined, BookOutlined } from "@ant-design/icons";
 
-import PaginationControl from "./PaginationControl";
+import PaginationControl from "../../../components/Common/PaginationControl";
+
 
 const { Title, Text } = Typography;
 

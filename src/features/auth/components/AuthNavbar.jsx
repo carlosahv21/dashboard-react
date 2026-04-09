@@ -14,18 +14,30 @@ const AuthNavbar = ({ theme, toggleTheme, t }) => {
       </div>
       <div className="dance-nav-actions">
         <div className="dance-nav-links">
-          <a className="dance-nav-link" href="javascript:void(0)">
+          <button
+            className="dance-nav-link"
+            style={{ background: "none", border: "none", cursor: "pointer" }}
+          >
             {t("auth.navHome")}
-          </a>
-          <a className="dance-nav-link" href="javascript:void(0)">
+          </button>
+          <button
+            className="dance-nav-link"
+            style={{ background: "none", border: "none", cursor: "pointer" }}
+          >
             {t("auth.navClasses")}
-          </a>
-          <a className="dance-nav-link" href="javascript:void(0)">
+          </button>
+          <button
+            className="dance-nav-link"
+            style={{ background: "none", border: "none", cursor: "pointer" }}
+          >
             {t("auth.navAcademy")}
-          </a>
-          <a className="dance-nav-link" href="javascript:void(0)">
+          </button>
+          <button
+            className="dance-nav-link"
+            style={{ background: "none", border: "none", cursor: "pointer" }}
+          >
             {t("auth.navContact")}
-          </a>
+          </button>
         </div>
 
         <button

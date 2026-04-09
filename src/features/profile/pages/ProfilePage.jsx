@@ -1,5 +1,5 @@
 import React, { useContext } from "react";
-import { Row, Col, theme, Typography, Spin, message, Form } from "antd";
+import { Row, Col, Typography, Spin, message, Form } from "antd";
 import { AuthContext } from "../../../context/AuthContext";
 import { useProfile } from "../hooks/useProfile";
 import { useTranslation } from "react-i18next";
