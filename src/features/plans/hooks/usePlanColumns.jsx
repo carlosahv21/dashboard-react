@@ -5,14 +5,14 @@ export const usePlanColumns = () => {
 
   const columns = [
     {
-      title: t("global.name") || "Nombre",
+      title: t("global.name"),
       dataIndex: "name",
       key: "name",
       sorter: true,
       defaultSortOrder: "ascend",
     },
     {
-      title: t("global.description") || "Descripción",
+      title: t("global.description"),
       dataIndex: "description",
       key: "description",
       sorter: true,

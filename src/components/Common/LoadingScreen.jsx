@@ -16,7 +16,7 @@ const LoadingScreen = ({ fullscreen = true }) => {
                     display: "flex",
                     justifyContent: "center",
                     alignItems: "center",
-                    backgroundColor: token.colorBgMask,
+                    backgroundColor: token.colorBgContainer,
                     zIndex: 9999,
                 }}
             >

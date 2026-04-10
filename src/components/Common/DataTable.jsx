@@ -15,7 +15,8 @@ const DataTable = ({
     onRow,
     selectedRowId,
     onChange,
-    rowSelection
+    rowSelection,
+    rowKey = "id"
 }) => {
     const { modal } = App.useApp();
     const { t } = useTranslation();
@@ -84,13 +85,17 @@ const DataTable = ({
             columns={enhancedColumns}
             dataSource={data}
             loading={loading}
-            rowKey="id"
+            rowKey={rowKey}
             bordered
             pagination={false}
             onRow={onRow}
             onChange={onChange}
             showSorterTooltip={false}
-            rowClassName={(record) => record.id === selectedRowId ? "ant-table-row-selected" : ""}
+            rowClassName={(record) => 
+                selectedRowId !== undefined && selectedRowId !== null && record[rowKey] === selectedRowId 
+                ? "ant-table-row-selected" 
+                : ""
+            }
             rowSelection={rowSelection}
         />
     );

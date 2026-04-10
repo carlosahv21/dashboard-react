@@ -1,5 +1,5 @@
 import React from "react";
-import { Card, Avatar, Tag, Button, Upload } from "antd";
+import { Card, Avatar, Tag, Button, Upload, theme } from "antd";
 import {
   UserOutlined,
   MailOutlined,
@@ -19,6 +19,7 @@ const ProfileHeaderCard = ({
   handleCustomUpload,
   t,
 }) => {
+  const { token } = theme.useToken();
   const roleLabel =
     data.role === "admin"
       ? t("roles.admin")
@@ -40,7 +41,7 @@ const ProfileHeaderCard = ({
       <div
         style={{
           height: 160,
-          background: "#007bff",
+          background: token.colorPrimary,
           position: "relative",
           zIndex: 1,
         }}
@@ -129,7 +130,7 @@ const ProfileHeaderCard = ({
                     <SafetyCertificateOutlined /> {roleLabel || "Estudiante"}
                   </Tag>
                 </div>
-                <p style={{ margin: "4px 0", color: "#666", fontSize: 16 }}>
+                <p style={{ margin: "4px 0", color: token.colorTextSecondary, fontSize: 16 }}>
                   <MailOutlined /> {data.email}
                 </p>
                 <Tag

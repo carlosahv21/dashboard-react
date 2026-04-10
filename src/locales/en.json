@@ -29,13 +29,24 @@
         "themeLight": "Switch to light mode",
         "themeDark": "Switch to dark mode",
         "genericError": "An error occurred. Please try again.",
-        "brandName": "DanceFlow"
+        "brandName": "DanceFlow",
+        "emailRequired": "Please enter your email!",
+        "emailInvalid": "Please enter a valid email!",
+        "passwordRequired": "Please enter your password!",
+        "passwordMinLength": "Password must be at least 6 characters!"
+    },
+    "session": {
+        "expiredTitle": "Session expired or invalid token",
+        "expiredContent": "Your session has expired. You must log in again.",
+        "expiredOk": "OK"
     },
     "dashboard": {
         "activeStudents": "Active Students",
         "todayClasses": "Today's Classes",
         "monthlyRevenue": "Monthly Revenue",
-        "attendanceRate": "Attendance Rate"
+        "attendanceRate": "Attendance Rate",
+        "totalMinutes": "Total Minutes",
+        "rating": "Rating"
     },
     "stats": {
         "userDistributionByPlan": "User Distribution by Plan",
@@ -135,6 +146,8 @@
         "logo": "Logo",
         "contactEmail": "Contact Email",
         "phoneNumber": "Phone Number",
+        "memberSince": "Member Since",
+        "lastAccess": "Last Access",
         "systemPreferences": "System Preferences",
         "currency": "Currency",
         "dateFormat": "Date Format",
@@ -142,6 +155,7 @@
         "language": "Language",
         "profile": "Profile",
         "gender": "Gender",
+        "email": "Email",
         "birthDate": "Birth Date",
         "address": "Address",
         "joined": "Joined",
@@ -257,7 +271,11 @@
         "updateModuleError": "Error updating module status.",
         "moduleStatusUpdated": "Module status updated successfully.",
         "moduleName": "Name",
-        "category": "Category"
+        "category": "Category",
+        "supportCardTitle": "Need help?",
+        "supportCardDescription": "If you have any questions or need assistance, don't hesitate to contact us.",
+        "contactSupport": "Contact support",
+        "addBlock": "Add Block"
     },
     "menu": {
         "dashboard": "Dashboard",
@@ -343,7 +361,11 @@
         "detail": "Detail",
         "edit": "Edit",
         "view": "View",
-        "history": "History"
+        "history": "History",
+        "name": "Name",
+        "description": "Description",
+        "email": "Email",
+        "role": "Role"
     },
     "search": {
         "title": "Search results",

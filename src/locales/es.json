@@ -44,7 +44,9 @@
         "activeStudents": "Estudiantes Activos",
         "todayClasses": "Clases de Hoy",
         "monthlyRevenue": "Ingresos Mensuales",
-        "attendanceRate": "Tasa de Asistencia"
+        "attendanceRate": "Tasa de Asistencia",
+        "totalMinutes": "Total de Minutos",
+        "rating": "Calificación"
     },
     "stats": {
         "userDistributionByPlan": "Distribución de Usuarios por Plan",
@@ -144,6 +146,8 @@
         "logo": "Logo",
         "contactEmail": "Correo de contacto",
         "phoneNumber": "Número de teléfono",
+        "memberSince": "Miembro desde",
+        "lastAccess": "Último acceso",
         "systemPreferences": "Preferencias del Sistema",
         "currency": "Moneda",
         "dateFormat": "Formato de fecha",
@@ -267,7 +271,11 @@
         "updateModuleError": "Error al actualizar el estado del módulo.",
         "moduleStatusUpdated": "Estado del módulo actualizado correctamente.",
         "moduleName": "Nombre",
-        "category": "Categoría"
+        "category": "Categoría",
+        "supportCardTitle": "¿Necesitas ayuda?",
+        "supportCardDescription": "Si tienes alguna duda o necesitas asistencia, no dudes en contactarnos.",
+        "contactSupport": "Contactar soporte",
+        "addBlock": "Agregar Bloque"
     },
     "menu": {
         "dashboard": "Dashboard",
@@ -353,7 +361,11 @@
         "detail": "Detalle",
         "edit": "Editar",
         "view": "Ver",
-        "history": "Historial"
+        "history": "Historial",
+        "name": "Nombre",
+        "description": "Descripción",
+        "email": "Correo electrónico",
+        "role": "Rol"
     },
     "search": {
         "title": "Resultados de la búsqueda",

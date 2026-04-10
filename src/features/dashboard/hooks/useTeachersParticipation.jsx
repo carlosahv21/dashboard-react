@@ -6,11 +6,13 @@ import {
   BookOutlined,
 } from "@ant-design/icons";
 import dashboardService from "../services/dashboardService";
+import { useTranslation } from "react-i18next";
 
 /**
  * Hook to manage Teachers Participation report data.
  */
 const useTeachersParticipation = () => {
+  const { t } = useTranslation();
   const [loading, setLoading] = useState(true);
   const [teacherData, setTeacherData] = useState([]);
 
@@ -77,7 +79,7 @@ const useTeachersParticipation = () => {
 
   const columns = [
     {
-      title: "Teacher",
+      title: t('teachers.name_plural'),
       dataIndex: "fullName",
       key: "fullName",
       render: (text) => (
@@ -88,7 +90,7 @@ const useTeachersParticipation = () => {
       ),
     },
     {
-      title: "Classes",
+      title: t('classes.name_plural'),
       dataIndex: "classes_count",
       key: "classes_count",
       align: "center",
@@ -100,7 +102,7 @@ const useTeachersParticipation = () => {
       ),
     },
     {
-      title: "Total Minutes",
+      title: t('dashboard.totalMinutes'),
       dataIndex: "total_minutes",
       key: "total_minutes",
       align: "center",
@@ -112,7 +114,7 @@ const useTeachersParticipation = () => {
       ),
     },
     {
-      title: "Rating",
+      title: t('dashboard.rating'),
       dataIndex: "rating",
       key: "rating",
       align: "center",

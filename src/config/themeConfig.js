@@ -14,8 +14,7 @@ export const getThemeConfig = (isDarkMode) => {
                 colorPrimary: "#0A84FF",
                 borderRadius: 8,
                 colorBorder: "#2D2D2D",
-                colorBorderSecondary: "#2D2D2D",
-                colorBgMask: "rgba(0, 0, 0, 0.85)",
+                colorBorderSecondary: "#2D2D2D"
             },
             components: {
                 Layout: {
@@ -53,7 +52,6 @@ export const getThemeConfig = (isDarkMode) => {
             borderRadius: 8,
             colorBorder: "#E0E0E0",
             colorBorderSecondary: "#E0E0E0",
-            colorBgMask: "#FFFFFF",
         },
         components: {
             Card: {

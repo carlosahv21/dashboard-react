@@ -1,14 +1,14 @@
 import React from "react";
-import { Card, Form, Input, Button } from "antd";
+import { Card, Form, Input, Button, theme } from "antd";
 import { LockOutlined } from "@ant-design/icons";
 
 const ChangePasswordCard = ({ form, onFinish, t }) => {
+  const { token } = theme.useToken();
   return (
     <Card
       title={
         <span>
-          <LockOutlined style={{ color: "#007bff", marginRight: 8 }} /> Cambiar
-          Contraseña
+          <LockOutlined style={{ color: token.colorPrimary, marginRight: 8 }} /> {t("settings.changePassword")}
         </span>
       }
       bordered={false}
@@ -20,7 +20,7 @@ const ChangePasswordCard = ({ form, onFinish, t }) => {
     >
       <Form form={form} layout="vertical" onFinish={onFinish}>
         <Form.Item
-          label="Contraseña Actual"
+          label={t("settings.currentPassword")}
           name="currentPassword"
           rules={[{ required: true, message: t("forms.requiredField") }]}
         >
@@ -28,7 +28,7 @@ const ChangePasswordCard = ({ form, onFinish, t }) => {
         </Form.Item>
 
         <Form.Item
-          label="Nueva Contraseña"
+          label={t("settings.newPassword")}
           name="newPassword"
           rules={[
             { required: true, message: t("forms.requiredField") },
@@ -39,7 +39,7 @@ const ChangePasswordCard = ({ form, onFinish, t }) => {
         </Form.Item>
 
         <Form.Item
-          label="Confirmar Contraseña"
+          label={t("settings.confirmPassword")}
           name="confirmPassword"
           dependencies={["newPassword"]}
           rules={[
@@ -65,7 +65,7 @@ const ChangePasswordCard = ({ form, onFinish, t }) => {
             block
             style={{ borderRadius: 8, height: 45, fontWeight: "500" }}
           >
-            Cambiar Contraseña
+            {t("settings.changePassword")}
           </Button>
         </Form.Item>
       </Form>

@@ -81,7 +81,7 @@ const ProfilePage = () => {
         }}
       >
         <Title level={2} style={{ marginBottom: 0, marginTop: 0 }}>
-          {t("profile.title") || "Perfil"}
+          {t("settings.profile")}
         </Title>
       </div>
 

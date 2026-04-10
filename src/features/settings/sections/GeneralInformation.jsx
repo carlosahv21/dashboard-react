@@ -8,7 +8,7 @@ import { AuthContext } from "../../../context/AuthContext";
 import { useTranslation } from "react-i18next";
 
 /** Academy-level fields updated via the settings endpoint */
-const ACADEMY_FIELDS = ["academy_name", "logo_url", "contact_email", "phone_number", "currency", "date_format", "address"];
+const ACADEMY_FIELDS = ["name", "logo", "currency", "date_format", "address"];
 /** User-level preference fields */
 const USER_FIELDS = ["theme", "language"];
 
@@ -16,7 +16,7 @@ const GeneralInformation = () => {
     const { t } = useTranslation();
     const [form] = Form.useForm();
     const { request } = useFetch();
-    const { settings, academy, user, login } = useContext(AuthContext); // use login to sync state
+    const { academy, user, login } = useContext(AuthContext); // use login to sync state
     const [imageUrl, setImageUrl] = useState(academy?.logo_url || "");
     const [uploadKey, setUploadKey] = useState(Date.now());
 
@@ -26,10 +26,8 @@ const GeneralInformation = () => {
             {
                 block_name: t('settings.academyInfo'),
                 fields: [
-                    { label: t('settings.academyName'), name: "academy_name", type: "text", required: true, placeholder: t('settings.academyNamePlaceholder') },
-                    { label: t('settings.logo'), name: "logo_url", type: "image" },
-                    { label: t('settings.contactEmail'), name: "contact_email", type: "email" },
-                    { label: t('settings.phoneNumber'), name: "phone_number", type: "text" },
+                    { label: t('settings.academyName'), name: "name", type: "text", required: true, placeholder: t('settings.academyNamePlaceholder') },
+                    { label: t('settings.logo'), name: "logo", type: "image" }
                 ],
             },
             {

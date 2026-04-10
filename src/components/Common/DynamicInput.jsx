@@ -82,7 +82,6 @@ const parseValidationRules = (required, type, t) => {
                 break;
             case "image":
                 rules.push({
-                    required: true,
                     message: t('forms.invalidImage'),
                 });
                 break;

@@ -183,6 +183,7 @@ const RolePermissions = () => {
                 data={dataTableData}
                 loading={loading}
                 showActions={false}
+                rowKey="key"
             />
         </>
     );
