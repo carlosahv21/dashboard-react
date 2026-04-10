@@ -169,22 +169,40 @@ export const AuthProvider = ({ children }) => {
     }, [modules]);
 
     const toggleTheme = async () => {
+        if (!user?.id) return;
         const newTheme = user?.theme === "dark" ? "light" : "dark";
         const updatedUser = { ...user, theme: newTheme };
         setUser(updatedUser);
         localStorage.setItem("user", JSON.stringify(updatedUser));
 
         try {
-            await authService.updateSettings({ theme: newTheme });
+            await authService.updateSettings(user.id, { theme: newTheme });
         } catch (error) {
             console.error("Failed to persist theme setting:", error);
+        }
+    };
+
+    /**
+     * Updates user data both in state and backend.
+     * @param {Object} data - The partial user data to update.
+     */
+    const updateUser = async (data) => {
+        if (!user?.id) return;
+        const updatedUser = { ...user, ...data };
+        setUser(updatedUser);
+        localStorage.setItem("user", JSON.stringify(updatedUser));
+
+        try {
+            await authService.updateSettings(user.id, data);
+        } catch (error) {
+            console.error("Failed to update user settings:", error);
         }
     };
 
     return (
         <AuthContext.Provider value={{
             user, academy, settings, permissions, modules, loading,
-            login, logout, hasPermission, hasModule, toggleTheme,
+            login, logout, hasPermission, hasModule, toggleTheme, updateUser,
         }}>
             {children}
         </AuthContext.Provider>

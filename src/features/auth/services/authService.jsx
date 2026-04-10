@@ -8,7 +8,7 @@ export const authService = {
      */
     login: (credentials) => api.post("auth/login", credentials),
     me: () => api.get("/auth/me"),
-    updateSettings: (payload) => api.put("/settings", payload),
+    updateSettings: (id, payload) => api.put(`users/${id}`, payload),
 };
 
 export default authService;
