@@ -7,12 +7,17 @@ import useFetch from "../../../hooks/useFetch";
 import { AuthContext } from "../../../context/AuthContext";
 import { useTranslation } from "react-i18next";
 
+/** Academy-level fields updated via the settings endpoint */
+const ACADEMY_FIELDS = ["academy_name", "logo_url", "contact_email", "phone_number", "currency", "date_format", "address"];
+/** User-level preference fields */
+const USER_FIELDS = ["theme", "language"];
+
 const GeneralInformation = () => {
     const { t } = useTranslation();
     const [form] = Form.useForm();
     const { request } = useFetch();
-    const { settings, setSettings } = useContext(AuthContext); // ahora usamos AuthContext
-    const [imageUrl, setImageUrl] = useState(settings?.logo_url || "");
+    const { settings, academy, user, login } = useContext(AuthContext); // use login to sync state
+    const [imageUrl, setImageUrl] = useState(academy?.logo_url || "");
     const [uploadKey, setUploadKey] = useState(Date.now());
 
     const moduleData = useMemo(() => ({
@@ -39,14 +44,14 @@ const GeneralInformation = () => {
         ],
     }), [t]);
 
-    // Cargar settings desde AuthContext en el formulario
+    // Load current settings into the form on mount/changes
     useEffect(() => {
         if (!form) return;
-        if (settings) {
-            form.setFieldsValue(settings);
-            setImageUrl(settings.logo_url || "");
-        }
-    }, [form, settings]);
+        // Merge academy + user fields into form values
+        const merged = { ...academy, theme: user?.theme, language: user?.language };
+        form.setFieldsValue(merged);
+        setImageUrl(academy?.logo_url || "");
+    }, [form, academy, user]);
 
     const handleImageUpload = (url) => setImageUrl(url);
 
@@ -54,13 +59,27 @@ const GeneralInformation = () => {
         try {
             const payload = { ...values, logo_url: imageUrl || values.logo_url };
             const response = await request("settings", "PUT", payload);
-
             const resultData = response?.data || response;
-            const updatedSettings = { ...settings, ...payload, ...(typeof resultData === 'object' ? resultData : {}) };
 
-            setSettings(updatedSettings);
+            // Sync updated values back through the login helper which persists
+            // each slice (academy / user) while keeping the token intact.
+            const academyUpdates = {};
+            const userUpdates = {};
+            const merged = { ...payload, ...(typeof resultData === 'object' ? resultData : {}) };
+
+            Object.entries(merged).forEach(([key, val]) => {
+                if (ACADEMY_FIELDS.includes(key)) academyUpdates[key] = val;
+                if (USER_FIELDS.includes(key)) userUpdates[key] = val;
+            });
+
+            // Re-use login's partial update logic: pass only changed slices
+            login({
+                token: localStorage.getItem("token"),
+                academy: { ...academy, ...academyUpdates },
+                user: { ...user, ...userUpdates },
+            });
+
             setUploadKey(Date.now());
-
             message.success(t('settings.updateSuccess'));
         } catch (err) {
             console.error("Error al actualizar settings:", err);

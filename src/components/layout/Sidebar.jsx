@@ -9,7 +9,7 @@ import { useTranslation } from "react-i18next";
 const { Sider } = Layout;
 
 const Sidebar = forwardRef((props, ref) => {
-	const { settings, hasPermission, toggleTheme } = useContext(AuthContext);
+	const { settings, academy, hasPermission, hasModule, toggleTheme } = useContext(AuthContext);
 	const navigate = useNavigate();
 	const location = useLocation();
 	const { t } = useTranslation();
@@ -23,53 +23,68 @@ const Sidebar = forwardRef((props, ref) => {
 		return <IconComponent />;
 	};
 
+	/**
+	 * Menu definition.
+	 * - `module`: must match a key in the backend `modules` array to be shown.
+	 * - `permissionRequired`: "module:action" permission string for role-based filtering.
+	 */
 	const staticMenuDefinition = [
 		{
 			label: t("menu.dashboard"),
 			icon: "Dashboard",
 			path: "/",
+			module: "dashboard",
 			permissionRequired: "dashboard:view",
 		},
 		{
 			label: t("menu.plans"),
 			icon: "SolutionOutlined",
 			path: "/plans",
+			module: "plans",
 			permissionRequired: "plans:view",
 		},
 		{
 			label: t("menu.classes"),
 			icon: "Read",
 			path: "/classes",
+			module: "classes",
 			permissionRequired: "classes:view",
 		},
 		{
 			label: t("menu.students"),
 			icon: "Team",
 			path: "/students",
+			module: "students",
 			permissionRequired: "students:view",
 		},
 		{
 			label: t("menu.teachers"),
 			icon: "IdcardOutlined",
 			path: "/teachers",
+			module: "teachers",
 			permissionRequired: "teachers:view",
 		},
 		{
 			label: t("menu.registrations"),
 			icon: "UserAddOutlined",
 			path: "/registrations",
+			module: "registrations",
 			permissionRequired: "registrations:view",
 		},
 		{
 			label: t("menu.attendances"),
 			icon: "CalendarOutlined",
 			path: "/attendances",
+			module: "attendances",
 			permissionRequired: "attendances:view",
-		},
+		}
 	];
 
 	const buildMenuItems = (menuDefinition) =>
 		menuDefinition
+			// 1. Filter by backend modules array (multitenant: only enabled modules)
+			.filter((item) => !item.module || hasModule(item.module))
+			// 2. Filter by role permissions
 			.filter((item) => hasPermission(item.permissionRequired))
 			.map((item) => {
 				const hasChildren = item.children && item.children.length > 0;
@@ -90,7 +105,8 @@ const Sidebar = forwardRef((props, ref) => {
 
 	const items = buildMenuItems(staticMenuDefinition);
 
-	const logo = "/logo-" + (settings?.theme || "light") + ".png";
+	// Prefer the academy logo from the backend; fall back to theme-based static asset.
+	const logoSrc = academy?.logo_url || `/logo-${settings?.theme || "light"}.png`;
 
 	return (
 		<Sider
@@ -123,8 +139,8 @@ const Sidebar = forwardRef((props, ref) => {
 			>
 				<a href="/">
 					<img
-						src={logo}
-						alt="Logo"
+						src={logoSrc}
+						alt={academy?.name || "Logo"}
 						style={{
 							width: "4rem",
 							paddingTop: "0.5rem",
@@ -133,8 +149,11 @@ const Sidebar = forwardRef((props, ref) => {
 						}}
 						onError={(e) => {
 							e.target.onerror = null;
-							e.target.src =
-								"https://placehold.co/40x40/0A84FF/ffffff?text=L";
+							// Academy initial as fallback when both logo_url and static asset fail
+							const initial = encodeURIComponent(
+								(academy?.name || "L").charAt(0).toUpperCase()
+							);
+							e.target.src = `https://placehold.co/40x40/0A84FF/ffffff?text=${initial}`;
 						}}
 					/>
 				</a>

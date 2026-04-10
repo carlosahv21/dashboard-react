@@ -1,4 +1,4 @@
-import React, { createContext, useState, useEffect, useCallback } from "react";
+import React, { createContext, useState, useEffect, useCallback, useMemo } from "react";
 import { authService } from "../features/auth/services/authService.jsx";
 import i18n from "i18next";
 import dayjs from "dayjs";
@@ -22,69 +22,101 @@ const safeParseItem = (key, fallback) => {
 
 /**
  * AuthProvider component
- * Manages user session, permissions, academy settings, and themes.
+ * Manages user session, permissions, academy settings (multitenant), and themes.
+ *
+ * State shape (aligned with backend response):
+ *  - user:        { id, email, name, role, theme, language, ... }
+ *  - academy:     { id, name, logo_url, plan, currency, date_format, address }
+ *  - modules:     string[]  — list of enabled module keys for this academy
+ *  - permissions: { [module]: { actions: string[], scope: string } }
  */
 export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(() => safeParseItem("user", null));
-    const [settings, setSettings] = useState(() => safeParseItem("settings", { theme: 'light', language: 'es' }));
+    const [academy, setAcademy] = useState(() => safeParseItem("academy", null));
     const [permissions, setPermissions] = useState(() => safeParseItem("permissions", {}));
     const [modules, setModules] = useState(() => safeParseItem("modules", []));
     const [loading, setLoading] = useState(true);
 
+    // --- Derived: keep legacy `settings` alias so existing consumers don't break ---
+    // Merges academy business settings with user UI preferences into a single object.
+    const settings = useMemo(() => ({
+        // Academy business settings
+        currency: academy?.currency ?? "USD",
+        date_format: academy?.date_format ?? "DD/MM/YYYY",
+        // User UI preferences
+        theme: user?.theme ?? "light",
+        language: user?.language ?? "es",
+    }), [academy, user]);
+
     const logout = useCallback(() => {
         localStorage.clear();
         setUser(null);
-        setSettings({ theme: 'light', language: 'es' });
+        setAcademy(null);
         setPermissions({});
         setModules([]);
         setLoading(false);
     }, []);
 
+    /**
+     * Called after a successful login OR as a partial state updater.
+     * Expects the `data` field from the backend response:
+     *   { token, user, academy, modules, permissions }
+     *
+     * Can also be called with only a subset of fields to patch specific slices
+     * without affecting others (e.g. after a profile photo update: { token, user }).
+     */
     const login = useCallback((data) => {
-        if (!data.token) return;
+        // Token is required for a true login; for partial updates callers pass
+        // the current token from localStorage so we keep the session alive.
+        if (data.token) {
+            localStorage.setItem("token", data.token);
+        }
 
-        localStorage.setItem("token", data.token);
-        localStorage.setItem("user", JSON.stringify(data.user));
-        localStorage.setItem("permissions", JSON.stringify(data.permissions || {}));
-        localStorage.setItem("modules", JSON.stringify(data.modules || []));
+        if (data.user) {
+            localStorage.setItem("user", JSON.stringify(data.user));
+            setUser(data.user);
+        }
 
-        setUser(data.user);
-        setPermissions(data.permissions || {});
-        setModules(data.modules || []);
-        
-        if (data.academy || data.settings) {
-            const newSettings = data.academy || data.settings;
-            setSettings(newSettings);
-            localStorage.setItem("settings", JSON.stringify(newSettings));
+        if (data.academy) {
+            localStorage.setItem("academy", JSON.stringify(data.academy));
+            setAcademy(data.academy);
+        }
+
+        if (data.permissions) {
+            localStorage.setItem("permissions", JSON.stringify(data.permissions));
+            setPermissions(data.permissions);
+        }
+
+        if (data.modules) {
+            localStorage.setItem("modules", JSON.stringify(data.modules));
+            setModules(data.modules);
         }
     }, []);
 
     const fetchUserData = useCallback(async () => {
         try {
             const { data } = await authService.me();
-            
+
             // Normalize user data from API response
             const userData = data.user || (data.id ? data : null);
-            
             if (userData) {
                 setUser(userData);
                 localStorage.setItem("user", JSON.stringify(userData));
             }
-            
+
+            if (data.academy) {
+                setAcademy(data.academy);
+                localStorage.setItem("academy", JSON.stringify(data.academy));
+            }
+
             if (data.permissions) {
                 setPermissions(data.permissions);
                 localStorage.setItem("permissions", JSON.stringify(data.permissions));
             }
-            
+
             if (data.modules) {
                 setModules(data.modules);
                 localStorage.setItem("modules", JSON.stringify(data.modules));
-            }
-            
-            if (data.academy || data.settings) {
-                const newSettings = data.academy || data.settings;
-                setSettings(newSettings);
-                localStorage.setItem("settings", JSON.stringify(newSettings));
             }
         } catch (err) {
             console.error("Auth verification failed:", err);
@@ -107,37 +139,43 @@ export const AuthProvider = ({ children }) => {
         }
     }, [fetchUserData]);
 
-    // Global UI Sync (Language, Locale, Settings persistence)
+    // Global UI Sync — react to user language/theme changes
     useEffect(() => {
-        if (settings?.language) {
-            i18n.changeLanguage(settings.language);
-            dayjs.locale(settings.language);
-        }
-        // Sync theme with document for CSS-level styling if needed
-        document.documentElement.setAttribute('data-theme', settings?.theme || 'light');
-        localStorage.setItem("settings", JSON.stringify(settings));
-    }, [settings]);
+        const lang = user?.language ?? "es";
+        const theme = user?.theme ?? "light";
+
+        i18n.changeLanguage(lang);
+        dayjs.locale(lang);
+        document.documentElement.setAttribute("data-theme", theme);
+    }, [user]);
 
     /**
-     * Permission checker
+     * Permission checker (string-based shorthand)
      * Format: "module:action" (e.g. "students:create")
      */
     const hasPermission = useCallback((permString) => {
         if (!permString) return true;
         const [module, action] = permString.split(":");
         if (!permissions || !permissions[module]) return false;
-        if (action) return permissions[module].actions?.includes(action) || false;
+        if (action) return permissions[module].actions?.includes(action) ?? false;
         return true;
     }, [permissions]);
 
+    /**
+     * Check if a specific module is enabled for this academy.
+     */
+    const hasModule = useCallback((moduleName) => {
+        return modules.includes(moduleName);
+    }, [modules]);
+
     const toggleTheme = async () => {
-        const newTheme = settings?.theme === 'dark' ? 'light' : 'dark';
-        setSettings(prev => ({ ...prev, theme: newTheme })); // Optimistic update
-        
+        const newTheme = user?.theme === "dark" ? "light" : "dark";
+        const updatedUser = { ...user, theme: newTheme };
+        setUser(updatedUser);
+        localStorage.setItem("user", JSON.stringify(updatedUser));
+
         try {
-            // Remove meta timestamps for API payload
-            const { created_at, updated_at, ...payload } = settings;
-            await authService.updateSettings({ ...payload, theme: newTheme });
+            await authService.updateSettings({ theme: newTheme });
         } catch (error) {
             console.error("Failed to persist theme setting:", error);
         }
@@ -145,8 +183,8 @@ export const AuthProvider = ({ children }) => {
 
     return (
         <AuthContext.Provider value={{
-            user, settings, permissions, modules, loading,
-            login, logout, hasPermission, toggleTheme
+            user, academy, settings, permissions, modules, loading,
+            login, logout, hasPermission, hasModule, toggleTheme,
         }}>
             {children}
         </AuthContext.Provider>

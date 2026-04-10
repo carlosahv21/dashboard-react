@@ -14,7 +14,12 @@ import SupportCard from "../components/SupportCard";
 const { Title } = Typography;
 
 const ProfilePage = () => {
-  const { user, setUser, settings } = useContext(AuthContext);
+  const { user, login, settings } = useContext(AuthContext);
+  // Stable callback to update the user slice in context + localStorage
+  const updateUser = (updater) => {
+    const updated = typeof updater === "function" ? updater(user) : { ...user, ...updater };
+    login({ token: localStorage.getItem("token"), user: updated });
+  };
   const { t } = useTranslation();
   const [passwordForm] = Form.useForm();
   const [profileForm] = Form.useForm();
@@ -41,7 +46,7 @@ const ProfilePage = () => {
 
   const handleCustomUpload = async ({ file, onSuccess, onError }) => {
     try {
-      const url = await uploadPhoto(file, setUser);
+      const url = await uploadPhoto(file, updateUser);
       onSuccess(null, { url });
     } catch (error) {
       onError(error);
