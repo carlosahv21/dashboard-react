@@ -107,16 +107,20 @@ export const useFormModal = (endpoint, moduleFieldId, titleSingular, fixedValues
         }
         console.log(transformedValues);
         try {
+            let resultData = null;
             if (editingId) {
-                await request(`${endpoint}/${editingId}`, 'PUT', transformedValues);
+                const response = await request(`${endpoint}/${editingId}`, 'PUT', transformedValues);
                 message.success(t('forms.updateSuccess', { title: titleSingular }));
+                resultData = response?.data;
             } else {
                 const response = await request(`${endpoint}/`, 'POST', transformedValues);
                 if (response?.success) {
                     message.success(t('forms.createSuccess', { title: titleSingular }));
                 }
+                resultData = response?.data;
             }
-            return closeModal(true);
+            closeModal(true);
+            return resultData || true;
         } catch (error) {
             if (error.errors) {
                 const fieldsWithErrors = error.errors.map(err => ({

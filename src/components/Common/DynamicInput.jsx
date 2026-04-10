@@ -1,8 +1,22 @@
-import React, { useState, useCallback } from "react";
-import { Form, Input, Select, Upload, DatePicker, TimePicker, Checkbox, message } from "antd";
-import { UploadOutlined } from "@ant-design/icons";
+import React, { useState, useCallback, useContext } from "react";
+import {
+    Form,
+    Input,
+    Select,
+    Upload,
+    DatePicker,
+    TimePicker,
+    Checkbox,
+    message,
+    Divider,
+    Space,
+    Button,
+} from "antd";
+import { UploadOutlined, PlusOutlined } from "@ant-design/icons";
 import useFetch from "../../hooks/useFetch";
 import { useTranslation } from "react-i18next";
+import { AuthContext } from "../../context/AuthContext";
+import QuickCreateModal from "./QuickCreateModal";
 
 const { Option } = Select;
 const { TextArea } = Input;
@@ -26,7 +40,7 @@ const parseValidationRules = (required, type, t) => {
     if (required) {
         rules.push({
             required: true,
-            message: t('forms.requiredField'),
+            message: t("forms.requiredField"),
         });
     }
 
@@ -35,7 +49,7 @@ const parseValidationRules = (required, type, t) => {
             case "text":
                 rules.push({
                     type: "string",
-                    message: t('forms.invalidText'),
+                    message: t("forms.invalidText"),
                 });
                 break;
             case "number":
@@ -44,7 +58,7 @@ const parseValidationRules = (required, type, t) => {
                         if (!value) return Promise.resolve(); // vacío pasa si no es requerido
                         if (value === "Ilimitadas") return Promise.resolve(); // para max_sessions
                         if (!isNaN(Number(value))) return Promise.resolve();
-                        return Promise.reject(new Error(t('forms.invalidNumber')));
+                        return Promise.reject(new Error(t("forms.invalidNumber")));
                     },
                 });
                 break;
@@ -53,8 +67,9 @@ const parseValidationRules = (required, type, t) => {
                 rules.push({
                     validator: (_, value) => {
                         if (!value) return Promise.resolve(); // permite vacío si no es requerido
-                        if (typeof value === "string" || typeof value === "number") return Promise.resolve();
-                        return Promise.reject(new Error(t('forms.invalidSelect')));
+                        if (typeof value === "string" || typeof value === "number")
+                            return Promise.resolve();
+                        return Promise.reject(new Error(t("forms.invalidSelect")));
                     },
                 });
                 break;
@@ -63,7 +78,7 @@ const parseValidationRules = (required, type, t) => {
                     validator: (_, value) =>
                         value
                             ? Promise.resolve()
-                            : Promise.reject(new Error(t('forms.invalidDate'))),
+                            : Promise.reject(new Error(t("forms.invalidDate"))),
                 });
                 break;
             case "time":
@@ -71,36 +86,36 @@ const parseValidationRules = (required, type, t) => {
                     validator: (_, value) =>
                         value
                             ? Promise.resolve()
-                            : Promise.reject(new Error(t('forms.invalidTime'))),
+                            : Promise.reject(new Error(t("forms.invalidTime"))),
                 });
                 break;
             case "boolean":
                 rules.push({
                     type: "boolean",
-                    message: t('forms.invalidBoolean'),
+                    message: t("forms.invalidBoolean"),
                 });
                 break;
             case "image":
                 rules.push({
-                    message: t('forms.invalidImage'),
+                    message: t("forms.invalidImage"),
                 });
                 break;
             case "relation":
                 rules.push({
                     required: true,
-                    message: t('forms.invalidRelation'),
+                    message: t("forms.invalidRelation"),
                 });
                 break;
             case "range": // Rango de fechas
                 rules.push({
                     type: "array",
-                    message: t('forms.invalidDateRange'),
+                    message: t("forms.invalidDateRange"),
                 });
                 break;
             default:
                 rules.push({
                     type: "string",
-                    message: t('forms.invalidText'),
+                    message: t("forms.invalidText"),
                 });
         }
     }
@@ -117,14 +132,39 @@ const DynamicInput = ({
     form,
     required,
     placeholder,
-    onImageUpload
+    onImageUpload,
 }) => {
     const { t } = useTranslation();
     const { request } = useFetch();
+    const { hasPermission } = useContext(AuthContext);
 
     // Estado para manejar las opciones de relación y la carga
     const [relationOptions, setRelationOptions] = useState([]);
     const [loadingOptions, setLoadingOptions] = useState(false);
+    const [isQuickCreateVisible, setIsQuickCreateVisible] = useState(false);
+
+    const getQuickCreateConfig = () => {
+        if (!relationConfig) return null;
+        let moduleName = relationConfig.table;
+        if (relationConfig.table === "users" && relationConfig.filters?.role_name) {
+            moduleName = `${relationConfig.filters.role_name}s`;
+        }
+        let hiddenFields = [];
+        if (relationConfig.table === "users" || moduleName === "teachers" || moduleName === "students") {
+            hiddenFields = ["role"];
+        }
+
+        return {
+            moduleName,
+            endpoint: moduleName,
+            moduleFieldId: moduleName,
+            titleSingular: t(`${moduleName}.name_singular`, {
+                defaultValue: "Registro",
+            }),
+            fixedValues: relationConfig.filters || {},
+            hiddenFields
+        };
+    };
 
     /**
      * Función para buscar opciones de relación en el backend.
@@ -144,14 +184,14 @@ const DynamicInput = ({
                 const response = await request(`fields/relation`, "POST", payload);
                 setRelationOptions(response.data);
             } catch (error) {
-                message.error(t('forms.relationLoadError'));
+                message.error(t("forms.relationLoadError"));
                 console.error("Error fetching relation options:", error);
                 setRelationOptions([]);
             } finally {
                 setLoadingOptions(false);
             }
         }, 300),
-        [relationConfig, request, t]
+        [relationConfig, request, t],
     );
 
     React.useEffect(() => {
@@ -160,18 +200,19 @@ const DynamicInput = ({
         }
     }, [type, relationConfig, fetchRelationOptions]);
 
-
     // Manejador para remover la imagen
     const handleRemoveImage = async (file) => {
         try {
-            await request(`images/`, "DELETE", { imageUrl: file.url || file.response.url });
-            message.success(t('forms.removeImageSuccess'));
+            await request(`images/`, "DELETE", {
+                imageUrl: file.url || file.response.url,
+            });
+            message.success(t("forms.removeImageSuccess"));
 
             form.setFieldsValue({ [name]: null });
 
             if (onImageUpload) onImageUpload(null);
         } catch (error) {
-            message.error(t('forms.removeImageError'));
+            message.error(t("forms.removeImageError"));
             console.error(error);
         }
     };
@@ -189,7 +230,7 @@ const DynamicInput = ({
             if (onImageUpload) onImageUpload(imageUrl);
             onSuccess(data);
         } catch (error) {
-            message.error(t('forms.uploadImageError'));
+            message.error(t("forms.uploadImageError"));
             console.error(error);
             onError(error);
         }
@@ -198,24 +239,34 @@ const DynamicInput = ({
     const renderInputComponent = () => {
         const p = placeholder || label;
         switch (type) {
-            case "text": return <Input placeholder={p} />;
-            case "number": return <Input type="number" placeholder={p} />;
+            case "text":
+                return <Input placeholder={p} />;
+            case "number":
+                return <Input type="number" placeholder={p} />;
             case "select":
                 return (
                     <Select placeholder={p}>
-                        {options?.map(opt => (
+                        {options?.map((opt) => (
                             <Option key={opt.toString()} value={opt.toString()}>
                                 {opt.toString()}
                             </Option>
                         ))}
                     </Select>
-
                 );
             case "relation":
                 if (!relationConfig) {
-                    console.error(`DynamicInput: El campo '${name}' de tipo 'relation' requiere 'relationConfig'.`);
-                    return <Input disabled value={t('forms.relationErrorMissingConfig')} />;
+                    console.error(
+                        `DynamicInput: El campo '${name}' de tipo 'relation' requiere 'relationConfig'.`,
+                    );
+                    return (
+                        <Input disabled value={t("forms.relationErrorMissingConfig")} />
+                    );
                 }
+                const qcConfig = getQuickCreateConfig();
+                const canCreate = qcConfig
+                    ? hasPermission(`${qcConfig.endpoint}:create`)
+                    : false;
+
                 return (
                     <Select
                         placeholder={p}
@@ -223,18 +274,60 @@ const DynamicInput = ({
                         loading={loadingOptions} // Muestra el estado de carga
                         onSearch={fetchRelationOptions} // Dispara la búsqueda al escribir (con debounce)
                         filterOption={false} // Deshabilita el filtro del lado del cliente, ya que el backend lo hace
-                        notFoundContent={loadingOptions ? t('forms.loadingOptions') : t('forms.noOptionsFound')}
+                        notFoundContent={
+                            loadingOptions
+                                ? t("forms.loadingOptions")
+                                : t("forms.noOptionsFound")
+                        }
+                        dropdownRender={(menu) => (
+                            <>
+                                {menu}
+                                {canCreate && (
+                                    <>
+                                        <Divider style={{ margin: "8px 0" }} />
+                                        <div style={{ padding: "0 8px 4px" }}>
+                                            <Button
+                                                type="text"
+                                                icon={<PlusOutlined />}
+                                                onMouseDown={(e) => {
+                                                    e.preventDefault();
+                                                    e.stopPropagation();
+                                                }}
+                                                onClick={() => setIsQuickCreateVisible(true)}
+                                                block
+                                                style={{ textAlign: "left" }}
+                                            >
+                                                {t("global.createTitle", {
+                                                    title: qcConfig.titleSingular,
+                                                })}
+                                            </Button>
+                                        </div>
+                                    </>
+                                )}
+                            </>
+                        )}
                     >
-                        {relationOptions?.map(opt => (
+                        {relationOptions?.map((opt) => (
                             <Option key={opt.value} value={opt.value}>
                                 {opt.label}
                             </Option>
                         ))}
                     </Select>
                 );
-            case "date": return <DatePicker format="YYYY-MM-DD" placeholder={placeholder} />;
-            case "time": return <TimePicker format="HH:mm" placeholder={placeholder} needConfirm={false} minuteStep={15} use12Hours />;
-            case "textarea": return <TextArea placeholder={p} style={{ resize: "none" }} />;
+            case "date":
+                return <DatePicker format="YYYY-MM-DD" placeholder={placeholder} />;
+            case "time":
+                return (
+                    <TimePicker
+                        format="HH:mm"
+                        placeholder={placeholder}
+                        needConfirm={false}
+                        minuteStep={15}
+                        use12Hours
+                    />
+                );
+            case "textarea":
+                return <TextArea placeholder={p} style={{ resize: "none" }} />;
             case "range":
                 return <RangePicker format="YYYY-MM-DD" />;
             case "image":
@@ -245,15 +338,16 @@ const DynamicInput = ({
                         maxCount={1}
                         customRequest={customRequest}
                         beforeUpload={(file) => {
-                            const isJpgOrPng = file.type === "image/jpeg" || file.type === "image/png";
+                            const isJpgOrPng =
+                                file.type === "image/jpeg" || file.type === "image/png";
                             if (!isJpgOrPng) {
-                                message.error(t('forms.imageTypeErrorMessage'));
+                                message.error(t("forms.imageTypeErrorMessage"));
                                 return Upload.LIST_IGNORE; // evita que se agregue el archivo
                             }
 
                             const isLt5M = file.size / 1024 / 1024 < 5;
                             if (!isLt5M) {
-                                message.error(t('forms.imageSizeErrorMessage'));
+                                message.error(t("forms.imageSizeErrorMessage"));
                                 return Upload.LIST_IGNORE;
                             }
 
@@ -263,31 +357,56 @@ const DynamicInput = ({
                     >
                         <button style={{ border: 0, background: "none" }} type="button">
                             <UploadOutlined />
-                            <div style={{ marginTop: 8 }}>{t('forms.upload')}</div>
+                            <div style={{ marginTop: 8 }}>{t("forms.upload")}</div>
                         </button>
                     </Upload>
                 );
-            case "boolean": return <Checkbox placeholder={placeholder} />;
-            default: return <Input placeholder={p} />;
+            case "boolean":
+                return <Checkbox placeholder={placeholder} />;
+            default:
+                return <Input placeholder={p} />;
         }
     };
 
-    const valueProp = type === 'boolean' ? { valuePropName: 'checked' } : {};
-    const imageProps = type === 'image' ? {
-        getValueFromEvent: ({ fileList }) => fileList.length > 0 ? form.getFieldValue(name) : null
-    } : {};
-
+    const valueProp = type === "boolean" ? { valuePropName: "checked" } : {};
+    const imageProps =
+        type === "image"
+            ? {
+                getValueFromEvent: ({ fileList }) =>
+                    fileList.length > 0 ? form.getFieldValue(name) : null,
+            }
+            : {};
 
     return (
-        <Form.Item
-            label={label}
-            name={name}
-            rules={parseValidationRules(required, type, t)}
-            {...valueProp}
-            {...imageProps}
-        >
-            {renderInputComponent()}
-        </Form.Item>
+        <>
+            <Form.Item
+                label={label}
+                name={name}
+                rules={parseValidationRules(required, type, t)}
+                {...valueProp}
+                {...imageProps}
+            >
+                {renderInputComponent()}
+            </Form.Item>
+            {type === "relation" && relationConfig && (
+                <QuickCreateModal
+                    visible={isQuickCreateVisible}
+                    endpoint={getQuickCreateConfig().endpoint}
+                    moduleFieldId={getQuickCreateConfig().moduleFieldId}
+                    titleSingular={getQuickCreateConfig().titleSingular}
+                    fixedValues={getQuickCreateConfig().fixedValues}
+                    hiddenFields={getQuickCreateConfig().hiddenFields}
+                    onSuccess={(savedRecord) => {
+                        setIsQuickCreateVisible(false);
+                        fetchRelationOptions("");
+                        if (savedRecord && savedRecord.id) {
+                            form.setFieldsValue({ [name]: savedRecord.id });
+                        }
+                    }}
+                    onCancel={() => setIsQuickCreateVisible(false)}
+                />
+            )}
+        </>
     );
 };
 
