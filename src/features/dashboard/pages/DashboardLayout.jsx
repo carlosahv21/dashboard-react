@@ -1,13 +1,13 @@
-import React, { useContext, useRef } from "react";
-import { Layout } from "antd";
-import { Outlet } from "react-router-dom";
+import React, { useContext, useRef, useEffect } from "react";
+import { Layout, Modal } from "antd";
+import { Outlet, useNavigate } from "react-router-dom";
 
 import Sidebar from "../../../components/layout/Sidebar";
 import HeaderComponent from "../../../components/layout/Header";
 import Footer from "../../../components/layout/Footer";
 
 import { AuthContext } from "../../../context/AuthContext";
-import { OnboardingProvider } from "../../onboarding/context/OnboardingContext";
+import { OnboardingProvider, useOnboarding } from "../../onboarding/context/OnboardingContext";
 import OnboardingWidget from "../../onboarding/components/OnboardingWidget";
 import AppOnboarding from "../../onboarding/components/AppOnboarding";
 
@@ -36,7 +36,11 @@ const useDashboardLayout = (routes) => {
 const { Content } = Layout;
 
 const DashboardContent = () => {
-  const { routes } = useContext(AuthContext);
+  const { routes, user } = useContext(AuthContext);
+  const { isOpen, isTourFinished } = useOnboarding();
+  const navigate = useNavigate();
+  const alertShownRef = useRef(false);
+
   const {
     onboardingRef,
     searchRef,
@@ -44,6 +48,25 @@ const DashboardContent = () => {
     sidebarRef,
     handleRestartTour,
   } = useDashboardLayout(routes);
+
+  useEffect(() => {
+    if (isTourFinished && !isOpen && user?.needs_password_change && !alertShownRef.current) {
+      alertShownRef.current = true;
+      Modal.confirm({
+        title: "Actualiza tu contraseña",
+        content: "Tu contraseña no se ha modificado, cámbiala ya.",
+        okText: "Cambiar ahora",
+        cancelText: "Más tarde",
+        onOk: () => {
+          navigate("/profile");
+        },
+        onCancel: () => {
+          // Si elige más tarde, podríamos dejar que vuelva a aparecer en la próxima recarga
+          // o mantener la referencia para no molestar en la misma sesión.
+        }
+      });
+    }
+  }, [isOpen, isTourFinished, user?.needs_password_change, navigate]);
 
   return (
     <Layout style={{ minHeight: "100vh" }}>

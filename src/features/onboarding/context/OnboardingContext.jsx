@@ -11,6 +11,7 @@ export const OnboardingProvider = ({ children }) => {
     const [completedSteps, setCompletedSteps] = useState([]);
     const [isOpen, setIsOpen] = useState(false);
     const [isWidgetHidden, setIsWidgetHidden] = useState(false);
+    const [isTourFinished, setIsTourFinished] = useState(false);
 
     // Key for localStorage persistence
     const STORAGE_KEY = 'app_onboarding_progress';
@@ -27,7 +28,9 @@ export const OnboardingProvider = ({ children }) => {
         // Check if tour is completed in user profile or localStorage
         const userTourCompleted = user?.tour_completed === true;
         const localTourCompleted = localStorage.getItem(COMPLETED_KEY) === 'true';
-        const isTourFinished = userTourCompleted || localTourCompleted;
+        const finished = userTourCompleted || localTourCompleted;
+        
+        setIsTourFinished(finished);
 
         // Check if widget is hidden in user profile or localStorage
         const userHideTour = user?.hide_tour === true;
@@ -37,7 +40,7 @@ export const OnboardingProvider = ({ children }) => {
         setIsWidgetHidden(isHidden);
 
         // Auto-open tour if not finished and not hidden
-        if (!isTourFinished && !isHidden) {
+        if (!finished && !isHidden) {
             const timer = setTimeout(() => setIsOpen(true), 1500);
             return () => clearTimeout(timer);
         }
@@ -61,6 +64,7 @@ export const OnboardingProvider = ({ children }) => {
 
     const markTourAsCompleted = async () => {
         localStorage.setItem(COMPLETED_KEY, 'true');
+        setIsTourFinished(true);
         // The user asked to update "app_tour_completed" twice, which might be a typo for another variable, 
         // but we'll ensure it's set and also update the backend.
         if (user && !user.tour_completed) {
@@ -125,6 +129,7 @@ export const OnboardingProvider = ({ children }) => {
         skipTour,
         resetOnboarding,
         progressPercentage,
+        isTourFinished,
     };
 
     return (
