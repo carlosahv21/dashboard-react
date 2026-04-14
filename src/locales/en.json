@@ -33,7 +33,20 @@
         "emailRequired": "Please enter your email!",
         "emailInvalid": "Please enter a valid email!",
         "passwordRequired": "Please enter your password!",
-        "passwordMinLength": "Password must be at least 6 characters!"
+        "passwordMinLength": "Password must be at least 6 characters!",
+        "resetPasswordTitle": "Reset Password",
+        "forgotPasswordTitle": "Recover Password",
+        "tabRequestReset": "1. Request",
+        "tabResetPassword": "2. Reset",
+        "requestResetInstructions": "Enter your email address and we'll send you instructions to recover your access.",
+        "sendResetEmailButton": "Send Recovery Email",
+        "enterResetTokenInstructions": "Enter the code you received by email and your new password.",
+        "resetTokenLabel": "Recovery Code",
+        "tokenRequired": "The code is required!",
+        "tokenPlaceholder": "Enter your code",
+        "newPasswordLabel": "New Password",
+        "resetPasswordButton": "Change Password",
+        "passwordResetSuccess": "Password updated successfully."
     },
     "session": {
         "expiredTitle": "Session expired or invalid token",

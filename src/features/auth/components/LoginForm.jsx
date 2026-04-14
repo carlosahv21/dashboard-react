@@ -1,8 +1,19 @@
-import React from "react";
-import { Form, Input, Button, Checkbox } from "antd";
+import React, { useState } from "react";
+import { Form, Input, Button, Checkbox, Modal, message } from "antd";
 import { MailOutlined, LockOutlined, LoginOutlined } from "@ant-design/icons";
 
-const LoginForm = ({ onFinish, loading, t }) => {
+const LoginForm = ({ onFinish, onForgotPassword, loading, t }) => {
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [forgotForm] = Form.useForm();
+
+  const handleForgotSubmit = async (values) => {
+    const success = await onForgotPassword(values.email);
+    if (success) {
+      setIsModalVisible(false);
+      forgotForm.resetFields();
+    }
+  };
+
   return (
     <div className="login-form-container">
       <div className="login-header" style={{ marginBottom: "0" }}>
@@ -72,7 +83,9 @@ const LoginForm = ({ onFinish, loading, t }) => {
             <Checkbox>{t("auth.rememberMe")}</Checkbox>
           </Form.Item>
           <button
+            type="button"
             className="forgot-password-link"
+            onClick={() => setIsModalVisible(true)}
             style={{
               background: "none",
               border: "none",
@@ -115,6 +128,43 @@ const LoginForm = ({ onFinish, loading, t }) => {
           {t("auth.accessHelp")}
         </p>
       </div>
+      <Modal
+        title={t("auth.forgotPasswordTitle")}
+        open={isModalVisible}
+        onCancel={() => {
+            setIsModalVisible(false);
+            forgotForm.resetFields();
+        }}
+        footer={null}
+        centered
+        width={450}
+      >
+        <Form
+          form={forgotForm}
+          layout="vertical"
+          onFinish={handleForgotSubmit}
+          size="large"
+        >
+          <p style={{ marginBottom: 24, color: "#666" }}>
+            {t("auth.requestResetInstructions")}
+          </p>
+          <Form.Item
+            name="email"
+            label={t("auth.emailLabel")}
+            rules={[
+              { required: true, message: t("auth.emailRequired") },
+              { type: "email", message: t("auth.emailInvalid") },
+            ]}
+          >
+            <Input prefix={<MailOutlined />} placeholder={t("auth.emailPlaceholder")} />
+          </Form.Item>
+          <Form.Item style={{ marginBottom: 0, marginTop: 24 }}>
+            <Button type="primary" htmlType="submit" block loading={loading}>
+              {t("auth.sendResetEmailButton")}
+            </Button>
+          </Form.Item>
+        </Form>
+      </Modal>
     </div>
   );
 };

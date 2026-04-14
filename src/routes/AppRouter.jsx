@@ -5,6 +5,7 @@ import LoadingScreen from "../components/Common/LoadingScreen";
 
 // Auth
 const Login = lazy(() => import("../features/auth/pages/LoginPage"));
+const ResetPassword = lazy(() => import("../features/auth/pages/ResetPasswordPage"));
 
 // Layout Principal
 const DashboardLayout = lazy(() => import("../features/dashboard/pages/DashboardLayout"));
@@ -35,7 +36,10 @@ const AppRouter = () => {
         <Suspense fallback={<LoadingScreen />}>
             <Routes>
                 {!user ? (
-                    <Route path="*" element={<Login />} />
+                    <>
+                        <Route path="reset-password/:token" element={<ResetPassword />} />
+                        <Route path="*" element={<Login />} />
+                    </>
                 ) : (
                     <Route element={<DashboardLayout />}>
 

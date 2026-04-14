@@ -19,6 +19,7 @@ const LoginPage = () => {
     toggleTheme,
     slides,
     handleLogin,
+    handleForgotPassword,
   } = useLogin(login, t);
 
   return (
@@ -36,7 +37,12 @@ const LoginPage = () => {
             className="login-content-wrapper"
             style={{ width: "100%", maxWidth: "28rem", zIndex: 10 }}
           >
-            <LoginForm onFinish={handleLogin} loading={loading} t={t} />
+            <LoginForm 
+              onFinish={handleLogin} 
+              onForgotPassword={handleForgotPassword}
+              loading={loading} 
+              t={t} 
+            />
           </div>
         </div>
 
