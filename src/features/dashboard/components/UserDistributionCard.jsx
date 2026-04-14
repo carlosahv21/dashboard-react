@@ -2,9 +2,14 @@ import React from "react";
 import { Card, Spin, Empty } from "antd";
 import ReactECharts from "echarts-for-react";
 
-const UserDistributionCard = ({ loading, option, theme, t }) => {
+const UserDistributionCard = ({ loading, option, theme, t, onClick }) => {
   return (
-    <Card hoverable title={t("stats.userDistributionByPlan")}>
+    <Card 
+      hoverable 
+      title={t("stats.userDistributionByPlan")}
+      onClick={onClick}
+      style={{ cursor: "pointer" }}
+    >
       <div style={{ height: "400px", width: "100%" }}>
         {loading ? (
           <div

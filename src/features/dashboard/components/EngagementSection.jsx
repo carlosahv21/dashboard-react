@@ -82,8 +82,8 @@ const EngagementSection = ({
                             {user.last_attendance === null
                               ? t("stats.noAttendanceData")
                               : t("stats.lastAttendance") +
-                                " " +
-                                formatDate(user.last_attendance, settings)}
+                              " " +
+                              formatDate(user.last_attendance, settings)}
                           </Typography.Text>
                         </>
                       }

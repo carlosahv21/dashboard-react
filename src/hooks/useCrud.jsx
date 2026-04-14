@@ -13,7 +13,12 @@ export const useCrud = (
     const { request } = useFetch();
     const [items, setItems] = useState([]);
     const [loading, setLoading] = useState(false);
-    const [search, setSearch] = useState("");
+    
+    // Read initial search from URL or empty
+    const urlParams = new URLSearchParams(window.location.search);
+    const initialSearch = urlParams.get("search") || "";
+    
+    const [search, setSearch] = useState(initialSearch);
     const [pagination, setPagination] = useState({
         current: 1,
         pageSize: initialPageSize,
@@ -30,10 +35,14 @@ export const useCrud = (
     ) => {
         try {
             setLoading(true);
+            
+            // Merge URL params with component filters
+            const urlParamsObject = Object.fromEntries(new URLSearchParams(window.location.search));
+            
             const params = {
                 page,
                 limit,
-                search: search.length >= 3 ? search : undefined,
+                search: search.length >= 2 ? search : undefined, // search logic
                 order_by: currentSort.field,
                 order_direction:
                     currentSort.order === "ascend"
@@ -41,20 +50,21 @@ export const useCrud = (
                         : currentSort.order === "descend"
                             ? "desc"
                             : undefined,
-                ...filters,
+                ...urlParamsObject, // Merge URL params
+                ...filters, // Component filters take precedence
             };
             const queryParams = new URLSearchParams(
                 Object.entries(params).filter(
                     ([_, v]) => v !== undefined && v !== "" && v !== null
                 )
             ).toString();
-
+ 
             const response = await request(`${endpoint}/?${queryParams}`, "GET");
-            const items = response.data;
+            const itemsData = response.data;
             const paginationData = response.pagination;
-
-            setItems(items || []);
-            const total = paginationData.total || 0;
+ 
+            setItems(itemsData || []);
+            const total = paginationData?.total || 0;
             const lastPage = Math.max(1, Math.ceil(total / limit));
             const current = page > lastPage ? lastPage : page;
             setPagination((prev) => ({ ...prev, total, current, pageSize: limit }));
@@ -64,15 +74,15 @@ export const useCrud = (
         } finally {
             setLoading(false);
         }
-    }, [endpoint, titlePlural, filters, search, sort, pagination.current, pagination.pageSize, request]);
-
+    }, [endpoint, titlePlural, filters, search, sort, pagination.pageSize, request]);
+ 
     useEffect(() => {
         const delay = setTimeout(
             () => fetchItems(1, pagination.pageSize, sort),
             500
         );
         return () => clearTimeout(delay);
-    }, [search, fetchItems, pagination.pageSize, sort]);
+    }, [search, sort, pagination.pageSize, fetchItems]);
 
     useEffect(() => {
         if (isAllSelected) {

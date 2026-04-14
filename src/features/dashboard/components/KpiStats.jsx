@@ -8,15 +8,20 @@ import {
 } from "@ant-design/icons";
 import { formatCurrency } from "../../../utils/formatters";
 
-const KpiStats = ({ kpiLoading, kpiData, t, token, settings }) => {
+const KpiStats = ({ kpiLoading, kpiData, t, token, settings, onKpiClick }) => {
+  const cardStyle = {
+    borderLeft: `4px solid ${token.colorPrimary}`,
+    cursor: "pointer",
+    transition: "transform 0.2s",
+  };
+
   return (
     <Row gutter={[24, 24]} style={{ marginBottom: 24 }}>
       <Col xs={24} sm={6}>
         <Card
           hoverable
-          style={{
-            borderLeft: `4px solid ${token.colorPrimary}`,
-          }}
+          style={cardStyle}
+          onClick={() => onKpiClick("activeStudents")}
         >
           <Spin spinning={kpiLoading}>
             <Statistic
@@ -32,9 +37,8 @@ const KpiStats = ({ kpiLoading, kpiData, t, token, settings }) => {
       <Col xs={24} sm={6}>
         <Card
           hoverable
-          style={{
-            borderLeft: `4px solid ${token.colorPrimary}`,
-          }}
+          style={cardStyle}
+          onClick={() => onKpiClick("todayClasses")}
         >
           <Spin spinning={kpiLoading}>
             <Statistic
@@ -50,14 +54,13 @@ const KpiStats = ({ kpiLoading, kpiData, t, token, settings }) => {
       <Col xs={24} sm={6}>
         <Card
           hoverable
-          style={{
-            borderLeft: `4px solid ${token.colorPrimary}`,
-          }}
+          style={cardStyle}
+          onClick={() => onKpiClick("monthlyRevenue")}
         >
           <Spin spinning={kpiLoading}>
             <Statistic
               title={t("dashboard.monthlyRevenue")}
-              value={formatCurrency(kpiData.monthlyRevenue, settings)}
+              value={formatCurrency(kpiData.monthlyRevenue, settings || {})}
               suffix={
                 <DollarOutlined style={{ marginLeft: 8, color: token.colorPrimary }} />
               }
@@ -68,9 +71,8 @@ const KpiStats = ({ kpiLoading, kpiData, t, token, settings }) => {
       <Col xs={24} sm={6}>
         <Card
           hoverable
-          style={{
-            borderLeft: `4px solid ${token.colorPrimary}`,
-          }}
+          style={cardStyle}
+          onClick={() => onKpiClick("attendanceRate")}
         >
           <Spin spinning={kpiLoading}>
             <Statistic

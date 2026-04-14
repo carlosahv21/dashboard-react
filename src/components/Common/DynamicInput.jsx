@@ -146,12 +146,18 @@ const DynamicInput = ({
     const getQuickCreateConfig = () => {
         if (!relationConfig) return null;
         let moduleName = relationConfig.table;
+        let fixedValues = { ...(relationConfig.filters || {}) };
+
         if (relationConfig.table === "users" && relationConfig.filters?.role_name) {
             moduleName = `${relationConfig.filters.role_name}s`;
+            // Map role_name to role for the backend
+            fixedValues.role = relationConfig.filters.role_name;
+            delete fixedValues.role_name;
         }
+
         let hiddenFields = [];
         if (relationConfig.table === "users" || moduleName === "teachers" || moduleName === "students") {
-            hiddenFields = ["role"];
+            hiddenFields = ["role", "role_name"];
         }
 
         return {
@@ -161,7 +167,7 @@ const DynamicInput = ({
             titleSingular: t(`${moduleName}.name_singular`, {
                 defaultValue: "Registro",
             }),
-            fixedValues: relationConfig.filters || {},
+            fixedValues,
             hiddenFields
         };
     };

@@ -8,13 +8,19 @@ const EfficiencySection = ({
   teacherRadarOption,
   theme,
   t,
+  onClick
 }) => {
   return (
     <>
       <Divider orientation="left">{t("divider.operationalEfficiency")}</Divider>
       <Row gutter={[24, 24]} style={{ marginBottom: 24 }}>
         <Col span={14}>
-          <Card hoverable title={t("stats.occupancyClass")}>
+          <Card 
+            hoverable 
+            title={t("stats.occupancyClass")}
+            onClick={onClick}
+            style={{ cursor: "pointer" }}
+          >
             <div style={{ height: "500px", width: "100%" }}>
               {loading ? (
                 <div
@@ -40,7 +46,12 @@ const EfficiencySection = ({
           </Card>
         </Col>
         <Col span={10}>
-          <Card hoverable title={t("stats.teachersEfficiency")}>
+          <Card 
+            hoverable 
+            title={t("stats.teachersEfficiency")}
+            onClick={onClick}
+            style={{ cursor: "pointer" }}
+          >
             <div style={{ height: "500px", width: "100%" }}>
               {loading ? (
                 <div

@@ -8,13 +8,19 @@ const RetentionChurnSection = ({
   churnGaugeOption,
   theme,
   t,
+  onClick
 }) => {
   return (
     <>
       <Divider orientation="left">{t("divider.retentionChurn")}</Divider>
       <Row gutter={[24, 24]} style={{ marginBottom: 24 }}>
         <Col span={16}>
-          <Card hoverable title={t("stats.retentionChurn")}>
+          <Card 
+            hoverable 
+            title={t("stats.retentionChurn")}
+            onClick={onClick}
+            style={{ cursor: "pointer" }}
+          >
             <div style={{ height: "450px", width: "100%" }}>
               {loading ? (
                 <div
@@ -49,7 +55,12 @@ const RetentionChurnSection = ({
           </Card>
         </Col>
         <Col span={8}>
-          <Card hoverable title={t("stats.churnRate")}>
+          <Card 
+            hoverable 
+            title={t("stats.churnRate")}
+            onClick={onClick}
+            style={{ cursor: "pointer" }}
+          >
             <div
               style={{
                 height: "450px",

@@ -2,11 +2,15 @@ import React from "react";
 import { Card, Spin, Empty, Typography, Divider } from "antd";
 import { CheckCircleOutlined, WarningOutlined } from "@ant-design/icons";
 
-const AuditLogCard = ({ loading, isSuspicious, t }) => {
+const AuditLogCard = ({ loading, isSuspicious, t, onClick }) => {
   return (
     <>
       <Divider orientation="left">{t("divider.adminAuditControl")}</Divider>
-      <Card hoverable style={{ textAlign: "center", padding: "40px 0" }}>
+      <Card 
+        hoverable 
+        style={{ textAlign: "center", padding: "40px 0", cursor: "pointer" }}
+        onClick={onClick}
+      >
         {loading ? (
           <Spin size="large" />
         ) : !isSuspicious ? (

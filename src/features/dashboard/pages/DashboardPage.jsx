@@ -1,5 +1,6 @@
 import React, { useContext } from "react";
 import { Row, Col, Divider, theme } from "antd";
+import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../../../context/AuthContext";
 import useDashboard from "../hooks/useDashboard";
 import { useTranslation } from "react-i18next";
@@ -22,6 +23,7 @@ import AuditLogCard from "../components/AuditLogCard";
 const DashboardPage = () => {
     const { settings } = useContext(AuthContext);
     const { token } = theme.useToken();
+    const navigate = useNavigate();
     const { t } = useTranslation();
 
     const {
@@ -46,6 +48,34 @@ const DashboardPage = () => {
         isSuspicious,
     } = useDashboard(settings);
 
+    // Helpers for navigation
+    const handleNavigation = (path, params = {}) => {
+        const queryString = new URLSearchParams(params).toString();
+        const fullPath = queryString ? `${path}?${queryString}` : path;
+        navigate(fullPath);
+    };
+
+    const handleKpiClick = (type) => {
+        switch (type) {
+            case "activeStudents":
+                handleNavigation("/students");
+                break;
+            case "todayClasses":
+                const days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+                const currentDay = days[new Date().getDay()];
+                handleNavigation("/classes", { date: currentDay });
+                break;
+            case "monthlyRevenue":
+                handleNavigation("/registrations", { date_range: "this_month" });
+                break;
+            case "attendanceRate":
+                handleNavigation("/attendances", { date_range: "this_month" });
+                break;
+            default:
+                break;
+        }
+    };
+
     // Theme configuration for ECharts
     const isDarkMode = settings?.theme === "dark";
     const chartTheme = isDarkMode ? "dark" : "light";
@@ -59,6 +89,7 @@ const DashboardPage = () => {
                 t={t}
                 token={token}
                 settings={settings}
+                onKpiClick={handleKpiClick}
             />
 
             {/* 2. Occupancy Drilldown Section */}
@@ -82,6 +113,7 @@ const DashboardPage = () => {
                         option={charts.userDistribution}
                         theme={chartTheme}
                         t={t}
+                        onClick={() => handleNavigation("/students")}
                     />
                 </Col>
                 <Col span={12}>
@@ -90,6 +122,7 @@ const DashboardPage = () => {
                         columns={teachersParticipationColumns}
                         data={teachersParticipationData}
                         t={t}
+                        onClick={() => handleNavigation("/teachers")}
                     />
                 </Col>
             </Row>
@@ -101,6 +134,7 @@ const DashboardPage = () => {
                 churnGaugeOption={charts.churnGauge}
                 theme={chartTheme}
                 t={t}
+                onClick={() => handleNavigation("/students", { segment: "at_risk" })}
             />
 
             {/* 5. Revenue Section */}
@@ -110,6 +144,7 @@ const DashboardPage = () => {
                 barComparisonOption={charts.revenueComparison}
                 theme={chartTheme}
                 t={t}
+                onClick={() => handleNavigation("/registrations")}
             />
 
             {/* 6. Engagement Section */}
@@ -121,6 +156,7 @@ const DashboardPage = () => {
                 token={token}
                 settings={settings}
                 t={t}
+                onClick={() => handleNavigation("/students", { filter: "engagement" })}
             />
 
             {/* 7. Efficiency Section */}
@@ -130,10 +166,16 @@ const DashboardPage = () => {
                 teacherRadarOption={charts.efficiencyRadar}
                 theme={chartTheme}
                 t={t}
+                onClick={() => handleNavigation("/classes", { filter: "efficiency" })}
             />
 
             {/* 8. Audit Section */}
-            <AuditLogCard loading={auditLoading} isSuspicious={isSuspicious} t={t} />
+            <AuditLogCard 
+                loading={auditLoading} 
+                isSuspicious={isSuspicious} 
+                t={t} 
+                onClick={() => handleNavigation("/settings")}
+            />
         </>
     );
 };

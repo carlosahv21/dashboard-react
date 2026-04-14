@@ -8,13 +8,19 @@ const RevenueAnalysisSection = ({
   barComparisonOption,
   theme,
   t,
+  onClick
 }) => {
   return (
     <>
       <Divider orientation="left">{t("divider.revenueOptimization")}</Divider>
       <Row gutter={[24, 24]} style={{ marginBottom: 24 }}>
         <Col span={12}>
-          <Card hoverable title={t("stats.paymentMethodAnalysis")}>
+          <Card 
+            hoverable 
+            title={t("stats.paymentMethodAnalysis")}
+            onClick={onClick}
+            style={{ cursor: "pointer" }}
+          >
             <div style={{ height: "400px", width: "100%" }}>
               {loading ? (
                 <div
@@ -40,7 +46,12 @@ const RevenueAnalysisSection = ({
           </Card>
         </Col>
         <Col span={12}>
-          <Card hoverable title={t("stats.transactionsVsAverage")}>
+          <Card 
+            hoverable 
+            title={t("stats.transactionsVsAverage")}
+            onClick={onClick}
+            style={{ cursor: "pointer" }}
+          >
             <div style={{ height: "400px", width: "100%" }}>
               {loading ? (
                 <div
