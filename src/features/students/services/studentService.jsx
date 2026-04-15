@@ -37,6 +37,16 @@ const studentService = {
       notes: reason,
     });
   },
+
+  /**
+   * Updates student personal data.
+   * @param {string} studentId
+   * @param {Object} data
+   * @returns {Promise<Object>}
+   */
+  updateStudent: async (studentId, data) => {
+    return await api.put(`students/${studentId}`, data);
+  },
 };
 
 export default studentService;

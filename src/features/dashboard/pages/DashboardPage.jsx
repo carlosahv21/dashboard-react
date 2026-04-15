@@ -122,7 +122,7 @@ const DashboardPage = () => {
                         columns={teachersParticipationColumns}
                         data={teachersParticipationData}
                         t={t}
-                        onClick={() => handleNavigation("/teachers")}
+                        onClick={(teacherId) => handleNavigation(teacherId ? `/teachers/${teacherId}/profile` : "/teachers")}
                     />
                 </Col>
             </Row>
@@ -170,10 +170,10 @@ const DashboardPage = () => {
             />
 
             {/* 8. Audit Section */}
-            <AuditLogCard 
-                loading={auditLoading} 
-                isSuspicious={isSuspicious} 
-                t={t} 
+            <AuditLogCard
+                loading={auditLoading}
+                isSuspicious={isSuspicious}
+                t={t}
                 onClick={() => handleNavigation("/settings")}
             />
         </>

@@ -2,6 +2,7 @@ import React from "react";
 import BaseView from "../../../components/Common/BaseView";
 import StudentCard from "../components/StudentCard";
 import { useStudentColumns } from "../hooks/useStudentColumns";
+import StudentDrawerFooter from "../components/StudentDrawerFooter";
 import { useTranslation } from "react-i18next";
 
 const StudentPage = () => {
@@ -24,8 +25,11 @@ const StudentPage = () => {
             hiddenFields={hiddenFields}
             fixedValues={{ role: "student" }}
             filters={{ role: "student" }}
-            viewOptions={["card", "table"]}
+            viewOptions={["table", "card"]}
             cardComponent={StudentCard}
+            footer={(drawerData, navigate) => (
+                <StudentDrawerFooter drawerData={drawerData} navigate={navigate} />
+            )}
         />
     );
 };

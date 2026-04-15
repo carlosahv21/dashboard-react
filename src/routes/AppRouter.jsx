@@ -18,6 +18,7 @@ const Teachers = lazy(() => import("../features/teachers/pages/TeacherPage"));
 const TeacherProfile = lazy(() => import("../features/teachers/pages/TeacherProfilePage"));
 // Estudiantes
 const Students = lazy(() => import("../features/students/pages/StudentPage"));
+const StudentProfile = lazy(() => import("../features/students/pages/StudentProfilePage"));
 const StudentHistory = lazy(() => import("../features/students/pages/StudentHistoryPage"));
 
 const RegistrationList = lazy(() => import("../features/registrations/pages/RegistrationListPage"));
@@ -63,6 +64,7 @@ const AppRouter = () => {
                         {hasPermission("students:view") && (
                             <>
                                 <Route path="students" element={<Students />} />
+                                <Route path="students/:id/profile" element={<StudentProfile />} />
                                 <Route path="students/:id/history" element={<StudentHistory />} />
                             </>
                         )}
