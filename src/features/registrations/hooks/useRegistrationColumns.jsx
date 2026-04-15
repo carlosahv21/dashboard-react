@@ -50,6 +50,16 @@ export const useRegistrationColumns = () => {
             render: (genre) => (
                 <Tag color="purple">{genre?.toUpperCase()}</Tag>
             ),
+        },
+        {
+            title: t("payment_method", { defaultValue: "Método de Pago" }),
+            dataIndex: "payment_method",
+            key: "payment_method",
+            render: (method) => method ? (
+                <Tag color="cyan">
+                    {t(`payments.methods.${method}`, { defaultValue: method.replace('_', ' ').toUpperCase() })}
+                </Tag>
+            ) : '-'
         }
     ];
 };

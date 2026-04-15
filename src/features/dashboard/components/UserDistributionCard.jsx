@@ -7,8 +7,7 @@ const UserDistributionCard = ({ loading, option, theme, t, onClick }) => {
     <Card 
       hoverable 
       title={t("stats.userDistributionByPlan")}
-      onClick={onClick}
-      style={{ cursor: "pointer" }}
+      style={{ cursor: "default" }}
     >
       <div style={{ height: "400px", width: "100%" }}>
         {loading ? (
@@ -27,6 +26,11 @@ const UserDistributionCard = ({ loading, option, theme, t, onClick }) => {
             option={option}
             theme={theme}
             style={{ height: "100%", width: "100%" }}
+            onEvents={{
+              click: (params) => {
+                if (onClick) onClick(params.name);
+              },
+            }}
           />
         ) : (
           <div

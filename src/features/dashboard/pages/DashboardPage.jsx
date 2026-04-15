@@ -113,7 +113,7 @@ const DashboardPage = () => {
                         option={charts.userDistribution}
                         theme={chartTheme}
                         t={t}
-                        onClick={() => handleNavigation("/students")}
+                        onClick={(planName) => handleNavigation("/students", planName ? { plan_name: planName, plan_status: 'active' } : {})}
                     />
                 </Col>
                 <Col span={12}>
@@ -144,7 +144,7 @@ const DashboardPage = () => {
                 barComparisonOption={charts.revenueComparison}
                 theme={chartTheme}
                 t={t}
-                onClick={() => handleNavigation("/registrations")}
+                onClick={(paymentMethod) => handleNavigation("/registrations/list", paymentMethod ? { payment_method: paymentMethod } : {})}
             />
 
             {/* 6. Engagement Section */}
@@ -156,7 +156,7 @@ const DashboardPage = () => {
                 token={token}
                 settings={settings}
                 t={t}
-                onClick={() => handleNavigation("/students", { filter: "engagement" })}
+                onUserClick={(userId) => handleNavigation(`/students/${userId}/history`)}
             />
 
             {/* 7. Efficiency Section */}

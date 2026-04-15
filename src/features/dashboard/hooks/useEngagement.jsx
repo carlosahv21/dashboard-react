@@ -33,6 +33,7 @@ const useEngagement = () => {
       item.classes_used,
       `${item.first_name} ${item.last_name}`,
       item.plan_name,
+      item.user_id,
     ]);
 
     return {

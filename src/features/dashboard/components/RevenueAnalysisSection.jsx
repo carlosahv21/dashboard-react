@@ -18,8 +18,7 @@ const RevenueAnalysisSection = ({
           <Card 
             hoverable 
             title={t("stats.paymentMethodAnalysis")}
-            onClick={onClick}
-            style={{ cursor: "pointer" }}
+            style={{ cursor: "default" }}
           >
             <div style={{ height: "400px", width: "100%" }}>
               {loading ? (
@@ -38,6 +37,11 @@ const RevenueAnalysisSection = ({
                   option={donutOption}
                   theme={theme}
                   style={{ height: "100%", width: "100%" }}
+                  onEvents={{
+                    click: (params) => {
+                      if (onClick) onClick(params.name);
+                    },
+                  }}
                 />
               ) : (
                 <Empty description={t("global.noData")} />
@@ -49,8 +53,7 @@ const RevenueAnalysisSection = ({
           <Card 
             hoverable 
             title={t("stats.transactionsVsAverage")}
-            onClick={onClick}
-            style={{ cursor: "pointer" }}
+            style={{ cursor: "default" }}
           >
             <div style={{ height: "400px", width: "100%" }}>
               {loading ? (
@@ -69,6 +72,11 @@ const RevenueAnalysisSection = ({
                   option={barComparisonOption}
                   theme={theme}
                   style={{ height: "100%", width: "100%" }}
+                  onEvents={{
+                    click: (params) => {
+                      if (onClick) onClick(params.name);
+                    },
+                  }}
                 />
               ) : (
                 <Empty description={t("global.noData")} />

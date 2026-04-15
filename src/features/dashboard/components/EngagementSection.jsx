@@ -22,6 +22,7 @@ const EngagementSection = ({
   token,
   settings,
   t,
+  onUserClick
 }) => {
   return (
     <>
@@ -46,6 +47,14 @@ const EngagementSection = ({
                   option={scatterOption}
                   theme={theme}
                   style={{ height: "100%", width: "100%" }}
+                  onEvents={{
+                    click: (params) => {
+                      // index 4 is the user_id
+                      if (onUserClick && params.data && params.data[4]) {
+                        onUserClick(params.data[4]);
+                      }
+                    }
+                  }}
                 />
               ) : (
                 <Empty description={t("global.noData")} />
@@ -63,7 +72,10 @@ const EngagementSection = ({
               <List
                 dataSource={usersAtRisk}
                 renderItem={(user) => (
-                  <List.Item>
+                  <List.Item 
+                    onClick={() => onUserClick && onUserClick(user.id)}
+                    style={{ cursor: "pointer" }}
+                  >
                     <List.Item.Meta
                       avatar={
                         <Avatar
