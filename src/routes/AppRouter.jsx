@@ -15,6 +15,7 @@ const DashboardView = lazy(() => import("../features/dashboard/pages/DashboardPa
 const Plans = lazy(() => import("../features/plans/pages/PlanPage"));
 const Classes = lazy(() => import("../features/classes/pages/ClassPage"));
 const Teachers = lazy(() => import("../features/teachers/pages/TeacherPage"));
+const TeacherProfile = lazy(() => import("../features/teachers/pages/TeacherProfilePage"));
 // Estudiantes
 const Students = lazy(() => import("../features/students/pages/StudentPage"));
 const StudentHistory = lazy(() => import("../features/students/pages/StudentHistoryPage"));
@@ -68,7 +69,10 @@ const AppRouter = () => {
 
                         {/* Profesores  */}
                         {hasPermission("teachers:view") && (
-                            <Route path="teachers" element={<Teachers />} />
+                            <>
+                                <Route path="teachers" element={<Teachers />} />
+                                <Route path="teachers/:id/profile" element={<TeacherProfile />} />
+                            </>
                         )}
 
                         {/* Inscripciones  */}

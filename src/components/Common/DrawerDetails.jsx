@@ -53,7 +53,7 @@ const DetailSection = ({ label, items }) => {
 
 // --- Componente principal: DrawerDetails ---
 
-const DrawerDetails = ({ visible, onClose, data, onEdit, onDelete }) => {
+const DrawerDetails = ({ visible, onClose, data, onEdit, onDelete, footer }) => {
     const { token } = theme.useToken();
     const { t } = useTranslation();
     const { formatDate, formatCurrency } = useFormatting();
@@ -360,6 +360,7 @@ const DrawerDetails = ({ visible, onClose, data, onEdit, onDelete }) => {
             open={visible}
             size={500}
             styles={{ body: { padding: 0 } }}
+            footer={footer}
             extra={
                 <Space>
                     {onEdit && (

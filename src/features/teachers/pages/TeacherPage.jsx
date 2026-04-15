@@ -2,6 +2,7 @@ import React from "react";
 import BaseView from "../../../components/Common/BaseView";
 import { useTranslation } from "react-i18next";
 import { useTeacherColumns } from "../hooks/useTeacherColumns";
+import TeacherDrawerFooter from "../components/TeacherDrawerFooter";
 
 const TeacherPage = () => {
   const { t } = useTranslation();
@@ -17,6 +18,9 @@ const TeacherPage = () => {
       titlePlural={t("teachers.name_plural")}
       fixedValues={{ role: "teacher" }}
       filters={{ role: "teacher" }}
+      footer={(drawerData, navigate) => (
+        <TeacherDrawerFooter drawerData={drawerData} navigate={navigate} />
+      )}
     />
   );
 };

@@ -20,12 +20,16 @@ const ProfileHeaderCard = ({
   t,
 }) => {
   const { token } = theme.useToken();
+  console.log(data);
   const roleLabel =
     data.role === "admin"
       ? t("roles.admin")
       : data.role === "student"
       ? t("roles.student")
-      : data.role;
+      : data.role === "teacher"
+      ? t("roles.teacher")
+      : data.role
+      ;
 
   return (
     <Card

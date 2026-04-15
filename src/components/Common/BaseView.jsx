@@ -1,5 +1,6 @@
 import React, { useContext } from "react";
 import { Form, Spin, App, Row, Col, Empty } from "antd";
+import { useNavigate } from "react-router-dom";
 import { utils, writeFileXLSX } from "xlsx";
 
 import { useCrud } from "../../hooks/useCrud";
@@ -26,8 +27,10 @@ const BaseView = ({
     viewOptions,
     cardComponent: CardComponent,
     extraActions,
+    footer,
 }) => {
     const { t } = useTranslation();
+    const navigate = useNavigate();
     const { hasPermission } = useContext(AuthContext);
     const { modal } = App.useApp();
     const [form] = Form.useForm();
@@ -196,6 +199,7 @@ const BaseView = ({
                 data={drawerData}
                 onEdit={hasPermission(`${endpoint}:edit`) ? openModal : undefined}
                 onDelete={hasPermission(`${endpoint}:delete`) ? (id) => handleDelete(id, titleSingular) : undefined}
+                footer={typeof footer === "function" ? footer(drawerData, navigate) : footer}
             >
                 {drawerLoading && <div style={{ textAlign: "center", padding: "50px" }}><Spin size="large" /></div>}
             </DrawerDetails>
