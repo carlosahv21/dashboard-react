@@ -94,7 +94,7 @@ export const useAttendance = () => {
       }
     };
     fetchClasses();
-  }, [pagination.current, pagination.pageSize]);
+  }, [pagination.current, pagination.pageSize, selectedClass]);
 
   // Fetch Students and Attendance
   useEffect(() => {
@@ -168,7 +168,7 @@ export const useAttendance = () => {
     selectedClass,
     studentPagination.current,
     studentPagination.pageSize,
-    debouncedSearchText,
+    debouncedSearchText
   ]);
 
   const handleToggleAttendance = (studentId) => {

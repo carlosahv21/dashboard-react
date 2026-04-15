@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useContext } from "react";
+import React, { useState, useMemo, useContext } from "react";
 import {
     Form,
     Input,
@@ -9,7 +9,6 @@ import {
     Checkbox,
     message,
     Divider,
-    Space,
     Button,
 } from "antd";
 import { UploadOutlined, PlusOutlined } from "@ant-design/icons";
@@ -172,32 +171,29 @@ const DynamicInput = ({
         };
     };
 
-    /**
-     * Función para buscar opciones de relación en el backend.
-     * Ahora usa POST para enviar la configuración en el cuerpo (body).
-     */
-    const fetchRelationOptions = useCallback(
-        debounce(async (term) => {
-            if (!relationConfig) return;
+    const fetchRelationOptions = useMemo(
+        () =>
+            debounce(async (term) => {
+                if (!relationConfig) return;
 
-            setLoadingOptions(true);
-            try {
-                const payload = {
-                    relation_config: relationConfig,
-                    search: term,
-                };
+                setLoadingOptions(true);
+                try {
+                    const payload = {
+                        relation_config: relationConfig,
+                        search: term,
+                    };
 
-                const response = await request(`fields/relation`, "POST", payload);
-                setRelationOptions(response.data);
-            } catch (error) {
-                message.error(t("forms.relationLoadError"));
-                console.error("Error fetching relation options:", error);
-                setRelationOptions([]);
-            } finally {
-                setLoadingOptions(false);
-            }
-        }, 300),
-        [relationConfig, request, t],
+                    const response = await request(`fields/relation`, "POST", payload);
+                    setRelationOptions(response.data);
+                } catch (error) {
+                    message.error(t("forms.relationLoadError"));
+                    console.error("Error fetching relation options:", error);
+                    setRelationOptions([]);
+                } finally {
+                    setLoadingOptions(false);
+                }
+            }, 300),
+        [relationConfig, request, t]
     );
 
     React.useEffect(() => {

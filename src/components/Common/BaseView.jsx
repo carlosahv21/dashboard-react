@@ -25,6 +25,7 @@ const BaseView = ({
     hiddenFields,
     viewOptions,
     cardComponent: CardComponent,
+    extraActions,
 }) => {
     const { t } = useTranslation();
     const { hasPermission } = useContext(AuthContext);
@@ -134,6 +135,7 @@ const BaseView = ({
                 viewOptions={viewOptions}
                 currentView={currentView}
                 onViewChange={handleViewChange}
+                extraActions={extraActions}
             />
 
             {currentView === "table" ? (

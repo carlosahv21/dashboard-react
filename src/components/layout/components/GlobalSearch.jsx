@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from "react";
 import { Input, message, Avatar } from "antd";
-import { SearchOutlined, LoadingOutlined, ClockCircleOutlined, CloseOutlined, CloseCircleOutlined, UserOutlined } from "@ant-design/icons";
+import { SearchOutlined, LoadingOutlined, ClockCircleOutlined, CloseOutlined, UserOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import useFetch from "../../../hooks/useFetch";

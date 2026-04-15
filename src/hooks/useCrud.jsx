@@ -28,6 +28,9 @@ export const useCrud = (
     const [selectedKeys, setSelectedKeys] = useState([]);
     const [isAllSelected, setIsAllSelected] = useState(false);
 
+    // Stringify filters to avoid infinite loops when parent components pass new object references
+    const filtersString = JSON.stringify(filters || {});
+
     const fetchItems = useCallback(async (
         page = pagination.current,
         limit = pagination.pageSize,
@@ -51,7 +54,7 @@ export const useCrud = (
                             ? "desc"
                             : undefined,
                 ...urlParamsObject, // Merge URL params
-                ...filters, // Component filters take precedence
+                ...JSON.parse(filtersString), // Component filters take precedence
             };
             const queryParams = new URLSearchParams(
                 Object.entries(params).filter(
@@ -65,24 +68,27 @@ export const useCrud = (
  
             setItems(itemsData || []);
             const total = paginationData?.total || 0;
+            const serverCurrent = paginationData?.current || page;
             const lastPage = Math.max(1, Math.ceil(total / limit));
-            const current = page > lastPage ? lastPage : page;
-            setPagination((prev) => ({ ...prev, total, current, pageSize: limit }));
+            const current = serverCurrent > lastPage ? lastPage : serverCurrent;
+            setPagination((prev) => ({ ...prev, total, current: Number(current), pageSize: Number(limit) }));
         } catch (error) {
             console.error(error);
             message.error(`Error al cargar ${titlePlural}`);
         } finally {
             setLoading(false);
         }
-    }, [endpoint, titlePlural, filters, search, sort, pagination.pageSize, request]);
- 
+    }, [endpoint, titlePlural, filtersString, search, sort, pagination.current, pagination.pageSize, request]);
+
+    // Dispara búsqueda (y carga inicial) restableciendo a la página 1 cuando cambia el input de búsqueda.
     useEffect(() => {
         const delay = setTimeout(
             () => fetchItems(1, pagination.pageSize, sort),
             500
         );
         return () => clearTimeout(delay);
-    }, [search, sort, pagination.pageSize, fetchItems]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [search]); 
 
     useEffect(() => {
         if (isAllSelected) {
@@ -125,7 +131,7 @@ export const useCrud = (
                         : sort.order === "descend"
                             ? "desc"
                             : undefined,
-                ...filters,
+                ...JSON.parse(filtersString),
             };
             const queryParams = new URLSearchParams(
                 Object.entries(params).filter(

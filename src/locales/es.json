@@ -140,6 +140,27 @@
         "name_plural": "Profesores",
         "name_singular": "Profesor"
     },
+    "registrations": {
+        "name_plural": "Inscripciones",
+        "name_singular": "Inscripción",
+        "student": "Estudiante",
+        "class": "Clase",
+        "date": "Fecha de Registro",
+        "level": "Nivel",
+        "genre": "Género",
+        "enroll_classes": "Inscribir Clases"
+    },
+    "attendances": {
+        "name_plural": "Asistencias",
+        "name_singular": "Asistencia",
+        "student": "Estudiante",
+        "class": "Clase",
+        "date": "Fecha",
+        "status": "Estado",
+        "present": "Presente",
+        "absent": "Ausente",
+        "track_attendance": "Tomar Asistencia"
+    },
     "classes": {
         "name_plural": "Clases",
         "name_singular": "Clase",

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Form, Input, Button, Checkbox, Modal, message } from "antd";
+import { Form, Input, Button, Checkbox, Modal } from "antd";
 import { MailOutlined, LockOutlined, LoginOutlined } from "@ant-design/icons";
 
 const LoginForm = ({ onFinish, onForgotPassword, loading, t }) => {

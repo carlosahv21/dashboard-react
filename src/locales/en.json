@@ -139,6 +139,27 @@
         "name_plural": "Teachers",
         "name_singular": "Teacher"
     },
+    "registrations": {
+        "name_plural": "Registrations",
+        "name_singular": "Registration",
+        "student": "Student",
+        "class": "Class",
+        "date": "Registration Date",
+        "level": "Level",
+        "genre": "Genre",
+        "enroll_classes": "Enroll Classes"
+    },
+    "attendances": {
+        "name_plural": "Attendances",
+        "name_singular": "Attendance",
+        "student": "Student",
+        "class": "Class",
+        "date": "Date",
+        "status": "Status",
+        "present": "Present",
+        "absent": "Absent",
+        "track_attendance": "Track Attendance"
+    },
     "classes": {
         "name_plural": "Classes",
         "name_singular": "Class",

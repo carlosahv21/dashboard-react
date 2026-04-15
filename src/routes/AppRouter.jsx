@@ -19,8 +19,10 @@ const Teachers = lazy(() => import("../features/teachers/pages/TeacherPage"));
 const Students = lazy(() => import("../features/students/pages/StudentPage"));
 const StudentHistory = lazy(() => import("../features/students/pages/StudentHistoryPage"));
 
-const Registrations = lazy(() => import("../features/registrations/pages/RegistrationPage"));
-const Attendances = lazy(() => import("../features/attendances/pages/AttendancePage"));
+const RegistrationList = lazy(() => import("../features/registrations/pages/RegistrationListPage"));
+const RegistrationEnroll = lazy(() => import("../features/registrations/pages/RegistrationPage"));
+const AttendanceTrack = lazy(() => import("../features/attendances/pages/AttendancePage"));
+const AttendanceList = lazy(() => import("../features/attendances/pages/AttendanceListPage"));
 const Notifications = lazy(() => import("../features/notifications/pages/NotificationsPage"));
 const Profile = lazy(() => import("../features/profile/pages/ProfilePage"));
 
@@ -71,12 +73,18 @@ const AppRouter = () => {
 
                         {/* Inscripciones  */}
                         {hasPermission("registrations:view") && (
-                            <Route path="registrations" element={<Registrations />} />
+                            <>
+                                <Route path="registrations" element={<RegistrationEnroll />} />
+                                <Route path="registrations/list" element={<RegistrationList />} />
+                            </>
                         )}
 
                         {/* Asistencias  */}
                         {hasPermission("attendances:view") && (
-                            <Route path="attendances" element={<Attendances />} />
+                            <>
+                                <Route path="attendances" element={<AttendanceTrack />} />
+                                <Route path="attendances/list" element={<AttendanceList />} />
+                            </>
                         )}
 
                         {/* Perfil de Usuario  */}

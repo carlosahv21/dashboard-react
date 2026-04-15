@@ -10,6 +10,8 @@ import {
     AppstoreOutlined,
     TableOutlined,
 } from "@ant-design/icons";
+import * as Icons from "@ant-design/icons";
+import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 
 const { Title } = Typography;
@@ -30,8 +32,10 @@ const SearchFilter = ({
     viewOptions,
     currentView,
     onViewChange,
+    extraActions,
 }) => {
     const { t } = useTranslation();
+    const navigate = useNavigate();
     const masiveActions = [
         {
             key: "export",
@@ -121,6 +125,23 @@ const SearchFilter = ({
                         {t('global.createTitle', { title: title })}
                     </Button>
                 )}
+
+                {extraActions && extraActions.map((action, index) => {
+                    const IconComponent = action.icon && Icons[action.icon + "Outlined"] 
+                        ? Icons[action.icon + "Outlined"] 
+                        : (action.icon && Icons[action.icon] ? Icons[action.icon] : null);
+                    
+                    return (
+                        <Button 
+                            key={index}
+                            type={action.type || "default"}
+                            onClick={() => action.path ? navigate(action.path) : (action.onClick && action.onClick())}
+                            icon={IconComponent ? <IconComponent /> : null}
+                        >
+                            {action.label}
+                        </Button>
+                    );
+                })}
             </Space>
         </div>
     );

@@ -66,10 +66,10 @@ const DashboardPage = () => {
                 handleNavigation("/classes", { date: currentDay });
                 break;
             case "monthlyRevenue":
-                handleNavigation("/registrations", { date_range: "this_month" });
+                handleNavigation("/registrations/list", { date_range: "this_month" });
                 break;
             case "attendanceRate":
-                handleNavigation("/attendances", { date_range: "this_month" });
+                handleNavigation("/attendances/list", { date_range: "this_month" });
                 break;
             default:
                 break;
