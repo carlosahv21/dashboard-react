@@ -13,9 +13,15 @@ const DashboardLayout = lazy(() => import("../features/dashboard/pages/Dashboard
 // Vistas de Negocio
 const DashboardView = lazy(() => import("../features/dashboard/pages/DashboardPage"));
 const Plans = lazy(() => import("../features/plans/pages/PlanPage"));
+
+// Clases
 const Classes = lazy(() => import("../features/classes/pages/ClassPage"));
+const ClassDetails = lazy(() => import("../features/classes/pages/ClassDetailsPage"));
+
+// Profesores
 const Teachers = lazy(() => import("../features/teachers/pages/TeacherPage"));
 const TeacherProfile = lazy(() => import("../features/teachers/pages/TeacherProfilePage"));
+
 // Estudiantes
 const Students = lazy(() => import("../features/students/pages/StudentPage"));
 const StudentProfile = lazy(() => import("../features/students/pages/StudentProfilePage"));
@@ -57,7 +63,10 @@ const AppRouter = () => {
 
                         {/* Gestión de Clases  */}
                         {hasPermission("classes:view") && (
-                            <Route path="classes" element={<Classes />} />
+                            <>
+                                <Route path="classes" element={<Classes />} />
+                                <Route path="classes/:id/details" element={<ClassDetails />} />
+                            </>
                         )}
 
                         {/* Módulo de Estudiantes e Historial  */}

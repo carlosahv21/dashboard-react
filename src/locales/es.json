@@ -60,7 +60,8 @@
         "monthlyRevenue": "Ingresos Mensuales",
         "attendanceRate": "Tasa de Asistencia",
         "totalMinutes": "Total de Minutos",
-        "rating": "Calificación"
+        "rating": "Calificación",
+        "stats": "Estadísticas"
     },
     "stats": {
         "userDistributionByPlan": "Distribución de Usuarios por Plan",
@@ -170,7 +171,8 @@
         "date": "Días de clase",
         "hour": "Horas de clase",
         "noResultsSearch": "No se encontraron clases que coincidan con la búsqueda.",
-        "noAvailableClasses": "No hay clases disponibles o escriba al menos 3 caracteres para buscar."
+        "noAvailableClasses": "No hay clases disponibles o escriba al menos 3 caracteres para buscar.",
+        "session_info": "Detalles de Sesión"
     },
     "settings": {
         "general": "Información General",
@@ -400,7 +402,12 @@
         "name": "Nombre",
         "description": "Descripción",
         "email": "Correo electrónico",
-        "role": "Rol"
+        "role": "Rol",
+        "time": "Horario",
+        "duration": "Duración",
+        "viewDetail": "Ver Detalle",
+        "viewProfile": "Ver Perfil",
+        "total": "Total"
     },
     "search": {
         "title": "Resultados de la búsqueda",
