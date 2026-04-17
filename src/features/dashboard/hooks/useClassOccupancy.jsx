@@ -1,10 +1,13 @@
-import { useState, useEffect, useMemo, useCallback } from "react";
+import { useState, useEffect, useMemo, useCallback, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 import dashboardService from "../services/dashboardService";
 
 /**
  * Hook to manage Class Occupancy report data, including genre filtering and drilldown.
  */
 const useClassOccupancy = () => {
+  const navigate = useNavigate();
+  const chartInstanceRef = useRef(null);
   const [loading, setLoading] = useState(true);
   const [classOccupancyData, setClassOccupancyData] = useState([]);
 
@@ -35,8 +38,6 @@ const useClassOccupancy = () => {
           const uniqueGenres = [
             ...new Set(parsedData.map((item) => item.genre)),
           ].sort();
-          setAvailableGenres(uniqueGenres);
-
           if (uniqueGenres.length > 0 && !selectedGenre) {
             setSelectedGenre(uniqueGenres[0]);
           }
@@ -77,6 +78,7 @@ const useClassOccupancy = () => {
       .map((item, index) => {
         const classId = `${selectedGenre}-${index}`;
         classesMap[classId] = {
+          id: item.id,
           name: item.name,
           capacity: item.capacity,
           enrolled: item.enrolled_count,
@@ -136,9 +138,10 @@ const useClassOccupancy = () => {
           },
           label: {
             position: "top",
-            formatter: "{c}",
+            formatter: "{c}%",
             fontSize: 11,
           },
+          cursor: "pointer",
           emphasis: {
             itemStyle: {
               shadowBlur: 10,
@@ -207,10 +210,13 @@ const useClassOccupancy = () => {
           type: "bar",
           data: data.map((d) => ({
             value: d.value,
+            name: d.name,
+            classId: classItem.id, // Use the real ID here for drilldown clicks
             itemStyle: { color: d.color },
           })),
           barMaxWidth: 80,
           itemStyle: { borderRadius: [6, 6, 0, 0] },
+          cursor: "pointer",
           label: { position: "top", fontSize: 14, fontWeight: "bold" },
         },
       ],
@@ -262,20 +268,38 @@ const useClassOccupancy = () => {
 
   const onOccupancyChartClick = useCallback(
     (event) => {
-      if (event.data && event.data.classId && !currentClassId) {
-        setCurrentClassId(event.data.classId);
+      if (!event.data) return;
+
+      if (!currentClassId) {
+        // Step 1 -> Step 2: From Classes to Details
+        if (event.data.classId) {
+          setCurrentClassId(event.data.classId);
+        }
+      } else {
+        // Step 2 -> Redirection
+        const classItem = classesMap[currentClassId];
+        if (classItem && classItem.id) {
+          navigate(`/classes/${classItem.id}/details`);
+        }
       }
     },
-    [currentClassId]
+    [currentClassId, classesMap, navigate]
   );
 
-  const onOccupancyChartReady = useCallback(
-    (echartsInstance) => {
-      echartsInstance.off("click");
-      echartsInstance.on("click", onOccupancyChartClick);
-    },
-    [onOccupancyChartClick]
-  );
+  // Update event listener when handler changes to avoid stale closure
+  useEffect(() => {
+    if (chartInstanceRef.current) {
+      chartInstanceRef.current.off("click");
+      chartInstanceRef.current.on("click", onOccupancyChartClick);
+    }
+  }, [onOccupancyChartClick]);
+
+  const onOccupancyChartReady = useCallback((echartsInstance) => {
+    chartInstanceRef.current = echartsInstance;
+    // Attach immediately to avoid missing first click
+    echartsInstance.off("click");
+    echartsInstance.on("click", onOccupancyChartClick);
+  }, [onOccupancyChartClick]);
 
   return {
     classOccupancyLoading: loading,
