@@ -7,6 +7,8 @@ export const getThemeConfig = (isDarkMode) => {
         return {
             algorithm: darkAlgorithm,
             token: {
+                fontFamily: "'Inter', sans-serif",
+                fontSize: 14,
                 colorBgBase: "#121212",
                 colorBgContainer: "#1E1E1E",
                 colorText: "#E0E0E0",
@@ -23,14 +25,14 @@ export const getThemeConfig = (isDarkMode) => {
                     siderBg: "#1E1E1E",
                 },
                 Card: {
-                    colorBgContainer: "#2D2D2D",
-                    colorBorderSecondary: "#2D2D2D",
-                    boxShadow: "none",
+                    colorBgContainer: "#1E1E1E", // Sincronizado con container
+                    colorBorderSecondary: "rgba(255, 255, 255, 0.05)",
+                    boxShadow: "0 4px 20px rgba(0, 0, 0, 0.2)",
                 },
                 Table: {
-                    colorBgContainer: "#2D2D2D",
-                    headerBg: "#2D2D2D",
-                    borderColor: "#2D2D2D",
+                    colorBgContainer: "transparent",
+                    headerBg: "rgba(255, 255, 255, 0.02)",
+                    borderColor: "rgba(255, 255, 255, 0.05)",
                 },
                 Menu: {
                     darkItemBg: "#1E1E1E",
@@ -44,6 +46,8 @@ export const getThemeConfig = (isDarkMode) => {
     return {
         algorithm: defaultAlgorithm,
         token: {
+            fontFamily: "'Inter', sans-serif",
+            fontSize: 14,
             colorBgBase: "#F8F9FA",
             colorBgContainer: "#FFFFFF",
             colorText: "#2D3436",
@@ -55,11 +59,11 @@ export const getThemeConfig = (isDarkMode) => {
         },
         components: {
             Card: {
-                colorBorderSecondary: "#E0E0E0",
-                boxShadow: "none",
+                colorBorderSecondary: "rgba(0, 0, 0, 0.06)",
+                boxShadow: "0 4px 20px rgba(0, 0, 0, 0.05)",
             },
             Table: {
-                borderColor: "#E0E0E0",
+                borderColor: "#F0F0F0",
             },
         },
     };

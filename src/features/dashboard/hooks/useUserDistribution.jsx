@@ -4,7 +4,7 @@ import dashboardService from "../services/dashboardService";
 /**
  * Hook to manage User Distribution report data and ECharts options.
  */
-const useUserDistribution = () => {
+const useUserDistribution = (filters) => {
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState([]);
 
@@ -12,7 +12,7 @@ const useUserDistribution = () => {
     const fetchData = async () => {
       setLoading(true);
       try {
-        const response = await dashboardService.getUserDistribution();
+        const response = await dashboardService.getUserDistribution(filters);
         const result = response.data;
         if (result?.success) {
           setData(result.data);
@@ -27,7 +27,7 @@ const useUserDistribution = () => {
       }
     };
     fetchData();
-  }, []);
+  }, [filters]);
 
   const chartOption = useMemo(() => {
     const mappedData = data.map((item) => ({
@@ -38,6 +38,7 @@ const useUserDistribution = () => {
     return {
       tooltip: { trigger: "item", formatter: "{b}: {c} Alumnos ({d}%)" },
       backgroundColor: "transparent",
+      textStyle: { fontFamily: "'Inter', sans-serif" },
       legend: {
         orient: "horizontal",
         left: "center",

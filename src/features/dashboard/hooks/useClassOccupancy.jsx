@@ -5,7 +5,7 @@ import dashboardService from "../services/dashboardService";
 /**
  * Hook to manage Class Occupancy report data, including genre filtering and drilldown.
  */
-const useClassOccupancy = () => {
+const useClassOccupancy = (filters) => {
   const navigate = useNavigate();
   const chartInstanceRef = useRef(null);
   const [loading, setLoading] = useState(true);
@@ -26,7 +26,7 @@ const useClassOccupancy = () => {
     const fetchData = async () => {
       setLoading(true);
       try {
-        const response = await dashboardService.getClassOccupancy();
+        const response = await dashboardService.getClassOccupancy(filters);
         const result = response.data;
         if (result?.success) {
           const parsedData = result.data.map((item) => ({
@@ -38,7 +38,10 @@ const useClassOccupancy = () => {
           const uniqueGenres = [
             ...new Set(parsedData.map((item) => item.genre)),
           ].sort();
-          if (uniqueGenres.length > 0 && !selectedGenre) {
+
+          setAvailableGenres(uniqueGenres);
+
+          if (uniqueGenres.length > 0 && (!selectedGenre || !uniqueGenres.includes(selectedGenre))) {
             setSelectedGenre(uniqueGenres[0]);
           }
         } else {
@@ -56,7 +59,7 @@ const useClassOccupancy = () => {
       }
     };
     fetchData();
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [filters]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Reset drilldown when genre changes
   useEffect(() => {
@@ -96,6 +99,7 @@ const useClassOccupancy = () => {
 
     const option = {
       backgroundColor: "transparent",
+      textStyle: { fontFamily: "'Inter', sans-serif" },
       tooltip: {
         trigger: "axis",
         axisPointer: { type: "shadow" },
@@ -169,6 +173,7 @@ const useClassOccupancy = () => {
     ];
 
     return {
+      textStyle: { fontFamily: "'Inter', sans-serif" },
       title: {
         text: classItem.name,
         subtext: `Tasa de Ocupación: ${classItem.occupancy_rate.toFixed(2)}%`,

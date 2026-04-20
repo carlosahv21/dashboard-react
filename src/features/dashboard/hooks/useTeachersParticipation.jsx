@@ -11,7 +11,7 @@ import { useTranslation } from "react-i18next";
 /**
  * Hook to manage Teachers Participation report data.
  */
-const useTeachersParticipation = () => {
+const useTeachersParticipation = (filters) => {
   const { t } = useTranslation();
   const [loading, setLoading] = useState(true);
   const [teacherData, setTeacherData] = useState([]);
@@ -20,7 +20,7 @@ const useTeachersParticipation = () => {
     const fetchData = async () => {
       setLoading(true);
       try {
-        const response = await dashboardService.getTeachersParticipation();
+        const response = await dashboardService.getTeachersParticipation(filters);
         const result = response.data;
         if (result?.success) {
           setTeacherData(result.data);
@@ -36,7 +36,7 @@ const useTeachersParticipation = () => {
       }
     };
     fetchData();
-  }, []);
+  }, [filters]);
 
   const calculateRating = (totalMinutes, classesCount) => {
     const minutes =

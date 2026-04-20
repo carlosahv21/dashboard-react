@@ -61,7 +61,10 @@
         "attendanceRate": "Tasa de Asistencia",
         "totalMinutes": "Total de Minutos",
         "rating": "Calificación",
-        "stats": "Estadísticas"
+        "stats": "Estadísticas",
+        "welcome": "Bienvenido",
+        "subtitle": "a la administración de {{academyName}}",
+        "period": "Periodo"
     },
     "stats": {
         "userDistributionByPlan": "Distribución de Usuarios por Plan",

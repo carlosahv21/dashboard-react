@@ -1,13 +1,53 @@
 import React from "react";
-import { Tag, Typography } from "antd";
+import { Tag, Typography, Space } from "antd";
 import { useTranslation } from "react-i18next";
 import useFormatting from "../../../hooks/useFormatting";
 
 const { Text } = Typography;
 
-export const useRegistrationColumns = () => {
+export const useRegistrationColumns = (isGroupedByStudent = false) => {
     const { t } = useTranslation();
     const { formatDate } = useFormatting();
+
+    if (isGroupedByStudent) {
+        return [
+            {
+                title: t("registrations.student"),
+                key: "student",
+                render: (_, record) => (
+                    <Text strong>
+                        {record.first_name} {record.last_name}
+                    </Text>
+                ),
+                sorter: true,
+                dataIndex: "first_name",
+            },
+            {
+                title: t("payment_method", { defaultValue: "Método de Pago" }),
+                dataIndex: "payment_method",
+                key: "payment_method",
+                render: (method) => method ? (
+                    <Tag color="cyan">
+                        {t(`payments.methods.${method}`, { defaultValue: method.replace('_', ' ').toUpperCase() })}
+                    </Tag>
+                ) : '-'
+            },
+            {
+                title: t("registrations.classes", { defaultValue: "Clases Inscritas" }),
+                key: "classes",
+                render: (_, record) => (
+                    <Space size={[0, 8]} wrap>
+                        {record.classes?.map(cls => (
+                            <Tag key={cls.registration_id} color="blue">
+                                {cls.name} ({t(`days.${cls.date}`, { defaultValue: cls.date })} - {cls.hour})
+                            </Tag>
+                        ))}
+                    </Space>
+                )
+            }
+            // 
+        ];
+    }
 
     return [
         {

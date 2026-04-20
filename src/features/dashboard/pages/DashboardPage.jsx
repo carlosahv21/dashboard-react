@@ -6,6 +6,7 @@ import useDashboard from "../hooks/useDashboard";
 import { useTranslation } from "react-i18next";
 
 // Componentes modulares
+import DashboardHeader from "../components/DashboardHeader";
 import KpiStats from "../components/KpiStats";
 import OccupancyChart from "../components/OccupancyChart";
 import UserDistributionCard from "../components/UserDistributionCard";
@@ -21,7 +22,7 @@ import AuditLogCard from "../components/AuditLogCard";
  * Uses modular components to keep a clean structure.
  */
 const DashboardPage = () => {
-    const { settings } = useContext(AuthContext);
+    const { settings, user, academy } = useContext(AuthContext);
     const { token } = theme.useToken();
     const navigate = useNavigate();
     const { t } = useTranslation();
@@ -46,6 +47,8 @@ const DashboardPage = () => {
         auditLoading,
         usersAtRisk,
         isSuspicious,
+        dateRange,
+        setDateRange,
     } = useDashboard(settings);
 
     // Helpers for navigation
@@ -66,7 +69,7 @@ const DashboardPage = () => {
                 handleNavigation("/classes", { date: currentDay });
                 break;
             case "monthlyRevenue":
-                handleNavigation("/registrations/list", { date_range: "this_month" });
+                handleNavigation("/registrations/list", { payment_date: "this_month", group_by: "student" });
                 break;
             case "attendanceRate":
                 handleNavigation("/attendances/list", { date_range: "this_month" });
@@ -82,6 +85,15 @@ const DashboardPage = () => {
 
     return (
         <>
+            {/* 0. Welcome & Period Section */}
+            <DashboardHeader 
+                user={user} 
+                dateRange={dateRange} 
+                onDateRangeChange={setDateRange} 
+                settings={settings}
+                academy={academy}
+            />
+
             {/* 1. KPIs Section */}
             <KpiStats
                 kpiLoading={kpiLoading}

@@ -4,7 +4,7 @@ import dashboardService from "../services/dashboardService";
 /**
  * Hook to manage Admin Audit report data.
  */
-const useAudit = () => {
+const useAudit = (filters) => {
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState({
     manualPlanChanges: [],
@@ -16,7 +16,7 @@ const useAudit = () => {
     const fetchData = async () => {
       setLoading(true);
       try {
-        const response = await dashboardService.getAuditLog();
+        const response = await dashboardService.getAuditLog(filters);
         const result = response.data;
         if (result?.success) {
           setData(result.data);
@@ -28,7 +28,7 @@ const useAudit = () => {
       }
     };
     fetchData();
-  }, []);
+  }, [filters]);
 
   const isSuspicious =
     data.manualPlanChanges.length > 0 ||

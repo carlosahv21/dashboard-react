@@ -1,3 +1,5 @@
+import { useState, useMemo } from "react";
+import dayjs from "dayjs";
 import useKpis from "./useKpis";
 import useUserDistribution from "./useUserDistribution";
 import useClassOccupancy from "./useClassOccupancy";
@@ -13,8 +15,20 @@ import useAudit from "./useAudit";
  * @param {Object} settings - User/System settings (for formatting).
  */
 const useDashboard = (settings) => {
-  const { kpiLoading, kpiData } = useKpis();
-  const { userDistributionLoading, userDistributionOption } = useUserDistribution();
+  // Global date range state
+  const [dateRange, setDateRange] = useState([
+    dayjs().startOf("month"),
+    dayjs().endOf("month"),
+  ]);
+
+  // Derived filters for API calls
+  const filters = useMemo(() => ({
+    start_date: dateRange[0].format("YYYY-MM-DD"),
+    end_date: dateRange[1].format("YYYY-MM-DD"),
+  }), [dateRange]);
+
+  const { kpiLoading, kpiData } = useKpis(filters);
+  const { userDistributionLoading, userDistributionOption } = useUserDistribution(filters);
   const {
     classOccupancyLoading,
     availableGenres,
@@ -22,17 +36,19 @@ const useDashboard = (settings) => {
     setSelectedGenre,
     occupancyDrilldownOption,
     onOccupancyChartReady,
-  } = useClassOccupancy();
+  } = useClassOccupancy(filters);
+
+
   const {
     teachersParticipationLoading,
     teachersParticipationData,
     teachersParticipationColumns,
-  } = useTeachersParticipation();
-  const { retentionChurnLoading, heatmapOption, churnGaugeOption } = useRetentionChurn();
-  const { revenueLoading, donutOption, barComparisonOption } = useRevenue(settings);
-  const { engagementLoading, scatterOption, usersAtRisk } = useEngagement();
-  const { efficiencyLoading, fillRateOption, teacherRadarOption } = useEfficiency();
-  const { auditLoading, isSuspicious, auditData } = useAudit();
+  } = useTeachersParticipation(filters);
+  const { retentionChurnLoading, heatmapOption, churnGaugeOption } = useRetentionChurn(filters);
+  const { revenueLoading, donutOption, barComparisonOption } = useRevenue(settings, filters);
+  const { engagementLoading, scatterOption, usersAtRisk } = useEngagement(filters);
+  const { efficiencyLoading, fillRateOption, teacherRadarOption } = useEfficiency(filters);
+  const { auditLoading, isSuspicious, auditData } = useAudit(filters);
 
   const overallLoading =
     kpiLoading ||
@@ -76,6 +92,8 @@ const useDashboard = (settings) => {
     teachersParticipationLoading,
     teachersParticipationData,
     teachersParticipationColumns,
+    dateRange,
+    setDateRange,
   };
 };
 

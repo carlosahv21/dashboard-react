@@ -6,7 +6,7 @@ import dashboardService from "../services/dashboardService";
 /**
  * Hook to manage Revenue report data and ECharts options.
  */
-const useRevenue = (settings) => {
+const useRevenue = (settings, filters) => {
   const { token } = theme.useToken();
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState({ arpu: "0", paymentMethodAnalysis: [] });
@@ -15,7 +15,7 @@ const useRevenue = (settings) => {
     const fetchData = async () => {
       setLoading(true);
       try {
-        const response = await dashboardService.getRevenue();
+        const response = await dashboardService.getRevenue(filters);
         const result = response.data;
         if (result?.success) {
           setData(result.data);
@@ -27,7 +27,7 @@ const useRevenue = (settings) => {
       }
     };
     fetchData();
-  }, []);
+  }, [filters]);
 
   const donutOption = useMemo(() => {
     const { paymentMethodAnalysis, arpu } = data;
@@ -48,6 +48,7 @@ const useRevenue = (settings) => {
         },
       },
       backgroundColor: "transparent",
+      textStyle: { fontFamily: "'Inter', sans-serif" },
       legend: { orient: "vertical", left: "left" },
       graphic: {
         type: "text",
@@ -93,6 +94,7 @@ const useRevenue = (settings) => {
     const { paymentMethodAnalysis } = data;
     return {
       backgroundColor: "transparent",
+      textStyle: { fontFamily: "'Inter', sans-serif" },
       tooltip: {
         trigger: "axis",
         axisPointer: { type: "shadow" },

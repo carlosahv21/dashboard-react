@@ -18,7 +18,7 @@ const attendanceService = {
   getRegistrations: (classId, page, limit, search = "") => {
     const searchParam = search ? `&search=${encodeURIComponent(search)}` : "";
     return api.get(
-      `registrations?class_id=${classId}&page=${page}&limit=${limit}${searchParam}&order_by=u.first_name&order_direction=asc`
+      `registrations?class_id=${classId}&page=${page}&limit=${limit}${searchParam}&payment_date=this_month&order_by=u.first_name&order_direction=asc`
     );
   },
 
@@ -37,8 +37,7 @@ const attendanceService = {
   /**
    * Fetches all students registered in a class (no pagination, for saving all).
    */
-  getAllRegistrations: (classId) =>
-    api.get(`registrations?class_id=${classId}&limit=1000`),
+  getAllRegistrations: (params) => api.get("registrations", { params }),
 };
 
 export default attendanceService;

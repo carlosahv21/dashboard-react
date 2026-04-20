@@ -28,6 +28,8 @@ const BaseView = ({
     cardComponent: CardComponent,
     extraActions,
     footer,
+    rowKey = "id",
+    disableActions = false,
 }) => {
     const { t } = useTranslation();
     const navigate = useNavigate();
@@ -146,8 +148,10 @@ const BaseView = ({
                     columns={columns}
                     data={items}
                     loading={loading}
-                    onEdit={hasPermission(`${endpoint}:edit`) ? openModal : undefined}
-                    onDelete={hasPermission(`${endpoint}:delete`) ? (id) => handleDelete(id, titleSingular) : undefined}
+                    rowKey={rowKey}
+                    showActions={!disableActions}
+                    onEdit={hasPermission(`${endpoint}:edit`) && !disableActions ? openModal : undefined}
+                    onDelete={hasPermission(`${endpoint}:delete`) && !disableActions ? (id) => handleDelete(id, titleSingular) : undefined}
                     disableEdit={(record) => ["admin"].includes(record.role_name?.toLowerCase())}
                     disableDelete={(record) => ["admin"].includes(record.role_name?.toLowerCase())}
                     onRow={(record) => ({ onClick: () => handleRowClick(record), style: { cursor: "pointer" } })}

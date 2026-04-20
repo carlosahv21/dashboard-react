@@ -59,7 +59,10 @@
         "monthlyRevenue": "Monthly Revenue",
         "attendanceRate": "Attendance Rate",
         "totalMinutes": "Total Minutes",
-        "rating": "Rating"
+        "rating": "Rating",
+        "welcome": "Welcome",
+        "subtitle": "to the administration of {brandName}",
+        "period": "Period"
     },
     "stats": {
         "userDistributionByPlan": "User Distribution by Plan",

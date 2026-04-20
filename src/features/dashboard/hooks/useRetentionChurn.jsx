@@ -4,7 +4,7 @@ import dashboardService from "../services/dashboardService";
 /**
  * Hook to manage Retention and Churn report data and ECharts options.
  */
-const useRetentionChurn = () => {
+const useRetentionChurn = (filters) => {
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState({ cohortAnalysis: [], churnRate: [] });
 
@@ -12,7 +12,7 @@ const useRetentionChurn = () => {
     const fetchData = async () => {
       setLoading(true);
       try {
-        const response = await dashboardService.getRetentionChurn();
+        const response = await dashboardService.getRetentionChurn(filters);
         const result = response.data;
         if (result?.success) {
           setData(result.data);
@@ -27,7 +27,7 @@ const useRetentionChurn = () => {
       }
     };
     fetchData();
-  }, []);
+  }, [filters]);
 
   const heatmapOption = useMemo(() => {
     const { cohortAnalysis } = data;
@@ -48,6 +48,7 @@ const useRetentionChurn = () => {
 
     return {
       backgroundColor: "transparent",
+      textStyle: { fontFamily: "'Inter', sans-serif" },
       tooltip: {
         position: "top",
         formatter: (params) => {
@@ -121,6 +122,7 @@ const useRetentionChurn = () => {
 
     return {
       backgroundColor: "transparent",
+      textStyle: { fontFamily: "'Inter', sans-serif" },
       series: [
         {
           type: "gauge",

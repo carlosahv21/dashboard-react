@@ -4,7 +4,7 @@ import dashboardService from "../services/dashboardService";
 /**
  * Hook to manage Student Engagement report data and ECharts options.
  */
-const useEngagement = () => {
+const useEngagement = (filters) => {
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState({ classUtilization: [], usersAtRisk: [] });
 
@@ -12,7 +12,7 @@ const useEngagement = () => {
     const fetchData = async () => {
       setLoading(true);
       try {
-        const response = await dashboardService.getEngagement();
+        const response = await dashboardService.getEngagement(filters);
         const result = response.data;
         if (result?.success) {
           setData(result.data);
@@ -24,7 +24,7 @@ const useEngagement = () => {
       }
     };
     fetchData();
-  }, []);
+  }, [filters]);
 
   const scatterOption = useMemo(() => {
     const { classUtilization } = data;
@@ -43,6 +43,7 @@ const useEngagement = () => {
         },
       },
       backgroundColor: "transparent",
+      textStyle: { fontFamily: "'Inter', sans-serif" },
       xAxis: {
         name: "Capacidad Plan",
         type: "value",

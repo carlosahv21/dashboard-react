@@ -12,7 +12,7 @@ const initialKpiData = {
 /**
  * Hook to manage KPI data.
  */
-const useKpis = () => {
+const useKpis = (filters) => {
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState(initialKpiData);
 
@@ -20,10 +20,7 @@ const useKpis = () => {
     const fetchKpiData = async () => {
       setLoading(true);
       try {
-        const response = await dashboardService.getKpis();
-        // Since axios might return response.data directly depending on interceptors, 
-        // we check both response.data.success or direct response.success if it's already unwrapped.
-        // Looking at axiosInstance, it returns the raw response object.
+        const response = await dashboardService.getKpis(filters);
         const result = response.data;
         
         if (!result?.success) {
@@ -39,7 +36,7 @@ const useKpis = () => {
       }
     };
     fetchKpiData();
-  }, []);
+  }, [filters]);
 
   return {
     kpiLoading: loading,

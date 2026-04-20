@@ -4,7 +4,7 @@ import dashboardService from "../services/dashboardService";
 /**
  * Hook to manage Operational Efficiency report data and ECharts options.
  */
-const useEfficiency = () => {
+const useEfficiency = (filters) => {
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState({
     fillRateByClass: [],
@@ -15,7 +15,7 @@ const useEfficiency = () => {
     const fetchData = async () => {
       setLoading(true);
       try {
-        const response = await dashboardService.getEfficiency();
+        const response = await dashboardService.getEfficiency(filters);
         const result = response.data;
         if (result?.success) {
           setData(result.data);
@@ -27,7 +27,7 @@ const useEfficiency = () => {
       }
     };
     fetchData();
-  }, []);
+  }, [filters]);
 
   const fillRateOption = useMemo(() => {
     const sortedData = [...data.fillRateByClass].sort(
@@ -37,6 +37,7 @@ const useEfficiency = () => {
     return {
       tooltip: { trigger: "axis", axisPointer: { type: "shadow" } },
       backgroundColor: "transparent",
+      textStyle: { fontFamily: "'Inter', sans-serif" },
       grid: { left: "3%", right: "4%", bottom: "3%", containLabel: true },
       xAxis: {
         type: "value",
@@ -85,6 +86,7 @@ const useEfficiency = () => {
     return {
       tooltip: {},
       backgroundColor: "transparent",
+      textStyle: { fontFamily: "'Inter', sans-serif" },
       legend: {
         data: teacherEfficiency.map((i) => `${i.first_name} ${i.last_name}`),
       },
