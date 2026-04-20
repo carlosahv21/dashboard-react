@@ -33,6 +33,7 @@ const useUserDistribution = (filters) => {
     const mappedData = data.map((item) => ({
       value: item.user_count,
       name: item.plan_name,
+      plan_id: item.plan_id, // Incluir ID para navegación
     }));
 
     return {

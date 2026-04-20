@@ -13,6 +13,7 @@ const DashboardLayout = lazy(() => import("../features/dashboard/pages/Dashboard
 // Vistas de Negocio
 const DashboardView = lazy(() => import("../features/dashboard/pages/DashboardPage"));
 const Plans = lazy(() => import("../features/plans/pages/PlanPage"));
+const PlanDetails = lazy(() => import("../features/plans/pages/PlanDetailsPage"));
 
 // Clases
 const Classes = lazy(() => import("../features/classes/pages/ClassPage"));
@@ -58,7 +59,10 @@ const AppRouter = () => {
 
                         {/* Gestión de Planes  */}
                         {hasPermission("plans:view") && (
-                            <Route path="plans" element={<Plans />} />
+                            <>
+                                <Route path="plans" element={<Plans />} />
+                                <Route path="plans/:id/details" element={<PlanDetails />} />
+                            </>
                         )}
 
                         {/* Gestión de Clases  */}

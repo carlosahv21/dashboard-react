@@ -18,6 +18,7 @@ const ClassPage = () => {
       footer={(drawerData, navigate) => (
         <ClassDrawerFooter drawerData={drawerData} navigate={navigate} />
       )}
+      detailPath="/classes/:id/details"
     />
   );
 };

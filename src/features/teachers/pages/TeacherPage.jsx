@@ -21,6 +21,7 @@ const TeacherPage = () => {
       footer={(drawerData, navigate) => (
         <TeacherDrawerFooter drawerData={drawerData} navigate={navigate} />
       )}
+      detailPath="/teachers/:id/profile"
     />
   );
 };

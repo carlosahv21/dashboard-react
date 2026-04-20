@@ -20,7 +20,6 @@ const ProfileHeaderCard = ({
   t,
 }) => {
   const { token } = theme.useToken();
-  console.log(data);
   const roleLabel =
     data.role === "admin"
       ? t("roles.admin")

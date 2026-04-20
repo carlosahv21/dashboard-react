@@ -1,6 +1,6 @@
 import React from "react";
 import { Table, Space, Button, App, Popover } from "antd";
-import { EditOutlined, DeleteOutlined } from "@ant-design/icons";
+import { EditOutlined, DeleteOutlined, EyeOutlined } from "@ant-design/icons";
 import { useTranslation } from "react-i18next";
 
 const DataTable = ({
@@ -16,6 +16,7 @@ const DataTable = ({
     selectedRowId,
     onChange,
     rowSelection,
+    onViewDetail,
     rowKey = "id"
 }) => {
     const { modal } = App.useApp();
@@ -32,7 +33,7 @@ const DataTable = ({
         });
     };
 
-    const enhancedColumns = showActions && (onEdit || onDelete)
+    const enhancedColumns = showActions && (onEdit || onDelete || onViewDetail)
         ? [
             ...columns,
             {
@@ -44,6 +45,19 @@ const DataTable = ({
 
                     return (
                         <Space size="middle">
+                            {onViewDetail && (
+                                <Popover content={t('global.view')} placement="bottom">
+                                    <Button
+                                        type="link"
+                                        icon={<EyeOutlined />}
+                                        style={{ color: "#1668dc" }}
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            onViewDetail(record.id);
+                                        }}
+                                    />
+                                </Popover>
+                            )}
                             {onEdit && (
                                 <Popover content={t('global.edit')} placement="bottom">
                                     <Button

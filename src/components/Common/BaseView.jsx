@@ -30,6 +30,7 @@ const BaseView = ({
     footer,
     rowKey = "id",
     disableActions = false,
+    detailPath,
 }) => {
     const { t } = useTranslation();
     const navigate = useNavigate();
@@ -152,6 +153,7 @@ const BaseView = ({
                     showActions={!disableActions}
                     onEdit={hasPermission(`${endpoint}:edit`) && !disableActions ? openModal : undefined}
                     onDelete={hasPermission(`${endpoint}:delete`) && !disableActions ? (id) => handleDelete(id, titleSingular) : undefined}
+                    onViewDetail={detailPath ? (id) => navigate(detailPath.replace(":id", id)) : undefined}
                     disableEdit={(record) => ["admin"].includes(record.role_name?.toLowerCase())}
                     disableDelete={(record) => ["admin"].includes(record.role_name?.toLowerCase())}
                     onRow={(record) => ({ onClick: () => handleRowClick(record), style: { cursor: "pointer" } })}

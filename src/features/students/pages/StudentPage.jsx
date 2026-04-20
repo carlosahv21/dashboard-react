@@ -30,6 +30,7 @@ const StudentPage = () => {
             footer={(drawerData, navigate) => (
                 <StudentDrawerFooter drawerData={drawerData} navigate={navigate} />
             )}
+            detailPath="/students/:id/profile"
         />
     );
 };

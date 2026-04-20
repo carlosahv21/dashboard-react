@@ -97,7 +97,16 @@
     },
     "plans": {
         "name_plural": "Planes",
-        "name_singular": "Plan"
+        "name_singular": "Plan",
+        "price": "Precio",
+        "configuration": "Configuración del Plan",
+        "max_sessions": "Sesiones Máximas",
+        "max_classes": "Clases por Semana",
+        "trial_period": "Periodo de Prueba",
+        "available": "Disponible al público",
+        "not_available": "No disponible",
+        "active": "Plan Activo",
+        "inactive": "Plan Inactivo"
     },
     "students": {
         "name_plural": "Estudiantes",

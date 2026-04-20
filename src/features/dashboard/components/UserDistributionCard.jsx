@@ -28,7 +28,7 @@ const UserDistributionCard = ({ loading, option, theme, t, onClick }) => {
             style={{ height: "100%", width: "100%" }}
             onEvents={{
               click: (params) => {
-                if (onClick) onClick(params.name);
+                if (onClick) onClick(params.data.plan_id, params.name);
               },
             }}
           />

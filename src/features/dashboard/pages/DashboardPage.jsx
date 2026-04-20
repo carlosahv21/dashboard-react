@@ -125,7 +125,7 @@ const DashboardPage = () => {
                         option={charts.userDistribution}
                         theme={chartTheme}
                         t={t}
-                        onClick={(planName) => handleNavigation("/students", planName ? { plan_name: planName, plan_status: 'active' } : {})}
+                        onClick={(planId) => {handleNavigation(`/plans/${planId}/details`);}}
                     />
                 </Col>
                 <Col span={12}>

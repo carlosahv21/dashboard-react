@@ -113,7 +113,6 @@ const StudentHistory = () => {
         <div className="student-history-container">
             <div style={{ marginBottom: 16, display: "flex", alignItems: "center" }}>
                 <Button type="text" icon={<LeftOutlined />} onClick={() => navigate("/students")} style={{ marginRight: 16 }}>
-                    {t('students.back')}
                 </Button>
                 <Title level={3} style={{ margin: 0 }}>
                     {t('students.history', { name: `${student?.first_name || ''} ${student?.last_name || ''}` })}
