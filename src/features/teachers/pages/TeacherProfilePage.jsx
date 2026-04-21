@@ -114,7 +114,7 @@ const TeacherProfilePage = () => {
                     style={{ marginRight: 16 }}
                 />
                 <Title level={2} style={{ margin: 0 }}>
-                    {t("teachers.profile", { defaultValue: "Perfil del Profesor" })}
+                    {t("teachers.profile")}
                 </Title>
             </div>
 
@@ -142,25 +142,25 @@ const TeacherProfilePage = () => {
                 <Col xs={24} lg={8}>
                     <Space direction="vertical" size="large" style={{ width: '100%' }}>
                         {/* Quick Stats */}
-                        <Card title={t("teachers.quickStats", { defaultValue: "Estadísticas" })}>
+                        <Card title={t("teachers.quickStats")}>
                             <Row gutter={16}>
                                 <Col span={8}>
                                     <Statistic
-                                        title={t("teachers.classes", { defaultValue: "Clases" })}
+                                        title={t("teachers.classes")}
                                         value={stats.classes_count}
                                         prefix={<CalendarOutlined />}
                                     />
                                 </Col>
                                 <Col span={8}>
                                     <Statistic
-                                        title={t("teachers.studentsCount", { defaultValue: "Alumnos" })}
+                                        title={t("teachers.studentsCount")}
                                         value={stats.students_count}
                                         prefix={<TeamOutlined />}
                                     />
                                 </Col>
                                 <Col span={8}>
                                     <Statistic
-                                        title={t("teachers.rating", { defaultValue: "Rating" })}
+                                        title={t("teachers.rating")}
                                         value={stats.rating}
                                         prefix={<StarOutlined />}
                                         precision={1}
@@ -170,27 +170,27 @@ const TeacherProfilePage = () => {
                         </Card>
 
                         {/* Payment Summary */}
-                        <Card title={t("teachers.paymentSummary", { defaultValue: "Resumen de Pagos" })}>
+                        <Card title={t("teachers.paymentSummary")}>
                             <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 16 }}>
-                                <Text type="secondary">{t("teachers.pendingAmount", { defaultValue: "Por Pagar" })}</Text>
+                                <Text type="secondary">{t("teachers.pendingAmount")}</Text>
                                 <Title level={4} style={{ margin: 0, color: '#1e8e3e' }}>
                                     {formatCurrency(payment_summary.pending_amount)}
                                 </Title>
                             </div>
                             <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 16 }}>
-                                <Text type="secondary">{t("teachers.paidThisMonth", { defaultValue: "Pagado este mes" })}</Text>
+                                <Text type="secondary">{t("teachers.paidThisMonth")}</Text>
                                 <Text strong>{formatCurrency(payment_summary.paid_amount)}</Text>
                             </div>
                             <Divider style={{ margin: '12px 0' }} />
                             <div style={{ display: "flex", justifyContent: "space-between" }}>
-                                <Text type="secondary">{t("teachers.nextCutoff", { defaultValue: "Próximo Corte" })}</Text>
+                                <Text type="secondary">{t("teachers.nextCutoff")}</Text>
                                 <Tag icon={<DollarOutlined />} color="blue">{payment_summary.next_cutoff_date}</Tag>
                             </div>
                         </Card>
 
                         {/* Weekly Classes */}
                         <Card
-                            title={t("teachers.weeklyClasses", { defaultValue: "Clases Semanales" })}
+                            title={t("teachers.weeklyClasses")}
                             styles={{ body: { padding: '0 12px' } }}
                         >
                             <List

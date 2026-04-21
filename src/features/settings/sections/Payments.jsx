@@ -15,7 +15,7 @@ const Payments = () => {
             render: (text, record) => `${record.user_first_name} ${record.user_last_name}`
         },
         {
-            title: t('students.date'),
+            title: t('global.date'),
             dataIndex: "payment_date",
             key: "payment_date",
             sorter: true,
@@ -23,19 +23,21 @@ const Payments = () => {
             render: (text, record) => formatDate(record.payment_date)
         },
         {
-            title: t('students.amount'),
+            title: t('global.amount'),
             dataIndex: "amount",
             key: "amount",
             sorter: true,
             render: (text, record) => formatCurrency(record.amount)
         },
         {
-            title: t('students.status'),
+            title: t('global.status'),
             dataIndex: "status",
             key: "status",
             render: (text, record) => {
                 return (
-                    <Tag color={text === "completed" ? "green" : "red"}>{text}</Tag>
+                    <Tag color={text === "completed" ? "green" : "red"}>
+                        {t(`global.${text}`, { defaultValue: text })}
+                    </Tag>
                 );
             }
         },

@@ -7,19 +7,19 @@ export const useHistoryColumns = () => {
     const { formatDateShort, formatCurrency } = useFormatting();
 
     const attendanceColumns = [
-        { title: t('common.date'), dataIndex: 'date', render: d => formatDateShort(d) },
+        { title: t('global.date'), dataIndex: 'date', render: d => formatDateShort(d) },
         { title: t('classes.name'), dataIndex: 'class_name' },
         {
-            title: t('common.status'),
+            title: t('global.status'),
             dataIndex: 'status',
-            render: s => <Tag color={s === "present" ? "green" : "red"}>{t(`common.${s}`)}</Tag>
+            render: s => <Tag color={s === "present" ? "green" : "red"}>{t(`global.${s}`)}</Tag>
         },
     ];
 
     const paymentColumns = [
-        { title: t('common.date'), dataIndex: 'payment_date', render: d => formatDateShort(d) },
-        { title: t('payments.amount'), dataIndex: 'amount', render: a => formatCurrency(a) },
-        { title: t('payments.method'), dataIndex: 'payment_method' },
+        { title: t('global.date'), dataIndex: 'payment_date', render: d => formatDateShort(d) },
+        { title: t('global.amount'), dataIndex: 'amount', render: a => formatCurrency(a) },
+        { title: t('global.method'), dataIndex: 'payment_method' },
     ];
 
     return { attendanceColumns, paymentColumns };

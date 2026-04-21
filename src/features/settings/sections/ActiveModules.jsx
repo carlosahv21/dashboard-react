@@ -49,6 +49,7 @@ const ActiveModules = () => {
             title: t('settings.moduleName'),
             dataIndex: "name",
             key: "name",
+            render: (name) => t(`menu.${name}`, { defaultValue: name.charAt(0).toUpperCase() + name.slice(1) })
         },
         {
             title: t('settings.descriptionLabel'),
@@ -59,6 +60,7 @@ const ActiveModules = () => {
             title: t('settings.category'),
             dataIndex: "tab",
             key: "tab",
+            render: (tab) => t(`settings.${tab}`, { defaultValue: tab.charAt(0).toUpperCase() + tab.slice(1) })
         },
         {
             title: t('students.status'),

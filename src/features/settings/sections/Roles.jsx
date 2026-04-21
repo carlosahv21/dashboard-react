@@ -6,7 +6,14 @@ import { useTranslation } from "react-i18next";
 const Roles = () => {
     const { t } = useTranslation();
     const columns = [
-        { title: t('settings.roleName'), dataIndex: "name", key: "name", sorter: true, defaultSortOrder: "ascend" },
+        { 
+            title: t('settings.roleName'), 
+            dataIndex: "name", 
+            key: "name", 
+            sorter: true, 
+            defaultSortOrder: "ascend",
+            render: (name) => t(`roles.${name.toLowerCase()}`, { defaultValue: name })
+        },
         { title: t('settings.roleDescription'), dataIndex: "description", key: "description", sorter: true },
     ];
 

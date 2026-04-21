@@ -1,11 +1,13 @@
 import React from "react";
 import { List, Card, Typography, Empty } from "antd";
 import { CalendarOutlined } from "@ant-design/icons";
+import { useTranslation } from "react-i18next";
 
 const { Text } = Typography;
 
 const AgendaCard = ({ data, loading, isDarkMode, role }) => {
-  const title = role === "admin" ? "Clases de Hoy" : "Mi Agenda de Hoy";
+  const { t } = useTranslation();
+  const title = role === "admin" ? t("sidebar.adminClasses") : t("sidebar.myAgenda");
 
   return (
     <Card
@@ -38,8 +40,8 @@ const AgendaCard = ({ data, loading, isDarkMode, role }) => {
                 }
                 description={
                   <span style={{ color: isDarkMode ? "#aaa" : "#595959" }}>
-                    {`${item.genre || "Clase"} • Nivel ${
-                      item.level || "Básico"
+                    {`${item.genre || t("global.genre")} • ${t("global.level")} ${
+                      item.level || ""
                     } • ${item.hour || ""}`}
                   </span>
                 }
@@ -49,7 +51,7 @@ const AgendaCard = ({ data, loading, isDarkMode, role }) => {
         />
       ) : (
         <Empty
-          description="No hay clases programadas para hoy"
+          description={t("sidebar.noClassesToday")}
           image={Empty.PRESENTED_IMAGE_SIMPLE}
         />
       )}

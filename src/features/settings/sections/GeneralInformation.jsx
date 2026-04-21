@@ -35,8 +35,14 @@ const GeneralInformation = () => {
                 fields: [
                     { label: t('settings.currency'), name: "currency", type: "select", options: ["USD", "EUR", "VES"] },
                     { label: t('settings.dateFormat'), name: "date_format", type: "select", options: ["DD/MM/YYYY", "MM/DD/YYYY", "YYYY-MM-DD"] },
-                    { label: t('settings.theme'), name: "theme", type: "select", options: ["light", "dark"] },
-                    { label: t('settings.language'), name: "language", type: "select", options: ["es", "en"] },
+                    { label: t('settings.theme'), name: "theme", type: "select", options: [
+                        { value: "light", label: t('settings.themes.light') },
+                        { value: "dark", label: t('settings.themes.dark') }
+                    ]},
+                    { label: t('settings.language'), name: "language", type: "select", options: [
+                        { value: "es", label: t('settings.languages.es') },
+                        { value: "en", label: t('settings.languages.en') }
+                    ]},
                 ],
             },
         ],

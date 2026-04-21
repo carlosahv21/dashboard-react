@@ -104,7 +104,7 @@ const RolePermissions = () => {
         if (!module) return "";
         const parts = module.split(".");
         const name = parts[parts.length - 1];
-        return name.charAt(0).toUpperCase() + name.slice(1);
+        return t(`menu.${name}`, { defaultValue: name.charAt(0).toUpperCase() + name.slice(1) });
     };
 
     const groupedPermissions = permissions.reduce((acc, perm) => {
@@ -164,7 +164,7 @@ const RolePermissions = () => {
                 >
                     {roles.map(role => (
                         <Option key={role.id} value={role.id}>
-                            {role.name.charAt(0).toUpperCase() + role.name.slice(1)}
+                            {t(`roles.${role.name.toLowerCase()}`, { defaultValue: role.name })}
                         </Option>
                     ))}
                 </Select>

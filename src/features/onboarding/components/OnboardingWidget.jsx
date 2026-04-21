@@ -23,19 +23,19 @@ const OnboardingWidget = () => {
     if (isWidgetHidden) return null;
 
     const stepsData = [
-        { title: t('onboarding.welcome.title', 'Bienvenida'), index: 0 },
-        { title: t('onboarding.sidebar.title', 'Navegación'), index: 1 },
-        { title: t('onboarding.search.title', 'Buscador'), index: 2 },
-        { title: t('onboarding.profile.title', 'Mi Perfil'), index: 3 },
-        { title: t('onboarding.finish.title', 'Finalizar'), index: 4 },
+        { title: t('onboarding.welcome.title'), index: 0 },
+        { title: t('onboarding.sidebar.title'), index: 1 },
+        { title: t('onboarding.search.title'), index: 2 },
+        { title: t('onboarding.profile.title'), index: 3 },
+        { title: t('onboarding.finish.title'), index: 4 },
     ];
 
     const checklistContent = (
         <div style={{ width: 320 }}>
             <div style={{ padding: '8px 4px' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <Text strong style={{ fontSize: 16 }}>{t('onboarding.widget.title', 'Progreso de Configuración')}</Text>
-                    <Tooltip title={t('onboarding.widget.hidePermanent', 'Ocultar widget siempre')}>
+                    <Text strong style={{ fontSize: 16 }}>{t('onboarding.widget.title')}</Text>
+                    <Tooltip title={t('onboarding.widget.hidePermanent')}>
                         <Button
                             type="text"
                             icon={<EyeInvisibleOutlined />}
@@ -68,7 +68,7 @@ const OnboardingWidget = () => {
                                     setPopoverVisible(false);
                                 }}
                             >
-                                {completedSteps.includes(item.index) ? t('common.repeat', 'Repetir') : t('common.go', 'Ir')}
+                                {completedSteps.includes(item.index) ? t('global.repeat') : t('global.go')}
                             </Button>
                         ]}
                     >
@@ -88,7 +88,7 @@ const OnboardingWidget = () => {
                 size="small"
                 onClick={() => resetOnboarding()}
             >
-                {t('onboarding.widget.reset', 'Reiniciar todo el tour')}
+                {t('onboarding.widget.reset')}
             </Button>
         </div>
     );
@@ -156,7 +156,7 @@ const OnboardingWidget = () => {
 
                     <Divider type="vertical" style={{ height: 20, margin: 0 }} />
 
-                    <Tooltip title={t('onboarding.widget.viewMore', 'Ver tareas')}>
+                    <Tooltip title={t('onboarding.widget.viewMore')}>
                         <Button
                             type="text"
                             shape="circle"

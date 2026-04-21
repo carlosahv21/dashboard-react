@@ -23,29 +23,28 @@ export const useRegistrationColumns = (isGroupedByStudent = false) => {
                 dataIndex: "first_name",
             },
             {
-                title: t("payment_method", { defaultValue: "Método de Pago" }),
+                title: t("global.method"),
                 dataIndex: "payment_method",
                 key: "payment_method",
                 render: (method) => method ? (
                     <Tag color="cyan">
-                        {t(`payments.methods.${method}`, { defaultValue: method.replace('_', ' ').toUpperCase() })}
+                        {t(`payments.methods.${method}`)}
                     </Tag>
                 ) : '-'
             },
             {
-                title: t("registrations.classes", { defaultValue: "Clases Inscritas" }),
+                title: t("registrations.classes"),
                 key: "classes",
                 render: (_, record) => (
                     <Space size={[0, 8]} wrap>
                         {record.classes?.map(cls => (
                             <Tag key={cls.registration_id} color="blue">
-                                {cls.name} ({t(`days.${cls.date}`, { defaultValue: cls.date })} - {cls.hour})
+                                {cls.name} ({t(`days.${cls.date}`)} - {cls.hour})
                             </Tag>
                         ))}
                     </Space>
                 )
             }
-            // 
         ];
     }
 
@@ -92,12 +91,12 @@ export const useRegistrationColumns = (isGroupedByStudent = false) => {
             ),
         },
         {
-            title: t("payment_method", { defaultValue: "Método de Pago" }),
+            title: t("global.method"),
             dataIndex: "payment_method",
             key: "payment_method",
             render: (method) => method ? (
                 <Tag color="cyan">
-                    {t(`payments.methods.${method}`, { defaultValue: method.replace('_', ' ').toUpperCase() })}
+                    {t(`payments.methods.${method}`)}
                 </Tag>
             ) : '-'
         }

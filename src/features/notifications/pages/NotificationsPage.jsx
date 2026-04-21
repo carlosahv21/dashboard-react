@@ -118,8 +118,7 @@ const NotificationsPage = () => {
                       fontStyle: "italic",
                     }}
                   >
-                    {t("notifications.footerMessage") ||
-                      "Has visto todas tus notificaciones recientes"}
+                    {t("notifications.footerMessage")}
                   </Text>
                 </div>
               )

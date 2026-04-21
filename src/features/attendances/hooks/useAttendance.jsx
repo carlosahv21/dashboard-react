@@ -2,15 +2,15 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import { message } from "antd";
 import dayjs from "dayjs";
 import attendanceService from "../services/attendanceService";
+import { useTranslation } from "react-i18next";
 import "dayjs/locale/es";
 import "dayjs/locale/en";
-
-dayjs.locale("es");
 
 const getCurrentDayEnglish = () => dayjs().locale("en").format("dddd");
 const getCurrentDate = () => dayjs().format("YYYY-MM-DD");
 
 export const useAttendance = () => {
+  const { t } = useTranslation();
   // --- Classes State ---
   const [classes, setClasses] = useState([]);
   const [selectedClass, setSelectedClass] = useState(null);
@@ -88,7 +88,7 @@ export const useAttendance = () => {
           setSelectedClass(nearest);
         }
       } catch (error) {
-        message.error("Error al cargar las clases");
+        message.error(t("attendances.loadClassesError"));
       } finally {
         setLoadingClasses(false);
       }
@@ -158,7 +158,7 @@ export const useAttendance = () => {
 
         setAttendanceData((prev) => (classChanged ? pageAtt : { ...prev, ...pageAtt }));
       } catch (error) {
-        message.error("Error al cargar estudiantes");
+        message.error(t("attendances.loadStudentsError"));
       } finally {
         setLoadingStudents(false);
       }
@@ -192,7 +192,7 @@ export const useAttendance = () => {
       const allReg = allRegRes.data?.data || allRegRes.data || [];
 
       if (allReg.length === 0) {
-        message.warning("No hay estudiantes registrados.");
+        message.warning(t("attendances.noStudentsRegistered"));
         return;
       }
 
@@ -205,10 +205,9 @@ export const useAttendance = () => {
       }));
 
       await attendanceService.saveAttendance(payload);
-      message.success("Asistencia guardada con éxito");
+      message.success(t("attendances.saveSuccess"));
     } catch (error) {
-      console.log(error);
-      message.error(error.response?.data?.message || "Error al guardar");
+      message.error(error.response?.data?.message || t("attendances.saveError"));
     } finally {
       setIsSaving(false);
     }

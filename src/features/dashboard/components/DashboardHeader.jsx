@@ -18,12 +18,12 @@ const DashboardHeader = ({ user, dateRange, onDateRangeChange, settings, academy
 
     // Custom format for the range display
     const rangePresets = [
-        { label: t('dateRange.today', 'Hoy'), value: [dayjs().startOf('day'), dayjs().endOf('day')] },
-        { label: t('dateRange.yesterday', 'Ayer'), value: [dayjs().subtract(1, 'd').startOf('day'), dayjs().subtract(1, 'd').endOf('day')] },
-        { label: t('dateRange.last7Days', 'Últimos 7 días'), value: [dayjs().subtract(7, 'd'), dayjs()] },
-        { label: t('dateRange.last30Days', 'Últimos 30 días'), value: [dayjs().subtract(30, 'd'), dayjs()] },
-        { label: t('dateRange.thisMonth', 'Este Mes'), value: [dayjs().startOf('month'), dayjs().endOf('month')] },
-        { label: t('dateRange.lastMonth', 'Mes Pasado'), value: [dayjs().subtract(1, 'month').startOf('month'), dayjs().subtract(1, 'month').endOf('month')] },
+        { label: t('dateRange.today'), value: [dayjs().startOf('day'), dayjs().endOf('day')] },
+        { label: t('dateRange.yesterday'), value: [dayjs().subtract(1, 'd').startOf('day'), dayjs().subtract(1, 'd').endOf('day')] },
+        { label: t('dateRange.last7Days'), value: [dayjs().subtract(7, 'd'), dayjs()] },
+        { label: t('dateRange.last30Days'), value: [dayjs().subtract(30, 'd'), dayjs()] },
+        { label: t('dateRange.thisMonth'), value: [dayjs().startOf('month'), dayjs().endOf('month')] },
+        { label: t('dateRange.lastMonth'), value: [dayjs().subtract(1, 'month').startOf('month'), dayjs().subtract(1, 'month').endOf('month')] },
     ];
 
     return (
@@ -42,7 +42,7 @@ const DashboardHeader = ({ user, dateRange, onDateRangeChange, settings, academy
                                 background: `linear-gradient(90deg, ${token.colorPrimary} 0%, ${token.colorPrimaryHover} 100%)`,
                                 WebkitBackgroundClip: 'text',
                                 WebkitTextFillColor: 'transparent',
-                            }}>{user?.name || t('common.admin')}</span>
+                            }}>{user?.name || t('global.admin')}</span>
                         </Title>
                         <Text type="secondary" style={{ fontSize: '15px', fontWeight: 400, opacity: 0.7 }}>
                             {t('dashboard.subtitle', {academyName : academy.name})} 
@@ -77,7 +77,7 @@ const DashboardHeader = ({ user, dateRange, onDateRangeChange, settings, academy
                             presets={rangePresets}
                             bordered={false}
                             suffixIcon={null}
-                            placeholder={[t('common.start', 'Inicio'), t('common.end', 'Fin')]}
+                            placeholder={[t('global.start'), t('global.end')]}
                             style={{ 
                                 padding: 0, 
                                 width: '100%',

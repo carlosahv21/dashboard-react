@@ -10,7 +10,7 @@ const ResetPasswordForm = ({ onFinish, loading, t }) => {
     <div className="login-form-container">
       <div style={{ marginBottom: "0" }}>
         <h1 className="login-title">{t("auth.resetPasswordTitle")}</h1>
-        <p className="login-subtitle">Crea una contraseña segura que puedas recordar fácilmente.</p>
+        <p className="login-subtitle">{t("auth.resetPasswordInstructions")}</p>
         <div className="login-divider"></div>
       </div>
 

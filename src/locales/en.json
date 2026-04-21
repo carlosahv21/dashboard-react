@@ -17,6 +17,7 @@
         "forgotPassword": "Forgot your password?",
         "signInButton": "Sign In",
         "invalidCredentials": "Incorrect email or password",
+        "invalidToken": "The recovery link is invalid or has expired.",
         "loading": "Signing in...",
         "contactAdmin": "Contact administration",
         "accessHelp": "if you need access or have lost your account details.",
@@ -46,6 +47,7 @@
         "tokenPlaceholder": "Enter your code",
         "newPasswordLabel": "New Password",
         "resetPasswordButton": "Change Password",
+        "resetPasswordInstructions": "Create a secure password that you can easily remember.",
         "passwordResetSuccess": "Password updated successfully."
     },
     "session": {
@@ -54,14 +56,17 @@
         "expiredOk": "OK"
     },
     "dashboard": {
+        "name_plural": "Dashboard",
+        "name_singular": "Dashboard",
         "activeStudents": "Active Students",
         "todayClasses": "Today's Classes",
         "monthlyRevenue": "Monthly Revenue",
         "attendanceRate": "Attendance Rate",
         "totalMinutes": "Total Minutes",
         "rating": "Rating",
+        "stats": "Statistics",
         "welcome": "Welcome",
-        "subtitle": "to the administration of {brandName}",
+        "subtitle": "to the administration of {{academyName}}",
         "period": "Period"
     },
     "stats": {
@@ -95,7 +100,20 @@
     },
     "plans": {
         "name_plural": "Plans",
-        "name_singular": "Plan"
+        "name_singular": "Plan",
+        "price": "Price",
+        "configuration": "Plan Configuration",
+        "max_sessions": "Max Sessions",
+        "max_classes": "Classes per Week",
+        "trial_period": "Trial Period",
+        "available": "Available to public",
+        "not_available": "Not available",
+        "active": "Active Plan",
+        "inactive": "Inactive Plan",
+        "assignPlan": "Assign Plan",
+        "type_package": "Package",
+        "type_subscription": "Subscription",
+        "monthly_billed": "Monthly billed"
     },
     "students": {
         "name_plural": "Students",
@@ -104,6 +122,7 @@
         "lastName": "Last Name",
         "email": "Email",
         "role": "Role",
+        "profile": "Student Profile",
         "history": "{{name}} History",
         "paymentsHistory": "Payment History",
         "attendances": "Attendance",
@@ -121,6 +140,8 @@
         "inactive": "Inactive",
         "pausePlan": "Pause Plan",
         "renewPlan": "Renew Plan",
+        "assignPlan": "Assign Plan",
+        "payment": "Payment",
         "type": "Type",
         "start": "Start",
         "expires": "Expires",
@@ -136,11 +157,24 @@
         "pausePlaceholder": "Ex: Student requested to freeze their plan due to travel...",
         "pauseNoteRequired": "Please enter a note explaining the reason for the pause.",
         "pauseSuccess": "The plan has been successfully paused.",
-        "pauseError": "Error pausing the plan."
+        "pauseError": "Error pausing the plan.",
+        "validity": "Validity",
+        "classProgress": "Class Progress",
+        "classesUsedCount": "{{used}} of {{total}} Used"
     },
     "teachers": {
         "name_plural": "Teachers",
-        "name_singular": "Teacher"
+        "name_singular": "Teacher",
+        "profile": "Teacher Profile",
+        "quickStats": "Stats",
+        "studentsCount": "Students",
+        "rating": "Rating",
+        "paymentSummary": "Payment Summary",
+        "pendingAmount": "Pending Amount",
+        "paidThisMonth": "Paid this month",
+        "nextCutoff": "Next Cutoff",
+        "weeklyClasses": "Weekly Classes",
+        "classes": "Classes"
     },
     "registrations": {
         "name_plural": "Registrations",
@@ -161,7 +195,31 @@
         "status": "Status",
         "present": "Present",
         "absent": "Absent",
-        "track_attendance": "Track Attendance"
+        "track_attendance": "Track Attendance",
+        "selectTeacherError": "Please select a teacher",
+        "loadClassesError": "Error loading classes",
+        "loadStudentsError": "Error loading students",
+        "noStudentsRegistered": "No students registered.",
+        "saveSuccess": "Attendance saved successfully",
+        "saveError": "Error saving attendance",
+        "pending": "Pending"
+    },
+    "days": {
+        "Monday": "Monday",
+        "Tuesday": "Tuesday",
+        "Wednesday": "Wednesday",
+        "Thursday": "Thursday",
+        "Friday": "Friday",
+        "Saturday": "Saturday",
+        "Sunday": "Sunday"
+    },
+    "payments": {
+        "methods": {
+            "cash": "Cash",
+            "transfer": "Transfer",
+            "card": "Card",
+            "other": "Other"
+        }
     },
     "classes": {
         "name_plural": "Classes",
@@ -172,9 +230,12 @@
         "date": "Class days",
         "hour": "Class hours",
         "noResultsSearch": "No classes found matching the search.",
-        "noAvailableClasses": "No classes available or type at least 3 characters to search."
+        "noAvailableClasses": "No classes available or type at least 3 characters to search.",
+        "session_info": "Session Details"
     },
     "settings": {
+        "name_plural": "Settings",
+        "name_singular": "Setting",
         "general": "General Information",
         "generalSubtitle": "Edit the academy's general information",
         "academyInfo": "Academy Information",
@@ -189,9 +250,22 @@
         "currency": "Currency",
         "dateFormat": "Date Format",
         "theme": "Theme",
+        "themes": {
+            "light": "Light",
+            "dark": "Dark"
+        },
         "language": "Language",
+        "languages": {
+            "es": "Spanish",
+            "en": "English"
+        },
         "profile": "Profile",
         "gender": "Gender",
+        "genders": {
+            "male": "Male",
+            "female": "Female",
+            "other": "Other"
+        },
         "email": "Email",
         "birthDate": "Birth Date",
         "address": "Address",
@@ -395,6 +469,7 @@
         "exportExcel": "Export to Excel",
         "deleteKeyword": "delete",
         "delete": "Delete",
+        "deleteShort": "DELETE",
         "detail": "Detail",
         "edit": "Edit",
         "view": "View",
@@ -402,7 +477,35 @@
         "name": "Name",
         "description": "Description",
         "email": "Email",
-        "role": "Role"
+        "role": "Role",
+        "time": "Time",
+        "duration": "Duration",
+        "viewDetail": "View Detail",
+        "viewProfile": "View Profile",
+        "total": "Total",
+        "active": "Active",
+        "inactive": "Inactive",
+        "days": "days",
+        "repeat": "Repeat",
+        "go": "Go",
+        "date": "Date",
+        "status": "Status",
+        "present": "Present",
+        "absent": "Absent",
+        "amount": "Amount",
+        "method": "Method",
+        "start": "Start",
+        "end": "End",
+        "admin": "Administrator",
+        "error_fetching": "Error fetching data",
+        "update_success": "Updated successfully",
+        "update_error": "Error updating",
+        "upload_success": "Image uploaded successfully",
+        "upload_error": "Error uploading image",
+        "noLimit": "No limit",
+        "never": "Never",
+        "verified": "Verified",
+        "notVerified": "Not Verified"
     },
     "search": {
         "title": "Search results",
@@ -417,17 +520,74 @@
         "viewAll": "View all"
     },
     "notifications": {
+        "name_plural": "Notifications",
+        "name_singular": "Notification",
         "title": "Notifications",
         "markAllRead": "Mark all as read",
+        "markAsRead": "Mark as read",
+        "readShort": "READ",
         "loading": "Loading notifications...",
         "viewAll": "View all",
         "empty": "No notifications",
-        "emptyDescription": "All your notifications have been read"
+        "emptyDescription": "All your notifications have been read",
+        "footerMessage": "You've seen all your recent notifications"
+    },
+    "sidebar": {
+        "adminClasses": "Today's Classes",
+        "myAgenda": "My Agenda for Today",
+        "noClassesToday": "No classes scheduled for today",
+        "studentStatusPlan": "Account Status and Plan",
+        "classesRemaining": "Remaining Classes",
+        "planExpires": "Your plan expires on:",
+        "noActivePlan": "You don't have an active plan",
+        "attendanceRatio": "Attendance Ratio",
+        "attendanceRatioTitle": "Attendance Percentage for Your Classes",
+        "dailyRevenue": "Daily Revenue",
+        "totalToday": "Total Today",
+        "weeklyAttendance": "Weekly Attendance",
+        "noClassesThisWeek": "No classes this week",
+        "assisted": "Assisted",
+        "absences": "Absences",
+        "topEnrollment": "Top Enrollment",
+        "active": "active",
+        "newStudents": "New Students",
+        "registeredThisWeek": "Registered this week"
     },
     "roles": {
         "admin": "Administrator",
         "student": "Student",
         "teacher": "Teacher",
         "receptionist": "Receptionist"
+    },
+    "dateRange": {
+        "today": "Today",
+        "yesterday": "Yesterday",
+        "last7Days": "Last 7 Days",
+        "last30Days": "Last 30 Days",
+        "thisMonth": "This Month",
+        "lastMonth": "Last Month"
+    },
+    "onboarding": {
+        "welcome": {
+            "title": "Welcome"
+        },
+        "sidebar": {
+            "title": "Navigation"
+        },
+        "search": {
+            "title": "Search"
+        },
+        "profile": {
+            "title": "My Profile"
+        },
+        "finish": {
+            "title": "Finish"
+        },
+        "widget": {
+            "title": "Setup Progress",
+            "hidePermanent": "Hide widget permanently",
+            "reset": "Reset all tour",
+            "viewMore": "View tasks"
+        }
     }
 }

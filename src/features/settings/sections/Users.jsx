@@ -20,7 +20,7 @@ const Users = () => {
             dataIndex: "role_name",
             key: "role_name",
             render: (text) =>
-                text ? text.charAt(0).toUpperCase() + text.slice(1) : "",
+                text ? t(`roles.${text.toLowerCase()}`, { defaultValue: text }) : "",
         },
     ];
 

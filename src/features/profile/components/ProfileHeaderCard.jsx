@@ -20,15 +20,7 @@ const ProfileHeaderCard = ({
   t,
 }) => {
   const { token } = theme.useToken();
-  const roleLabel =
-    data.role === "admin"
-      ? t("roles.admin")
-      : data.role === "student"
-      ? t("roles.student")
-      : data.role === "teacher"
-      ? t("roles.teacher")
-      : data.role
-      ;
+  const roleLabel = t(`roles.${data.role?.toLowerCase()}`, { defaultValue: data.role });
 
   return (
     <Card
@@ -130,7 +122,7 @@ const ProfileHeaderCard = ({
                     color="blue"
                     style={{ borderRadius: 12, padding: "2px 12px" }}
                   >
-                    <SafetyCertificateOutlined /> {roleLabel || "Estudiante"}
+                    <SafetyCertificateOutlined /> {roleLabel}
                   </Tag>
                 </div>
                 <p style={{ margin: "4px 0", color: token.colorTextSecondary, fontSize: 16 }}>
@@ -145,7 +137,7 @@ const ProfileHeaderCard = ({
                     color: data.email_verified ? "#1e8e3e" : "#d48806",
                   }}
                 >
-                  {data.email_verified ? "Verificado" : "No Verificado"}
+                  {data.email_verified ? t('global.verified') : t('global.notVerified')}
                 </Tag>
               </div>
               <div style={{ display: "flex", gap: 8 }}>

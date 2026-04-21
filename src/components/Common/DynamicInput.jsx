@@ -248,11 +248,15 @@ const DynamicInput = ({
             case "select":
                 return (
                     <Select placeholder={p}>
-                        {options?.map((opt) => (
-                            <Option key={opt.toString()} value={opt.toString()}>
-                                {opt.toString()}
-                            </Option>
-                        ))}
+                        {options?.map((opt) => {
+                            const val = typeof opt === "object" ? opt.value : opt;
+                            const lab = typeof opt === "object" ? opt.label : opt;
+                            return (
+                                <Option key={val?.toString()} value={val?.toString()}>
+                                    {lab?.toString()}
+                                </Option>
+                            );
+                        })}
                     </Select>
                 );
             case "relation":

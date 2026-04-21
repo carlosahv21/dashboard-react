@@ -1,18 +1,21 @@
 import React from "react";
 import { Card, Empty, List, Avatar, Typography, Statistic } from "antd";
 import { LineChartOutlined, TrophyOutlined, UserAddOutlined } from "@ant-design/icons";
+import { useTranslation } from "react-i18next";
 import ReactECharts from "echarts-for-react";
 
 const { Text } = Typography;
 
 const ActivityInsightCard = ({ data, role, isDarkMode }) => {
+  const { t } = useTranslation();
+
   if (role === "student" && data) {
     return (
       <Card
         title={
           <span>
             <LineChartOutlined style={{ marginRight: 8, color: "#eb2f96" }} />{" "}
-            Asistencia Semanal
+            {t("sidebar.weeklyAttendance")}
           </span>
         }
         style={{
@@ -27,7 +30,7 @@ const ActivityInsightCard = ({ data, role, isDarkMode }) => {
       >
         {data.present === 0 && data.absent === 0 ? (
           <Empty
-            description="No hay clases esta semana"
+            description={t("sidebar.noClassesThisWeek")}
             image={Empty.PRESENTED_IMAGE_SIMPLE}
           />
         ) : (
@@ -40,18 +43,18 @@ const ActivityInsightCard = ({ data, role, isDarkMode }) => {
               },
               series: [
                 {
-                  name: "Asistencia",
+                  name: t("sidebar.weeklyAttendance"),
                   type: "pie",
                   radius: ["40%", "70%"],
                   data: [
                     {
                       value: data.present,
-                      name: "Asistidas",
+                      name: t("sidebar.assisted"),
                       itemStyle: { color: "#52c41a" },
                     },
                     {
                       value: data.absent,
-                      name: "Ausencias",
+                      name: t("sidebar.absences"),
                       itemStyle: { color: "#f5222d" },
                     },
                   ],
@@ -70,8 +73,8 @@ const ActivityInsightCard = ({ data, role, isDarkMode }) => {
       <Card
         title={
           <span>
-            <TrophyOutlined style={{ marginRight: 8, color: "#faad14" }} /> Mayor
-            Inscripción
+            <TrophyOutlined style={{ marginRight: 8, color: "#faad14" }} />{" "}
+            {t("sidebar.topEnrollment")}
           </span>
         }
         style={{
@@ -106,7 +109,7 @@ const ActivityInsightCard = ({ data, role, isDarkMode }) => {
                 }
                 description={
                   <span style={{ color: isDarkMode ? "#aaa" : "#595959" }}>
-                    {item.studentCount} activos
+                    {item.studentCount} {t("sidebar.active")}
                   </span>
                 }
               />
@@ -123,7 +126,7 @@ const ActivityInsightCard = ({ data, role, isDarkMode }) => {
         title={
           <span>
             <UserAddOutlined style={{ marginRight: 8, color: "#13c2c2" }} />{" "}
-            Nuevos Estudiantes
+            {t("sidebar.newStudents")}
           </span>
         }
         style={{
@@ -140,7 +143,7 @@ const ActivityInsightCard = ({ data, role, isDarkMode }) => {
           <Statistic
             title={
               <span style={{ color: isDarkMode ? "#aaa" : "#595959" }}>
-                Registrados esta semana
+                {t("sidebar.registeredThisWeek")}
               </span>
             }
             value={data?.newStudentsCount || 0}

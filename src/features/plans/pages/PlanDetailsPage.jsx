@@ -102,7 +102,7 @@ const PlanDetailsPage = () => {
             key: 'status',
             render: (status) => (
                 <Tag color={status === 'active' || status === 'ACTIVO' ? "green" : "orange"} style={{ borderRadius: 12 }}>
-                    {status || 'Activo'}
+                    {status === 'active' || status === 'ACTIVO' ? t('global.active') : status}
                 </Tag>
             )
         },
@@ -244,7 +244,7 @@ const PlanDetailsPage = () => {
                             />
                             <div style={{ marginTop: 8 }}>
                                 <Tag style={{ background: 'rgba(255,255,255,0.2)', border: 'none', color: '#fff', borderRadius: 4 }}>
-                                    {type === 'package' ? 'Paquete' : 'Suscripción'}
+                                    {type === 'package' ? t('plans.type_package') : t('plans.type_subscription')}
                                 </Tag>
                             </div>
                         </Card>
@@ -258,11 +258,11 @@ const PlanDetailsPage = () => {
                             <Space direction="vertical" size="middle" style={{ width: '100%' }}>
                                 <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                                     <Text type="secondary">{t('plans.max_sessions')}</Text>
-                                    <Text strong>{max_sessions || 'Sin límite'}</Text>
+                                    <Text strong>{max_sessions || t('global.noLimit')}</Text>
                                 </div>
                                 <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                                     <Text type="secondary">{t('plans.max_classes')}</Text>
-                                    <Text strong>{max_classes || 'Sin límite'}</Text>
+                                    <Text strong>{max_classes || t('global.noLimit')}</Text>
                                 </div>
                                 <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                                     <Text type="secondary">{t('plans.trial_period')}</Text>

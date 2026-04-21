@@ -129,7 +129,7 @@ const NotificationItem = ({
                   gap: 4,
                 }}
               >
-                <Tooltip title={t("notifications.markAsRead") || "Marcar leída"}>
+                <Tooltip title={t("notifications.markAsRead")}>
                   <Button
                     shape="circle"
                     size="large"
@@ -153,7 +153,7 @@ const NotificationItem = ({
                     fontWeight: 600,
                   }}
                 >
-                  {t("notifications.readShort") || "LEÍDO"}
+                  {t("notifications.readShort")}
                 </Text>
               </div>
             )}
@@ -165,7 +165,7 @@ const NotificationItem = ({
                 gap: 4,
               }}
             >
-              <Tooltip title={t("settings.delete") || "Eliminar"}>
+              <Tooltip title={t("global.delete")}>
                 <Button
                   shape="circle"
                   size="large"
@@ -176,21 +176,10 @@ const NotificationItem = ({
                     deleteNotification(item.id);
                   }}
                   style={{
-                    backgroundColor: isDarkMode ? "#2d2d2d" : "#f0f2f5",
                     border: "none",
                   }}
                 />
               </Tooltip>
-              <Text
-                style={{
-                  fontSize: "10px",
-                  color: "#8c8c8c",
-                  textTransform: "uppercase",
-                  fontWeight: 600,
-                }}
-              >
-                {t("settings.deleteShort") || "ELIMINAR"}
-              </Text>
             </div>
           </Space>
         </div>

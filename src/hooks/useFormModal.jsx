@@ -105,7 +105,7 @@ export const useFormModal = (endpoint, moduleFieldId, titleSingular, fixedValues
         if ('password' in transformedValues && !transformedValues.password) {
             delete transformedValues.password;
         }
-        console.log(transformedValues);
+        
         try {
             let resultData = null;
             if (editingId) {

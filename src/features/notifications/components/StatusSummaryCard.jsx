@@ -1,18 +1,21 @@
 import React from "react";
 import { Card, Statistic, Typography, Empty } from "antd";
 import { DollarOutlined, CheckCircleFilled } from "@ant-design/icons";
+import { useTranslation } from "react-i18next";
 import dayjs from "dayjs";
 
 const { Text } = Typography;
 
 const StatusSummaryCard = ({ data, role, isDarkMode, formatCurrency, settings }) => {
+  const { t } = useTranslation();
+
   if (role === "student") {
     return (
       <Card
         title={
           <span>
             <DollarOutlined style={{ marginRight: 8, color: "#52c41a" }} />{" "}
-            Estado de Cuenta y Plan
+            {t("sidebar.studentStatusPlan")}
           </span>
         }
         style={{
@@ -28,18 +31,18 @@ const StatusSummaryCard = ({ data, role, isDarkMode, formatCurrency, settings })
         {data ? (
           <div style={{ textAlign: "center" }}>
             <Statistic
-              title="Clases Restantes"
+              title={t("sidebar.classesRemaining")}
               value={data.classes_remaining || 0}
               suffix={data.max_classes ? `/ ${data.max_classes}` : ""}
               valueStyle={{ color: "#52c41a", fontWeight: "bold" }}
             />
             <Text type="secondary" style={{ display: "block", marginTop: 12 }}>
-              Tu plan vence el: {dayjs(data.end_date).format("DD MMM YYYY")}
+              {t("sidebar.planExpires")} {dayjs(data.end_date).format("DD MMM YYYY")}
             </Text>
           </div>
         ) : (
           <Empty
-            description="No tienes un plan activo"
+            description={t("sidebar.noActivePlan")}
             image={Empty.PRESENTED_IMAGE_SIMPLE}
           />
         )}
@@ -53,7 +56,7 @@ const StatusSummaryCard = ({ data, role, isDarkMode, formatCurrency, settings })
         title={
           <span>
             <CheckCircleFilled style={{ marginRight: 8, color: "#1890ff" }} />{" "}
-            Ratio de Asistencia
+            {t("sidebar.attendanceRatio")}
           </span>
         }
         style={{
@@ -68,7 +71,7 @@ const StatusSummaryCard = ({ data, role, isDarkMode, formatCurrency, settings })
       >
         <div style={{ textAlign: "center" }}>
           <Statistic
-            title="Porcentaje de Asistencia a tus Clases"
+            title={t("sidebar.attendanceRatioTitle")}
             value={data?.ratio || 0}
             precision={1}
             suffix="%"
@@ -85,7 +88,7 @@ const StatusSummaryCard = ({ data, role, isDarkMode, formatCurrency, settings })
         title={
           <span>
             <DollarOutlined style={{ marginRight: 8, color: "#52c41a" }} />{" "}
-            Recaudación del Día
+            {t("sidebar.dailyRevenue")}
           </span>
         }
         style={{
@@ -100,7 +103,7 @@ const StatusSummaryCard = ({ data, role, isDarkMode, formatCurrency, settings })
       >
         <div style={{ textAlign: "center" }}>
           <Statistic
-            title="Total Hoy"
+            title={t("sidebar.totalToday")}
             value={formatCurrency(data?.revenue || 0, settings)}
             valueStyle={{ color: "#52c41a", fontWeight: "bold" }}
           />

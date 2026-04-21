@@ -73,9 +73,9 @@ const ProfileDetailsCard = ({
             <Col span={12}>
               <Form.Item label={t("settings.gender")} name="gender">
                 <Select style={{ borderRadius: 8 }}>
-                  <Option value="male">Masculino</Option>
-                  <Option value="female">Femenino</Option>
-                  <Option value="other">Otro</Option>
+                  <Option value="male">{t('settings.genders.male')}</Option>
+                  <Option value="female">{t('settings.genders.female')}</Option>
+                  <Option value="other">{t('settings.genders.other')}</Option>
                 </Select>
               </Form.Item>
             </Col>
@@ -108,8 +108,8 @@ const ProfileDetailsCard = ({
           <Descriptions.Item label={t("settings.gender")}>
             {data.gender
               ? data.gender === "M" || data.gender === "male"
-                ? "Masculino"
-                : "Femenino"
+                ? t('settings.genders.male')
+                : t('settings.genders.female')
               : "N/A"}
           </Descriptions.Item>
           <Descriptions.Item label={t("settings.birthDate")}>
@@ -122,7 +122,7 @@ const ProfileDetailsCard = ({
             {formatDate(data.created_at)}
           </Descriptions.Item>
           <Descriptions.Item label={t("settings.lastAccess")}>
-            {data.last_login ? formatDate(data.last_login, true) : "Nunca"}
+            {data.last_login ? formatDate(data.last_login, true) : t('global.never')}
           </Descriptions.Item>
         </Descriptions>
       )}

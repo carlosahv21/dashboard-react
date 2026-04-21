@@ -149,7 +149,8 @@ const RecycleBin = () => {
         }
     ];
 
-    const moduleName = modules.find(m => m.id === selectedModule)?.name || selectedModule;
+    const moduleRawName = modules.find(m => m.name === selectedModule)?.name || selectedModule;
+    const moduleName = t(`menu.${moduleRawName}`, { defaultValue: moduleRawName });
 
     return (
         <>
@@ -171,7 +172,7 @@ const RecycleBin = () => {
                         >
                             {modules.map(m => (
                                 <Select.Option key={m.id} value={m.name}>
-                                    {m.name}
+                                    {t(`menu.${m.name}`, { defaultValue: m.name })}
                                 </Select.Option>
                             ))}
                         </Select>

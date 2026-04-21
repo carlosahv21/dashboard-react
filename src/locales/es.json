@@ -47,6 +47,7 @@
         "tokenPlaceholder": "Ingresa tu código",
         "newPasswordLabel": "Nueva Contraseña",
         "resetPasswordButton": "Restablecer Contraseña",
+        "resetPasswordInstructions": "Crea una contraseña segura que puedas recordar fácilmente.",
         "passwordResetSuccess": "Contraseña actualizada con éxito."
     },
     "session": {
@@ -55,6 +56,8 @@
         "expiredOk": "Aceptar"
     },
     "dashboard": {
+        "name_plural": "Dashboard",
+        "name_singular": "Dashboard",
         "activeStudents": "Estudiantes Activos",
         "todayClasses": "Clases de Hoy",
         "monthlyRevenue": "Ingresos Mensuales",
@@ -106,7 +109,11 @@
         "available": "Disponible al público",
         "not_available": "No disponible",
         "active": "Plan Activo",
-        "inactive": "Plan Inactivo"
+        "inactive": "Plan Inactivo",
+        "assignPlan": "Asignar Plan",
+        "type_package": "Paquete",
+        "type_subscription": "Suscripción",
+        "monthly_billed": "Facturado mensual"
     },
     "students": {
         "name_plural": "Estudiantes",
@@ -115,6 +122,7 @@
         "lastName": "Apellido",
         "email": "Email",
         "role": "Rol",
+        "profile": "Perfil del Estudiante",
         "history": "Historial de {{name}}",
         "paymentsHistory": "Historial de Pagos",
         "attendances": "Asistencias",
@@ -132,6 +140,8 @@
         "inactive": "Inactivo",
         "pausePlan": "Pausar Plan",
         "renewPlan": "Renovar Plan",
+        "assignPlan": "Asignar Plan",
+        "payment": "Pago",
         "type": "Tipo",
         "start": "Inicio",
         "expires": "Vence",
@@ -147,11 +157,24 @@
         "pausePlaceholder": "Ej: El estudiante solicitó congelar su plan por viaje...",
         "pauseNoteRequired": "Por favor, ingresa una nota explicando la razón de la pausa.",
         "pauseSuccess": "El plan ha sido pausado correctamente.",
-        "pauseError": "Error al pausar el plan."
+        "pauseError": "Error al pausar el plan.",
+        "validity": "Vigencia",
+        "classProgress": "Progreso de Clases",
+        "classesUsedCount": "{{used}} de {{total}} Usadas"
     },
     "teachers": {
         "name_plural": "Profesores",
-        "name_singular": "Profesor"
+        "name_singular": "Profesor",
+        "profile": "Perfil del Profesor",
+        "quickStats": "Estadísticas",
+        "studentsCount": "Alumnos",
+        "rating": "Calificación",
+        "paymentSummary": "Resumen de Pagos",
+        "pendingAmount": "Por Pagar",
+        "paidThisMonth": "Pagado este mes",
+        "nextCutoff": "Próximo Corte",
+        "weeklyClasses": "Clases Semanales",
+        "classes": "Clases"
     },
     "registrations": {
         "name_plural": "Inscripciones",
@@ -172,7 +195,31 @@
         "status": "Estado",
         "present": "Presente",
         "absent": "Ausente",
-        "track_attendance": "Tomar Asistencia"
+        "track_attendance": "Tomar Asistencia",
+        "selectTeacherError": "Por favor, selecciona un profesor",
+        "loadClassesError": "Error al cargar las clases",
+        "loadStudentsError": "Error al cargar estudiantes",
+        "noStudentsRegistered": "No hay estudiantes registrados.",
+        "saveSuccess": "Asistencia guardada con éxito",
+        "saveError": "Error al guardar la asistencia",
+        "pending": "Pendiente"
+    },
+    "days": {
+        "Monday": "Lunes",
+        "Tuesday": "Martes",
+        "Wednesday": "Miércoles",
+        "Thursday": "Jueves",
+        "Friday": "Viernes",
+        "Saturday": "Sábado",
+        "Sunday": "Domingo"
+    },
+    "payments": {
+        "methods": {
+            "cash": "Efectivo",
+            "transfer": "Transferencia",
+            "card": "Tarjeta",
+            "other": "Otro"
+        }
     },
     "classes": {
         "name_plural": "Clases",
@@ -187,6 +234,8 @@
         "session_info": "Detalles de Sesión"
     },
     "settings": {
+        "name_plural": "Ajustes",
+        "name_singular": "Ajuste",
         "general": "Información General",
         "generalSubtitle": "Edita la información general de la academia",
         "academyInfo": "Información de la Academia",
@@ -201,9 +250,22 @@
         "currency": "Moneda",
         "dateFormat": "Formato de fecha",
         "theme": "Tema",
+        "themes": {
+            "light": "Claro",
+            "dark": "Oscuro"
+        },
         "language": "Idioma",
+        "languages": {
+            "es": "Español",
+            "en": "Inglés"
+        },
         "profile": "Perfil",
         "gender": "Género",
+        "genders": {
+            "male": "Masculino",
+            "female": "Femenino",
+            "other": "Otro"
+        },
         "email": "Email",
         "birthDate": "Fecha de Nacimiento",
         "address": "Dirección",
@@ -407,6 +469,7 @@
         "exportExcel": "Exportar a Excel",
         "deleteKeyword": "eliminar",
         "delete": "Eliminar",
+        "deleteShort": "ELIMINAR",
         "detail": "Detalle",
         "edit": "Editar",
         "view": "Ver",
@@ -419,7 +482,30 @@
         "duration": "Duración",
         "viewDetail": "Ver Detalle",
         "viewProfile": "Ver Perfil",
-        "total": "Total"
+        "total": "Total",
+        "active": "Activo",
+        "inactive": "Inactivo",
+        "days": "días",
+        "repeat": "Repetir",
+        "go": "Ir",
+        "date": "Fecha",
+        "status": "Estado",
+        "present": "Presente",
+        "absent": "Ausente",
+        "amount": "Monto",
+        "method": "Método",
+        "start": "Inicio",
+        "end": "Fin",
+        "admin": "Administrador",
+        "error_fetching": "Error al cargar los datos",
+        "update_success": "Actualizado correctamente",
+        "update_error": "Error al actualizar",
+        "upload_success": "Imagen subida correctamente",
+        "upload_error": "Error al subir la imagen",
+        "noLimit": "Sin límite",
+        "never": "Nunca",
+        "verified": "Verificado",
+        "notVerified": "No Verificado"
     },
     "search": {
         "title": "Resultados de la búsqueda",
@@ -434,17 +520,74 @@
         "viewAll": "Ver todos"
     },
     "notifications": {
+        "name_plural": "Notificaciones",
+        "name_singular": "Notificación",
         "title": "Notificaciones",
         "markAllRead": "Marcar todas como leídas",
+        "markAsRead": "Marcar como leída",
+        "readShort": "LEÍDO",
         "loading": "Cargando notificaciones...",
         "viewAll": "Ver todas",
         "empty": "No hay notificaciones",
-        "emptyDescription": "Todas tus notificaciones han sido leídas"
+        "emptyDescription": "Todas tus notificaciones han sido leídas",
+        "footerMessage": "Has visto todas tus notificaciones recientes"
+    },
+    "sidebar": {
+        "adminClasses": "Clases de Hoy",
+        "myAgenda": "Mi Agenda de Hoy",
+        "noClassesToday": "No hay clases programadas para hoy",
+        "studentStatusPlan": "Estado de Cuenta y Plan",
+        "classesRemaining": "Clases Restantes",
+        "planExpires": "Tu plan vence el:",
+        "noActivePlan": "No tienes un plan activo",
+        "attendanceRatio": "Ratio de Asistencia",
+        "attendanceRatioTitle": "Porcentaje de Asistencia a tus Clases",
+        "dailyRevenue": "Recaudación del Día",
+        "totalToday": "Total Hoy",
+        "weeklyAttendance": "Asistencia Semanal",
+        "noClassesThisWeek": "No hay clases esta semana",
+        "assisted": "Asistidas",
+        "absences": "Ausencias",
+        "topEnrollment": "Mayor Inscripción",
+        "active": "activos",
+        "newStudents": "Nuevos Estudiantes",
+        "registeredThisWeek": "Registrados esta semana"
     },
     "roles": {
         "admin": "Administrador",
         "student": "Estudiante",
         "teacher": "Profesor",
         "receptionist": "Recepcionista"
+    },
+    "dateRange": {
+        "today": "Hoy",
+        "yesterday": "Ayer",
+        "last7Days": "Últimos 7 días",
+        "last30Days": "Últimos 30 días",
+        "thisMonth": "Este Mes",
+        "lastMonth": "Mes Pasado"
+    },
+    "onboarding": {
+        "welcome": {
+            "title": "Bienvenida"
+        },
+        "sidebar": {
+            "title": "Navegación"
+        },
+        "search": {
+            "title": "Buscador"
+        },
+        "profile": {
+            "title": "Mi Perfil"
+        },
+        "finish": {
+            "title": "Finalizar"
+        },
+        "widget": {
+            "title": "Progreso de Configuración",
+            "hidePermanent": "Ocultar widget siempre",
+            "reset": "Reiniciar todo el tour",
+            "viewMore": "Ver tareas"
+        }
     }
 }

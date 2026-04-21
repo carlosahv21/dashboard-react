@@ -10,7 +10,7 @@ const ProfilePlanCard = ({ plan, t, settings }) => {
     <Card bordered={false} style={{ borderRadius: 16, boxShadow: "0 4px 20px rgba(0,0,0,0.05)" }}>
       <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 20 }}>
         <SafetyCertificateOutlined style={{ color: "#007bff", fontSize: 18 }} />
-        <span style={{ fontWeight: "bold", fontSize: 16 }}>Plan Actual</span>
+        <span style={{ fontWeight: "bold", fontSize: 16 }}>{t('students.currentPlan')}</span>
       </div>
       <Card
         style={{ backgroundColor: "#f0f7ff", borderRadius: 12, border: "1px solid #e6f7ff" }}
@@ -20,24 +20,24 @@ const ProfilePlanCard = ({ plan, t, settings }) => {
           <div>
             <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 8 }}>
               <h3 style={{ margin: 0, fontSize: 20, fontWeight: "bold" }}>{plan.name}</h3>
-              <Tag color="success" style={{ borderRadius: 12, border: "none" }}>{plan.status}</Tag>
+              <Tag color="success" style={{ borderRadius: 12, border: "none" }}>{t(`global.${plan.status.toLowerCase()}`, { defaultValue: plan.status })}</Tag>
             </div>
-            <p style={{ color: "#666", marginBottom: 20 }}>Acceso a clases grupales presenciales y material de apoyo.</p>
+            <p style={{ color: "#666", marginBottom: 20 }}>{plan.description}</p>
 
             <Row gutter={32}>
               <Col>
-                <div style={{ fontSize: 12, color: "#8c8c8c", textTransform: "uppercase" }}>Vigencia</div>
+                <div style={{ fontSize: 12, color: "#8c8c8c", textTransform: "uppercase" }}>{t('students.validity')}</div>
                 <div style={{ fontWeight: "500" }}>{formatDate(plan.start_date)} - {formatDate(plan.end_date)}</div>
               </Col>
               <Col>
-                <div style={{ fontSize: 12, color: "#8c8c8c", textTransform: "uppercase" }}>Progreso Clases</div>
-                <div style={{ fontWeight: "500" }}>{plan.classes_used} de {plan.classes_total} Usadas</div>
+                <div style={{ fontSize: 12, color: "#8c8c8c", textTransform: "uppercase" }}>{t('students.classProgress')}</div>
+                <div style={{ fontWeight: "500" }}>{t('students.classesUsedCount', { used: plan.classes_used, total: plan.classes_total })}</div>
               </Col>
             </Row>
           </div>
           <div style={{ textAlign: "right" }}>
-            <div style={{ fontSize: 32, fontWeight: "bold", color: "#007bff" }}>${plan.price}</div>
-            <div style={{ color: "#8c8c8c", fontSize: 12 }}>Facturado mensual</div>
+            <div style={{ fontSize: 32, fontWeight: "bold", color: "#007bff" }}>{settings?.currency_symbol || '$'}{plan.price}</div>
+            <div style={{ color: "#8c8c8c", fontSize: 12 }}>{t('plans.monthly_billed')}</div>
           </div>
         </div>
         <div style={{ marginTop: 20 }}>

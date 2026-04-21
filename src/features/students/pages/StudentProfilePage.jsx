@@ -17,7 +17,6 @@ import { useTranslation } from "react-i18next";
 import studentService from "../services/studentService";
 import profileService from "../../profile/services/profileService";
 import useFormatting from "../../../hooks/useFormatting";
-import dayjs from "dayjs";
 
 // Reusing components from Profile feature
 import ProfileHeaderCard from "../../profile/components/ProfileHeaderCard";
@@ -144,7 +143,7 @@ const StudentProfilePage = () => {
         );
     }
 
-    const { student, activePlan, attendances, payments } = studentData;
+    const { student, activePlan, payments } = studentData;
 
     return (
         <div style={{ minHeight: "100vh" }}>
