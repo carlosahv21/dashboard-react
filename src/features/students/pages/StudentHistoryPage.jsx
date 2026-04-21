@@ -38,7 +38,7 @@ const { Title, Text } = Typography;
 const StudentHistory = () => {
     const { t } = useTranslation();
     const { id } = useParams();
-    const navigate = useNavigate();
+
     const { token } = theme.useToken();
     const { message } = App.useApp();
     const { formatCurrency, formatDateShort } = useFormatting();

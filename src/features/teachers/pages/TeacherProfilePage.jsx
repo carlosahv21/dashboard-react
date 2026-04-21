@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import {
     Row, Col, Typography, Spin, message, Form, Statistic, List, Tag, Divider, Space
 } from "antd";
@@ -24,7 +24,7 @@ const { Title, Text } = Typography;
 
 const TeacherProfilePage = () => {
     const { id } = useParams();
-    const navigate = useNavigate();
+
     const { t } = useTranslation();
     const { formatCurrency } = useFormatting();
     const [profileForm] = Form.useForm();
