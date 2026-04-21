@@ -19,10 +19,14 @@ let isSessionExpiredShown = false;
 api.interceptors.response.use(
     (response) => response,
     (error) => {
-        if (error.response?.status === 401 && !isSessionExpiredShown) {
+        const isAuthRequest = error.config?.url?.includes("auth/login") ||
+            error.config?.url?.includes("auth/forgot-password") ||
+            error.config?.url?.includes("auth/reset-password");
+
+        if (error.response?.status === 401 && !isAuthRequest && !isSessionExpiredShown) {
             isSessionExpiredShown = true;
             Modal.warning({
-                title: 'Sesión Expirada',
+                title: 'Sesion Expirada',
                 content: 'Tu sesión ha expirado o el token es inválido. Por favor, inicia sesión nuevamente.',
                 okText: 'Entendido',
                 onOk: () => {

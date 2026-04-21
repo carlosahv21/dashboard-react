@@ -2,26 +2,30 @@ import React, { useState, useEffect, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import {
     Row, Col, Typography, Spin, message, Form, Button,
-    Card, Statistic, List, Tag, Divider, Space, Tooltip, theme
+    Card, Statistic, List, Tag, Divider, Space, theme,
+    Input, Modal
 } from "antd";
 import {
     LeftOutlined,
     ClockCircleOutlined,
-    CalendarOutlined,
     CreditCardOutlined,
-    HistoryOutlined
+    HistoryOutlined,
+    PauseCircleOutlined,
+    ExclamationCircleOutlined
 } from "@ant-design/icons";
 import { useTranslation } from "react-i18next";
 import studentService from "../services/studentService";
 import profileService from "../../profile/services/profileService";
 import useFormatting from "../../../hooks/useFormatting";
 import dayjs from "dayjs";
-import FullCalendar from "@fullcalendar/react";
-import dayGridPlugin from "@fullcalendar/daygrid";
 
 // Reusing components from Profile feature
 import ProfileHeaderCard from "../../profile/components/ProfileHeaderCard";
 import ProfileDetailsCard from "../../profile/components/ProfileDetailsCard";
+import { useFormModal } from "../../../hooks/useFormModal";
+import FormHeader from "../../../components/Common/FormHeader";
+import FormFooter from "../../../components/Common/FormFooter";
+import FormSection from "../../../components/Common/FormSection";
 
 const { Title, Text } = Typography;
 
@@ -32,11 +36,35 @@ const StudentProfilePage = () => {
     const { token } = theme.useToken();
     const { formatCurrency, formatDateShort } = useFormatting();
     const [profileForm] = Form.useForm();
+    const [paymentForm] = Form.useForm();
 
     const [loading, setLoading] = useState(true);
     const [studentData, setStudentData] = useState(null);
     const [isEditing, setIsEditing] = useState(false);
     const [uploading, setUploading] = useState(false);
+    const [isPauseModalOpen, setIsPauseModalOpen] = useState(false);
+    const [pauseReason, setPauseReason] = useState("");
+
+    const { modalVisible, moduleData, openModal, closeModal, handleSubmit } = useFormModal(
+        "payments", "payments", t('students.payment'), { user_id: id }, paymentForm
+    );
+
+    const handlePaymentSubmit = async (values) => {
+        if (await handleSubmit(values)) fetchStudentData();
+    };
+
+    const handlePausePlan = async () => {
+        if (!pauseReason.trim()) return message.error(t('students.pauseNoteRequired'));
+        try {
+            await studentService.pausePlan(activePlan.id, pauseReason);
+            message.success(t('students.pauseSuccess'));
+            setIsPauseModalOpen(false);
+            setPauseReason("");
+            fetchStudentData();
+        } catch (error) {
+            message.error(error.message || t('students.pauseError'));
+        }
+    };
 
     const fetchStudentData = useCallback(async () => {
         try {
@@ -118,15 +146,6 @@ const StudentProfilePage = () => {
 
     const { student, activePlan, attendances, payments } = studentData;
 
-    const events = attendances.map((att) => ({
-        id: att.id,
-        title: `${att.class_name} ${att.status === "present" ? "(P)" : "(A)"}`,
-        date: dayjs(att.date).format("YYYY-MM-DD"),
-        display: 'block',
-        backgroundColor: att.status === "present" ? token.colorSuccess : token.colorError,
-        extendedProps: { ...att }
-    }));
-
     return (
         <div style={{ minHeight: "100vh" }}>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 24 }}>
@@ -174,6 +193,17 @@ const StudentProfilePage = () => {
                         <Card
                             title={t('students.currentPlan')}
                             extra={<Tag color={activePlan?.status === "active" ? "green" : "red"}>{activePlan?.status || t('students.inactive')}</Tag>}
+                            actions={[
+                                activePlan?.status === "active" ? (
+                                    <Button danger icon={<PauseCircleOutlined />} onClick={() => setIsPauseModalOpen(true)}>
+                                        {t('students.pausePlan')}
+                                    </Button>
+                                ) : (
+                                    <Button type="primary" icon={<CreditCardOutlined />} onClick={() => openModal()}>
+                                        {activePlan ? t('students.renewPlan') : t('students.assignPlan', { defaultValue: 'Asignar Plan' })}
+                                    </Button>
+                                )
+                            ]}
                         >
                             {activePlan ? (
                                 <div style={{ textAlign: "center" }}>
@@ -202,9 +232,6 @@ const StudentProfilePage = () => {
                             ) : (
                                 <div style={{ textAlign: "center", padding: "20px 0" }}>
                                     <Text type="secondary">{t('students.noActivePlan')}</Text>
-                                    <Button type="primary" block style={{ marginTop: 16 }} onClick={() => navigate('/registrations')}>
-                                        {t('students.renewPlan')}
-                                    </Button>
                                 </div>
                             )}
                         </Card>
@@ -242,6 +269,37 @@ const StudentProfilePage = () => {
                     </Space>
                 </Col>
             </Row>
+
+            {/* Modal de Pago / Renovación */}
+            <Modal open={modalVisible} footer={null} width={800} onCancel={() => closeModal(false)} destroyOnClose>
+                {moduleData ? (
+                    <>
+                        <FormHeader title={t('students.createPayment')} onSave={() => paymentForm.submit()} onCancel={() => closeModal(false)} />
+                        <Form form={paymentForm} layout="vertical" onFinish={handlePaymentSubmit} style={{ padding: 20 }}>
+                            {moduleData.blocks?.map(block => (
+                                <FormSection
+                                    key={block.block_id}
+                                    title={block.block_name}
+                                    fields={block.fields.filter(f => f.name !== 'user_id')}
+                                />
+                            ))}
+                            <FormFooter onCancel={() => closeModal(false)} onSave={() => paymentForm.submit()} />
+                        </Form>
+                    </>
+                ) : <div style={{ padding: 50, textAlign: 'center' }}><Spin /></div>}
+            </Modal>
+
+            {/* Modal de Pausa */}
+            <Modal
+                title={<Space><ExclamationCircleOutlined style={{ color: token.colorError }} />{t('students.pausePlan')}</Space>}
+                open={isPauseModalOpen}
+                onOk={handlePausePlan}
+                onCancel={() => setIsPauseModalOpen(false)}
+                okButtonProps={{ danger: true }}
+            >
+                <Text>{t('students.pausePlanConfirm')}</Text>
+                <Input.TextArea rows={4} value={pauseReason} onChange={(e) => setPauseReason(e.target.value)} style={{ marginTop: 16 }} placeholder={t('students.pausePlaceholder')} />
+            </Modal>
         </div>
     );
 };

@@ -67,7 +67,7 @@ const StudentHistory = () => {
     }, [id, fetchAllData]);
 
     const { modalVisible, moduleData, openModal, closeModal, handleSubmit } = useFormModal(
-        request, "payments", "payments", t('students.payment'), { user_id: id }, form
+        "payments", "payments", t('students.payment'), { user_id: id }, form
     );
 
     const handleFormSubmit = async (values) => {
@@ -150,7 +150,7 @@ const StudentHistory = () => {
                                     </Button>
                                 ) : (
                                     <Button type="primary" icon={<CreditCardOutlined />} onClick={() => openModal()}>
-                                        {t('students.renewPlan')}
+                                        {activePlan ? t('students.renewPlan') : t('students.assignPlan', { defaultValue: 'Asignar Plan' })}
                                     </Button>
                                 )
                             ]}

@@ -185,7 +185,10 @@ export const useAttendance = () => {
     if (!selectedClass) return;
     try {
       setIsSaving(true);
-      const allRegRes = await attendanceService.getAllRegistrations(selectedClass.id);
+      const allRegRes = await attendanceService.getAllRegistrations({ 
+        class_id: selectedClass.id, 
+        limit: 1000 
+      });
       const allReg = allRegRes.data?.data || allRegRes.data || [];
 
       if (allReg.length === 0) {
@@ -204,6 +207,7 @@ export const useAttendance = () => {
       await attendanceService.saveAttendance(payload);
       message.success("Asistencia guardada con éxito");
     } catch (error) {
+      console.log(error);
       message.error(error.response?.data?.message || "Error al guardar");
     } finally {
       setIsSaving(false);
