@@ -1,24 +1,24 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import {
-    Row, Col, Typography, Spin, message, Form, Button,
-    Card, Statistic, List, Tag, Divider, Space
+    Row, Col, Typography, Spin, message, Form, Statistic, List, Tag, Divider, Space
 } from "antd";
 import {
-    LeftOutlined,
     TeamOutlined,
     StarOutlined,
     CalendarOutlined,
-    DollarOutlined
+    DollarOutlined,
+    BarChartOutlined
 } from "@ant-design/icons";
 import { useTranslation } from "react-i18next";
 import teacherService from "../services/teacherService";
 import profileService from "../../profile/services/profileService";
 import useFormatting from "../../../hooks/useFormatting";
 
-// Reusing components from Profile feature
 import ProfileHeaderCard from "../../profile/components/ProfileHeaderCard";
 import ProfileDetailsCard from "../../profile/components/ProfileDetailsCard";
+import PageHeaderActions from "../../../components/Common/PageHeaderActions";
+import DetailCard from "../../../components/Common/DetailCard";
 
 const { Title, Text } = Typography;
 
@@ -106,17 +106,9 @@ const TeacherProfilePage = () => {
 
     return (
         <div style={{ minHeight: "100vh" }}>
-            <div style={{ display: "flex", alignItems: "center", marginBottom: 32 }}>
-                <Button
-                    type="text"
-                    icon={<LeftOutlined />}
-                    onClick={() => navigate("/teachers")}
-                    style={{ marginRight: 16 }}
-                />
-                <Title level={2} style={{ margin: 0 }}>
-                    {t("teachers.profile")}
-                </Title>
-            </div>
+            <PageHeaderActions
+                title={t("teachers.profile")}
+            />
 
             <Row gutter={[24, 24]}>
                 <Col xs={24} lg={16}>
@@ -142,7 +134,7 @@ const TeacherProfilePage = () => {
                 <Col xs={24} lg={8}>
                     <Space direction="vertical" size="large" style={{ width: '100%' }}>
                         {/* Quick Stats */}
-                        <Card title={t("teachers.quickStats")}>
+                        <DetailCard title={t("teachers.quickStats")} icon={<BarChartOutlined />}>
                             <Row gutter={16}>
                                 <Col span={8}>
                                     <Statistic
@@ -167,10 +159,10 @@ const TeacherProfilePage = () => {
                                     />
                                 </Col>
                             </Row>
-                        </Card>
+                        </DetailCard>
 
                         {/* Payment Summary */}
-                        <Card title={t("teachers.paymentSummary")}>
+                        <DetailCard title={t("teachers.paymentSummary")} icon={<DollarOutlined />}>
                             <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 16 }}>
                                 <Text type="secondary">{t("teachers.pendingAmount")}</Text>
                                 <Title level={4} style={{ margin: 0, color: '#1e8e3e' }}>
@@ -186,12 +178,13 @@ const TeacherProfilePage = () => {
                                 <Text type="secondary">{t("teachers.nextCutoff")}</Text>
                                 <Tag icon={<DollarOutlined />} color="blue">{payment_summary.next_cutoff_date}</Tag>
                             </div>
-                        </Card>
+                        </DetailCard>
 
                         {/* Weekly Classes */}
-                        <Card
+                        <DetailCard
                             title={t("teachers.weeklyClasses")}
-                            styles={{ body: { padding: '0 12px' } }}
+                            icon={<CalendarOutlined />}
+                            bodyStyle={{ padding: '0 12px' }}
                         >
                             <List
                                 dataSource={weekly_classes}
@@ -210,7 +203,7 @@ const TeacherProfilePage = () => {
                                     </List.Item>
                                 )}
                             />
-                        </Card>
+                        </DetailCard>
                     </Space>
                 </Col>
             </Row>

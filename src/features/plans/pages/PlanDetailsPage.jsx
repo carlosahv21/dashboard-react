@@ -2,15 +2,12 @@ import React, { useState, useEffect, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import {
     Row, Col, Typography, Spin, message, Button,
-    Card, Statistic, Table, Tag, Divider, Space, Avatar, theme, Modal, Form
+    Statistic, Table, Tag, Divider, Space, Avatar, theme, Modal, Form
 } from "antd";
 import {
-    LeftOutlined,
     TeamOutlined,
-    DollarCircleOutlined,
     CalendarOutlined,
     ProjectOutlined,
-    SafetyCertificateOutlined,
     EditOutlined,
     CheckCircleOutlined,
     CloseCircleOutlined
@@ -23,8 +20,11 @@ import FormHeader from "../../../components/Common/FormHeader";
 import FormFooter from "../../../components/Common/FormFooter";
 import FormSection from "../../../components/Common/FormSection";
 import SupportCard from "../../profile/components/SupportCard";
+import PageHeaderActions from "../../../components/Common/PageHeaderActions";
+import EntityHeaderCard from "../../../components/Common/EntityHeaderCard";
+import DetailCard from "../../../components/Common/DetailCard";
 
-const { Title, Text } = Typography;
+const { Text } = Typography;
 
 const PlanDetailsPage = () => {
     const { id } = useParams();
@@ -127,89 +127,41 @@ const PlanDetailsPage = () => {
     return (
         <div style={{ minHeight: "100vh" }}>
             {/* Page Header */}
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 24 }}>
-                <div style={{ display: "flex", alignItems: "center" }}>
+            <PageHeaderActions 
+                title={t('global.detail', { title: t('plans.name_singular') })}
+                extraActions={
                     <Button
-                        type="text"
-                        icon={<LeftOutlined />}
-                        onClick={() => navigate("/plans")}
-                        style={{ marginRight: 12 }}
-                    />
-                    <Title level={3} style={{ margin: 0 }}>{t('global.detail', { title: t('plans.name_singular') })}</Title>
-                </div>
-                <Button
-                    type="primary"
-                    icon={<EditOutlined />}
-                    onClick={() => openModal(id)}
-                    style={{ borderRadius: 8 }}
-                >
-                    {t('global.edit')}
-                </Button>
-            </div>
+                        type="primary"
+                        icon={<EditOutlined />}
+                        onClick={() => openModal(id)}
+                        style={{ borderRadius: 8 }}
+                    >
+                        {t('global.edit')}
+                    </Button>
+                }
+            />
 
             <Row gutter={[24, 24]}>
                 {/* LEFT COLUMN: Header and Student List */}
                 <Col xs={24} lg={16}>
                     {/* Plan Header Card */}
-                    <Card
-                        bordered={false}
-                        style={{
-                            borderRadius: 16,
-                            boxShadow: "0 4px 20px rgba(0,0,0,0.05)",
-                            overflow: "hidden",
-                            marginBottom: 24,
-                        }}
-                        bodyStyle={{ padding: 0 }}
-                    >
-                        <div
-                            style={{
-                                height: 120,
-                                background: token.colorPrimary,
-                                position: "relative",
-                            }}
-                        />
-                        <div style={{ padding: "0 32px 32px", marginTop: -40, position: "relative" }}>
-                            <div style={{ display: "flex", alignItems: "flex-end", gap: 24, flexWrap: 'wrap' }}>
-                                <div style={{
-                                    padding: 4,
-                                    background: "#fff",
-                                    borderRadius: 12,
-                                    boxShadow: "0 4px 10px rgba(0,0,0,0.1)"
-                                }}>
-                                    <Avatar
-                                        size={100}
-                                        shape="square"
-                                        icon={<ProjectOutlined />}
-                                        style={{
-                                            backgroundColor: "#f0f2f5",
-                                            color: token.colorPrimary,
-                                            borderRadius: 8
-                                        }}
-                                    />
-                                </div>
-                                <div style={{ flex: 1, paddingBottom: 10 }}>
-                                    <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 4 }}>
-                                        <Title level={2} style={{ margin: 0, color: '#333' }}>{name}</Title>
-                                        <Tag color={active ? "green" : "red"} style={{ borderRadius: 10 }}>
-                                            {active ? t('global.active') : t('global.inactive')}
-                                        </Tag>
-                                    </div>
-                                    <Text type="secondary">{description}</Text>
-                                </div>
-                            </div>
-                        </div>
-                    </Card>
+                    <EntityHeaderCard
+                        title={name}
+                        subtitle={description}
+                        icon={<ProjectOutlined />}
+                        avatarShape="square"
+                        tags={
+                            <Tag color={active ? "green" : "red"} style={{ borderRadius: 10 }}>
+                                {active ? t('global.active') : t('global.inactive')}
+                            </Tag>
+                        }
+                    />
 
                     {/* Students List */}
-                    <Card
-                        title={
-                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                <Space><TeamOutlined /> {t('students.name_plural')}</Space>
-                                <Tag color="cyan" style={{ borderRadius: 10 }}>{students.length} {t('global.total')}</Tag>
-                            </div>
-                        }
-                        bordered={false}
-                        style={{ borderRadius: 16, boxShadow: "0 4px 20px rgba(0,0,0,0.05)" }}
+                    <DetailCard
+                        title={t('students.name_plural')}
+                        icon={<TeamOutlined />}
+                        extra={<Tag color="cyan" style={{ borderRadius: 10 }}>{students.length} {t('global.total')}</Tag>}
                         bodyStyle={{ padding: 0 }}
                     >
                         <Table
@@ -219,18 +171,15 @@ const PlanDetailsPage = () => {
                             rowKey="id"
                             locale={{ emptyText: t('global.noData') }}
                         />
-                    </Card>
+                    </DetailCard>
                 </Col>
 
                 {/* RIGHT COLUMN: Price and Features */}
                 <Col xs={24} lg={8}>
                     <Space direction="vertical" size="large" style={{ width: '100%' }}>
                         {/* Price Card */}
-                        <Card
-                            bordered={false}
+                        <DetailCard
                             style={{
-                                borderRadius: 16,
-                                boxShadow: "0 4px 20px rgba(0,0,0,0.05)",
                                 background: `linear-gradient(135deg, ${token.colorPrimary} 0%, ${token.colorPrimaryHover} 100%)`,
                                 color: '#fff'
                             }}
@@ -247,13 +196,12 @@ const PlanDetailsPage = () => {
                                     {type === 'package' ? t('plans.type_package') : t('plans.type_subscription')}
                                 </Tag>
                             </div>
-                        </Card>
+                        </DetailCard>
 
                         {/* Plan Config */}
-                        <Card
-                            title={<Space><CalendarOutlined /> {t('plans.configuration')}</Space>}
-                            bordered={false}
-                            style={{ borderRadius: 16, boxShadow: "0 4px 20px rgba(0,0,0,0.05)" }}
+                        <DetailCard
+                            title={t('plans.configuration')}
+                            icon={<CalendarOutlined />}
                         >
                             <Space direction="vertical" size="middle" style={{ width: '100%' }}>
                                 <div style={{ display: 'flex', justifyContent: 'space-between' }}>
@@ -276,7 +224,7 @@ const PlanDetailsPage = () => {
                                     <Text strong>{active ? t('plans.available') : t('plans.not_available')}</Text>
                                 </div>
                             </Space>
-                        </Card>
+                        </DetailCard>
                         {/* Support Section */}
                         <SupportCard settings={settings} t={t} />
                     </Space>

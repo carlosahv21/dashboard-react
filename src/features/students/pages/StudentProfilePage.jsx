@@ -1,16 +1,15 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import {
-    Row, Col, Typography, Spin, message, Form, Button,
-    Card, Statistic, List, Tag, Divider, Space, theme,
+    Row, Col, Typography, Spin, message, Form, Button, Statistic, List, Tag, Divider, Space, theme,
     Input, Modal
 } from "antd";
 import {
-    LeftOutlined,
     ClockCircleOutlined,
     CreditCardOutlined,
     HistoryOutlined,
     PauseCircleOutlined,
+    SafetyCertificateOutlined,
     ExclamationCircleOutlined
 } from "@ant-design/icons";
 import { useTranslation } from "react-i18next";
@@ -25,6 +24,8 @@ import { useFormModal } from "../../../hooks/useFormModal";
 import FormHeader from "../../../components/Common/FormHeader";
 import FormFooter from "../../../components/Common/FormFooter";
 import FormSection from "../../../components/Common/FormSection";
+import PageHeaderActions from "../../../components/Common/PageHeaderActions";
+import DetailCard from "../../../components/Common/DetailCard";
 
 const { Title, Text } = Typography;
 
@@ -147,23 +148,17 @@ const StudentProfilePage = () => {
 
     return (
         <div style={{ minHeight: "100vh" }}>
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 24 }}>
-                <div style={{ display: "flex", alignItems: "center" }}>
+            <PageHeaderActions
+                title={t('global.detail', { title: t('students.name_singular') })}
+                extraActions={
                     <Button
-                        type="text"
-                        icon={<LeftOutlined />}
-                        onClick={() => navigate("/students")}
-                        style={{ marginRight: 12 }}
-                    />
-                    <Title level={3} style={{ margin: 0 }}>{t('global.detail', { title: t('students.name_singular') })}</Title>
-                </div>
-                <Button
-                    icon={<HistoryOutlined />}
-                    onClick={() => navigate(`/students/${id}/history`)}
-                >
-                    {t('global.history')}
-                </Button>
-            </div>
+                        icon={<HistoryOutlined />}
+                        onClick={() => navigate(`/students/${id}/history`)}
+                    >
+                        {t('global.history')}
+                    </Button>
+                }
+            />
 
             <Row gutter={[24, 24]}>
                 <Col xs={24} lg={16}>
@@ -189,8 +184,9 @@ const StudentProfilePage = () => {
                 <Col xs={24} lg={8}>
                     <Space direction="vertical" size="large" style={{ width: '100%' }}>
                         {/* Plan Activo */}
-                        <Card
+                        <DetailCard
                             title={t('students.currentPlan')}
+                            icon={<SafetyCertificateOutlined />}
                             extra={<Tag color={activePlan?.status === "active" ? "green" : "red"}>{activePlan?.status || t('students.inactive')}</Tag>}
                             actions={[
                                 activePlan?.status === "active" ? (
@@ -233,16 +229,12 @@ const StudentProfilePage = () => {
                                     <Text type="secondary">{t('students.noActivePlan')}</Text>
                                 </div>
                             )}
-                        </Card>
+                        </DetailCard>
 
                         {/* Últimos Pagos */}
-                        <Card
-                            title={
-                                <Space>
-                                    <HistoryOutlined />
-                                    {t('students.recentPayments', { defaultValue: "Últimos Pagos" })}
-                                </Space>
-                            }
+                        <DetailCard
+                            title={t('students.recentPayments', { defaultValue: "Últimos Pagos" })}
+                            icon={<HistoryOutlined />}
                             bodyStyle={{ padding: '0 12px' }}
                         >
                             <List
@@ -264,7 +256,7 @@ const StudentProfilePage = () => {
                                     {t('global.viewAll')}
                                 </Button>
                             )}
-                        </Card>
+                        </DetailCard>
                     </Space>
                 </Col>
             </Row>

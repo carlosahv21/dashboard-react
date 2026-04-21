@@ -1,20 +1,14 @@
 import React from "react";
-import { Card, Form, Input, Button, theme } from "antd";
+import { Form, Input, Button } from "antd";
+import DetailCard from "../../../components/Common/DetailCard";
 import { LockOutlined } from "@ant-design/icons";
 
 const ChangePasswordCard = ({ form, onFinish, t }) => {
-  const { token } = theme.useToken();
   return (
-    <Card
-      title={
-        <span>
-          <LockOutlined style={{ color: token.colorPrimary, marginRight: 8 }} /> {t("settings.changePassword")}
-        </span>
-      }
-      bordered={false}
+    <DetailCard
+      title={t("settings.changePassword")}
+      icon={<LockOutlined />}
       style={{
-        borderRadius: 16,
-        boxShadow: "0 4px 20px rgba(0,0,0,0.05)",
         marginBottom: 24,
       }}
     >
@@ -69,7 +63,7 @@ const ChangePasswordCard = ({ form, onFinish, t }) => {
           </Button>
         </Form.Item>
       </Form>
-    </Card>
+    </DetailCard>
   );
 };
 

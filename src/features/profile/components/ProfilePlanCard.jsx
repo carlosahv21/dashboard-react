@@ -1,5 +1,6 @@
 import React from "react";
 import { Card, Tag, Row, Col } from "antd";
+import DetailCard from "../../../components/Common/DetailCard";
 import { SafetyCertificateOutlined } from "@ant-design/icons";
 import useFormatting from "../../../hooks/useFormatting";
 
@@ -7,7 +8,7 @@ const ProfilePlanCard = ({ plan, t, settings }) => {
   const { formatDate } = useFormatting();
 
   return (
-    <Card bordered={false} style={{ borderRadius: 16, boxShadow: "0 4px 20px rgba(0,0,0,0.05)" }}>
+    <DetailCard>
       <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 20 }}>
         <SafetyCertificateOutlined style={{ color: "#007bff", fontSize: 18 }} />
         <span style={{ fontWeight: "bold", fontSize: 16 }}>{t('students.currentPlan')}</span>
@@ -46,7 +47,7 @@ const ProfilePlanCard = ({ plan, t, settings }) => {
           </div>
         </div>
       </Card>
-    </Card>
+    </DetailCard>
   );
 };
 

@@ -27,7 +27,7 @@ const DashboardHeader = ({ user, dateRange, onDateRangeChange, settings, academy
     ];
 
     return (
-        <div style={{ marginBottom: 40, marginTop: 8 }}>
+        <div style={{ marginBottom: 24, marginTop: 8 }}>
             <Row justify="space-between" align="middle" gutter={[24, 24]}>
                 <Col xs={24} md={16}>
                     <Space direction="vertical" size={4}>

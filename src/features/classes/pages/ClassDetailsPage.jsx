@@ -2,15 +2,13 @@ import React, { useState, useEffect, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { 
   Row, Col, Typography, Spin, message, Button, 
-  Card, Statistic, Table, Tag, Divider, Space, Avatar, theme, Modal, Form 
+  Statistic, Table, Tag, Divider, Space, Avatar, theme, Modal, Form 
 } from "antd";
-import { 
-  LeftOutlined, 
+import {
   TeamOutlined, 
   ClockCircleOutlined,
   EnvironmentOutlined,
   ProjectOutlined,
-  SafetyCertificateOutlined,
   EditOutlined
 } from "@ant-design/icons";
 import { useTranslation } from "react-i18next";
@@ -21,8 +19,11 @@ import FormHeader from "../../../components/Common/FormHeader";
 import FormFooter from "../../../components/Common/FormFooter";
 import FormSection from "../../../components/Common/FormSection";
 import SupportCard from "../../profile/components/SupportCard";
+import PageHeaderActions from "../../../components/Common/PageHeaderActions";
+import EntityHeaderCard from "../../../components/Common/EntityHeaderCard";
+import DetailCard from "../../../components/Common/DetailCard";
 
-const { Title, Text } = Typography;
+const { Text } = Typography;
 
 const ClassProfilePage = () => {
   const { id } = useParams();
@@ -116,86 +117,36 @@ const ClassProfilePage = () => {
   return (
     <div style={{ minHeight: "100vh" }}>
       {/* Page Header with Back Button and Top Actions */}
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 24 }}>
-        <div style={{ display: "flex", alignItems: "center" }}>
+      <PageHeaderActions 
+        title={t('global.detail', { title: t('classes.name_singular') })}
+        extraActions={
           <Button 
-            type="text" 
-            icon={<LeftOutlined />} 
-            onClick={() => navigate("/classes")} 
-            style={{ marginRight: 12 }}
-          />
-          <Title level={3} style={{ margin: 0 }}>{t('global.detail', { title: t('classes.name_singular') })}</Title>
-        </div>
-        <Button 
-          type="primary" 
-          icon={<EditOutlined />} 
-          onClick={() => openModal(id)}
-          style={{ borderRadius: 8 }}
-        >
-          {t('global.edit')}
-        </Button>
-      </div>
+            type="primary" 
+            icon={<EditOutlined />} 
+            onClick={() => openModal(id)}
+            style={{ borderRadius: 8 }}
+          >
+            {t('global.edit')}
+          </Button>
+        }
+      />
 
       <Row gutter={[24, 24]}>
         {/* LEFT COLUMN: Header and Student List */}
         <Col xs={24} lg={16}>
           {/* Class "Profile" Header Card (Reuse Profile Style) */}
-          <Card
-            bordered={false}
-            style={{
-              borderRadius: 16,
-              boxShadow: "0 4px 20px rgba(0,0,0,0.05)",
-              overflow: "hidden",
-              marginBottom: 24,
-            }}
-            bodyStyle={{ padding: 0 }}
-          >
-            <div
-              style={{
-                height: 120,
-                background: token.colorPrimary,
-                position: "relative",
-              }}
-            />
-            <div style={{ padding: "0 32px 32px", marginTop: -40, position: "relative" }}>
-              <div style={{ display: "flex", alignItems: "flex-end", gap: 24, flexWrap: 'wrap' }}>
-                <div style={{ 
-                  padding: 4, 
-                  background: "#fff", 
-                  borderRadius: 12, 
-                  boxShadow: "0 4px 10px rgba(0,0,0,0.1)" 
-                }}>
-                  <Avatar
-                    size={100}
-                    shape="square"
-                    icon={<ProjectOutlined />}
-                    style={{ 
-                        backgroundColor: "#f0f2f5", 
-                        color: token.colorPrimary,
-                        borderRadius: 8
-                    }}
-                  />
-                </div>
-                <div style={{ flex: 1, paddingBottom: 10 }}>
-                    <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 4 }}>
-                    <Title level={2} style={{ margin: 0, color: '#333' }}>{header.title}</Title>
-                    </div>
-                    <Text type="secondary">{header.level_tag}</Text>
-                </div>
-              </div>
-            </div>
-          </Card>
+          <EntityHeaderCard 
+            title={header.title}
+            subtitle={header.level_tag}
+            icon={<ProjectOutlined />}
+            avatarShape="square"
+          />
 
           {/* Students List */}
-          <Card 
-            title={
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <Space><TeamOutlined /> {t('students.name_plural')}</Space>
-                    <Tag color="cyan" style={{ borderRadius: 10 }}>{students.length} {t('global.total')}</Tag>
-                </div>
-            }
-            bordered={false}
-            style={{ borderRadius: 16, boxShadow: "0 4px 20px rgba(0,0,0,0.05)" }}
+          <DetailCard 
+            title={t('students.name_plural')}
+            icon={<TeamOutlined />}
+            extra={<Tag color="cyan" style={{ borderRadius: 10 }}>{students.length} {t('global.total')}</Tag>}
             bodyStyle={{ padding: 0 }}
           >
             <Table 
@@ -205,17 +156,16 @@ const ClassProfilePage = () => {
               rowKey="id"
               locale={{ emptyText: t('global.noData') }}
             />
-          </Card>
+          </DetailCard>
         </Col>
 
         {/* RIGHT COLUMN: Stats and Session Details */}
         <Col xs={24} lg={8}>
           <Space direction="vertical" size="large" style={{ width: '100%' }}>
             {/* Stats Section in a Row with Dividers */}
-            <Card 
-                title={<Space><ProjectOutlined /> {t('dashboard.stats')}</Space>}
-                bordered={false}
-                style={{ borderRadius: 16, boxShadow: "0 4px 20px rgba(0,0,0,0.05)" }}
+            <DetailCard 
+                title={t('dashboard.stats')}
+                icon={<ProjectOutlined />}
                 bodyStyle={{ padding: '24px 16px' }}
             >
               <div style={{ display: 'flex', justifyContent: 'space-around', alignItems: 'center' }}>
@@ -230,13 +180,12 @@ const ClassProfilePage = () => {
                   </React.Fragment>
                 ))}
               </div>
-            </Card>
+            </DetailCard>
 
             {/* Session Details */}
-            <Card 
-                title={<Space><ClockCircleOutlined /> {t('classes.session_info')}</Space>}
-                bordered={false}
-                style={{ borderRadius: 16, boxShadow: "0 4px 20px rgba(0,0,0,0.05)" }}
+            <DetailCard 
+                title={t('classes.session_info')}
+                icon={<ClockCircleOutlined />}
             >
               <Space direction="vertical" size="middle" style={{ width: '100%' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between' }}>
@@ -262,7 +211,7 @@ const ClassProfilePage = () => {
                     </div>
                 </Space>
               </Space>
-            </Card>
+            </DetailCard>
 
             {/* Support Section */}
             <SupportCard settings={settings} t={t} />

@@ -1,5 +1,6 @@
 import React from "react";
-import { Card, Descriptions, Form, Row, Col, Input, Select, DatePicker, theme } from "antd";
+import { Descriptions, Form, Row, Col, Input, Select, DatePicker, theme } from "antd";
+import DetailCard from "../../../components/Common/DetailCard";
 import { UserOutlined, PhoneOutlined, MailOutlined } from "@ant-design/icons";
 import dayjs from "dayjs";
 import useFormatting from "../../../hooks/useFormatting";
@@ -18,16 +19,10 @@ const ProfileDetailsCard = ({
   const { formatDate } = useFormatting();
 
   return (
-    <Card
-      title={
-        <span style={{ fontWeight: "bold" }}>
-          <UserOutlined style={{ color: token.colorPrimary, marginRight: 8 }} /> {t("profile.details  ")} 
-        </span>
-      }
-      bordered={false}
+    <DetailCard
+      title={t("profile.details")}
+      icon={<UserOutlined />}
       style={{
-        borderRadius: 16,
-        boxShadow: "0 4px 20px rgba(0,0,0,0.05)",
         marginBottom: 24,
       }}
     >
@@ -126,7 +121,7 @@ const ProfileDetailsCard = ({
           </Descriptions.Item>
         </Descriptions>
       )}
-    </Card>
+    </DetailCard>
   );
 };
 

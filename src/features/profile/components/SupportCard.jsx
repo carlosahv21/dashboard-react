@@ -1,5 +1,6 @@
 import React from "react";
-import { Card, Button, theme } from "antd";
+import { Button, theme } from "antd";
+import DetailCard from "../../../components/Common/DetailCard";
 import { QuestionOutlined, ArrowRightOutlined } from "@ant-design/icons";
 
 const SupportCard = ({ settings, t }) => {
@@ -7,10 +8,8 @@ const SupportCard = ({ settings, t }) => {
     const isDarkMode = settings?.theme === "dark";
 
     return (
-        <Card
-            bordered={false}
+        <DetailCard
             style={{
-                borderRadius: 16,
                 boxShadow: isDarkMode
                     ? "0 4px 12px rgba(0,0,0,0.2)"
                     : "0 4px 20px rgba(0,0,0,0.05)",
@@ -64,7 +63,7 @@ const SupportCard = ({ settings, t }) => {
                     </Button>
                 </div>
             </div>
-        </Card>
+        </DetailCard>
     );
 };
 

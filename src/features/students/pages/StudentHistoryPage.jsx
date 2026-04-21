@@ -1,26 +1,32 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import {
-    Row, Col, Card, Tabs, Button, Tag, Typography,
+    Row, Col, Tabs, Button, Tag, Typography,
     Table, Statistic, Tooltip, theme, Form, Modal,
     Spin, App, Input, Space
 } from "antd";
 import {
-    LeftOutlined, ClockCircleOutlined, CreditCardOutlined,
-    PauseCircleOutlined, ExclamationCircleOutlined
+    ClockCircleOutlined,
+    CreditCardOutlined,
+    PauseCircleOutlined,
+    ExclamationCircleOutlined,
+    CalendarOutlined,
+    SafetyCertificateOutlined,
+    ProfileOutlined
 } from "@ant-design/icons";
 import dayjs from "dayjs";
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 
 // Hooks y Componentes Propios
-import useFetch from "../../../hooks/useFetch";
 import { useFormModal } from "../../../hooks/useFormModal";
 import useFormatting from "../../../hooks/useFormatting";
 import FormHeader from "../../../components/Common/FormHeader";
 import FormFooter from "../../../components/Common/FormFooter";
 import FormSection from "../../../components/Common/FormSection";
 import { useTranslation } from "react-i18next";
+import PageHeaderActions from "../../../components/Common/PageHeaderActions";
+import DetailCard from "../../../components/Common/DetailCard";
 
 // Lógica separada (La crearemos abajo)
 import studentService from "../services/studentService";
@@ -33,7 +39,6 @@ const StudentHistory = () => {
     const { t } = useTranslation();
     const { id } = useParams();
     const navigate = useNavigate();
-    const { request } = useFetch();
     const { token } = theme.useToken();
     const { message } = App.useApp();
     const { formatCurrency, formatDateShort } = useFormatting();
@@ -111,17 +116,13 @@ const StudentHistory = () => {
 
     return (
         <div className="student-history-container">
-            <div style={{ marginBottom: 16, display: "flex", alignItems: "center" }}>
-                <Button type="text" icon={<LeftOutlined />} onClick={() => navigate("/students")} style={{ marginRight: 16 }}>
-                </Button>
-                <Title level={3} style={{ margin: 0 }}>
-                    {t('students.history', { name: `${student?.first_name || ''} ${student?.last_name || ''}` })}
-                </Title>
-            </div>
+            <PageHeaderActions
+                title={t('students.history', { name: `${student?.first_name || ''} ${student?.last_name || ''}` })}
+            />
 
             <Row gutter={[24, 24]}>
                 <Col xs={24} lg={16}>
-                    <Card title={t('students.activitiesCalendar')}>
+                    <DetailCard title={t('students.activitiesCalendar')} icon={<CalendarOutlined />}>
                         <FullCalendar
                             plugins={[dayGridPlugin]}
                             initialView="dayGridMonth"
@@ -135,13 +136,14 @@ const StudentHistory = () => {
                                 </Tooltip>
                             )}
                         />
-                    </Card>
+                    </DetailCard>
                 </Col>
 
                 <Col xs={24} lg={8}>
                     <Space direction="vertical" size="large" style={{ width: '100%' }}>
-                        <Card
+                        <DetailCard
                             title={t('students.currentPlan')}
+                            icon={<SafetyCertificateOutlined />}
                             extra={<Tag color={activePlan?.status === "active" ? "green" : "red"}>{activePlan?.status || t('students.inactive')}</Tag>}
                             actions={[
                                 activePlan?.status === "active" ? (
@@ -169,11 +171,11 @@ const StudentHistory = () => {
                                     </Row>
                                 </div>
                             ) : <Text type="secondary">{t('students.noActivePlan')}</Text>}
-                        </Card>
+                        </DetailCard>
 
-                        <Card title={t('students.details')} bodyStyle={{ padding: '0 12px' }}>
+                        <DetailCard title={t('students.details')} icon={<ProfileOutlined />} bodyStyle={{ padding: '0 12px' }}>
                             <Tabs defaultActiveKey="1" items={tabItems} />
-                        </Card>
+                        </DetailCard>
                     </Space>
                 </Col>
             </Row>

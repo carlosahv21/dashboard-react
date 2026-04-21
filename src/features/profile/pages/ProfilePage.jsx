@@ -1,5 +1,5 @@
 import React, { useContext } from "react";
-import { Row, Col, Typography, Spin, message, Form } from "antd";
+import { Row, Col, Spin, message, Form } from "antd";
 import { AuthContext } from "../../../context/AuthContext";
 import { useProfile } from "../hooks/useProfile";
 import { useTranslation } from "react-i18next";
@@ -10,8 +10,7 @@ import ProfileDetailsCard from "../components/ProfileDetailsCard";
 import ProfilePlanCard from "../components/ProfilePlanCard";
 import ChangePasswordCard from "../components/ChangePasswordCard";
 import SupportCard from "../components/SupportCard";
-
-const { Title } = Typography;
+import PageHeaderActions from "../../../components/Common/PageHeaderActions";
 
 const ProfilePage = () => {
   const { user, login, settings } = useContext(AuthContext);
@@ -72,18 +71,9 @@ const ProfilePage = () => {
 
   return (
     <div style={{ minHeight: "100vh" }}>
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          marginBottom: 32,
-        }}
-      >
-        <Title level={2} style={{ marginBottom: 0, marginTop: 0 }}>
-          {t("settings.profile")}
-        </Title>
-      </div>
+      <PageHeaderActions
+        title={t("settings.profile")}
+      />
 
       <Row gutter={[24, 24]}>
         {/* Main Section */}

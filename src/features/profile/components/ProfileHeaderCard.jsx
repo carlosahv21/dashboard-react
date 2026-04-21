@@ -1,5 +1,6 @@
 import React from "react";
-import { Card, Avatar, Tag, Button, Upload, theme } from "antd";
+import { Avatar, Tag, Button, Upload, theme } from "antd";
+import DetailCard from "../../../components/Common/DetailCard";
 import {
   UserOutlined,
   MailOutlined,
@@ -23,11 +24,8 @@ const ProfileHeaderCard = ({
   const roleLabel = t(`roles.${data.role?.toLowerCase()}`, { defaultValue: data.role });
 
   return (
-    <Card
-      bordered={false}
+    <DetailCard
       style={{
-        borderRadius: 16,
-        boxShadow: "0 4px 20px rgba(0,0,0,0.05)",
         overflow: "hidden",
         marginBottom: 24,
       }}
@@ -177,7 +175,7 @@ const ProfileHeaderCard = ({
           </div>
         </div>
       </div>
-    </Card>
+    </DetailCard>
   );
 };
 
