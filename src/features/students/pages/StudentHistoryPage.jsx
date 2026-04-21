@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import {
     Row, Col, Tabs, Button, Tag, Typography,
     Table, Statistic, Tooltip, theme, Form, Modal,
