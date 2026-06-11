@@ -1,14 +1,16 @@
 import React, { useState, useEffect, useContext, useCallback, useMemo } from "react";
 import { Divider, Form, Select, Card, Row, Col, Button, Modal, Checkbox, Input, Skeleton, Empty, Space, Tooltip, theme, App } from "antd";
-import { EditOutlined, PlusOutlined, DeleteOutlined, InfoCircleOutlined } from "@ant-design/icons";
+import { EditOutlined, PlusOutlined, DeleteOutlined, InfoCircleOutlined, HolderOutlined } from "@ant-design/icons";
+import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import useFetch from "../../../hooks/useFetch";
 import FormHeader from "../../../components/Common/FormHeader";
 import FormFooter from "../../../components/Common/FormFooter";
-import { AuthContext } from "../../../context/AuthContext"; // <--- IMPORTANTE
+import { AuthContext } from "../../../context/AuthContext";
 import { useTranslation } from "react-i18next";
+import "./CustomFields.css";
 
 // -----------------------------------------------------------
-// FIELD CARD → Ahora con permisos del AuthContext
+// FIELD CARD → Draggable fields within a block
 // -----------------------------------------------------------
 const FieldCard = ({ block, onEdit, onAddField, onDeleteField, onDeleteBlock }) => {
     const { t } = useTranslation();
@@ -31,8 +33,6 @@ const FieldCard = ({ block, onEdit, onAddField, onDeleteField, onDeleteBlock }) 
                     <Space>{block.block_name}</Space>
 
                     <Space>
-
-                        {/* Agregar campo */}
                         {canCreateField && (
                             <Tooltip title={isInheritedBlock ? t('settings.cannotAddFieldInherited') : t('settings.addField')}>
                                 <Button
@@ -45,7 +45,6 @@ const FieldCard = ({ block, onEdit, onAddField, onDeleteField, onDeleteBlock }) 
                             </Tooltip>
                         )}
 
-                        {/* Eliminar bloque */}
                         {canDeleteBlock && (
                             <Tooltip title={isInheritedBlock ? t('settings.cannotDeleteBlockInherited') : t('settings.deleteBlock')}>
                                 <Button
@@ -62,49 +61,77 @@ const FieldCard = ({ block, onEdit, onAddField, onDeleteField, onDeleteBlock }) 
                 </Space>
             }
         >
-            <Row>
-                {block.fields.map(field => (
-                    <Col
-                        key={field.field_id}
-                        span={12}
-                        style={{
-                            marginTop: "10px",
-                            marginBottom: "10px",
-                            backgroundColor: token.colorFillAlter, // Use 'colorFillAlter' or similar for light gray replacement
-                            padding: "10px",
-                            borderRadius: "4px"
-                        }}
+            <Droppable droppableId={`block-${block.block_id}`} type="FIELD" direction="vertical">
+                {(provided) => (
+                    <div
+                        ref={provided.innerRef}
+                        {...provided.droppableProps}
+                        className="custom-fields-list"
                     >
-                        <Space>
-                            <span style={{ color: token.colorText }}>
-                                {field.label}
-                                {field.required === 1 && <span style={{ color: "red" }}> *</span>}
-                            </span>
+                        {block.fields.map((field, index) => (
+                            <Draggable
+                                key={field.field_id}
+                                draggableId={`field-${field.field_id}`}
+                                index={index}
+                                isDragDisabled={isInheritedBlock || field.inherited}
+                            >
+                                {(provided, snapshot) => (
+                                    <div
+                                        ref={provided.innerRef}
+                                        {...provided.draggableProps}
+                                        className={`custom-field-item ${snapshot.isDragging ? "dragging" : ""}`}
+                                        style={{
+                                            backgroundColor: snapshot.isDragging ? token.colorBgElevated : token.colorFillAlter,
+                                            borderColor: snapshot.isDragging ? token.colorPrimary : "transparent",
+                                            boxShadow: snapshot.isDragging ? "0 4px 12px rgba(0, 0, 0, 0.15)" : "none",
+                                            ...provided.draggableProps.style,
+                                        }}
+                                    >
+                                        <div className="custom-field-item-content">
+                                            <div className="custom-field-item-left">
+                                                {!isInheritedBlock && !field.inherited && (
+                                                    <span {...provided.dragHandleProps} className="field-drag-handle">
+                                                        <HolderOutlined />
+                                                    </span>
+                                                )}
+                                                <span className="field-label" style={{ color: token.colorText }}>
+                                                    {field.label}
+                                                    {field.required === 1 && <span className="field-required">*</span>}
+                                                </span>
+                                                <span className="field-type" style={{ color: token.colorTextDescription }}>
+                                                    ({t(`settings.fieldType${field.type.charAt(0).toUpperCase() + field.type.slice(1)}`) || field.type})
+                                                </span>
+                                            </div>
 
-                            {/* Editar campo */}
-                            {canEditField && (
-                                <Button
-                                    type="link"
-                                    icon={<EditOutlined />}
-                                    onClick={() => !field.inherited && onEdit(field, block.block_id)}
-                                    disabled={field.inherited}
-                                />
-                            )}
+                                            <div className="custom-field-item-actions">
+                                                {canEditField && (
+                                                    <Button
+                                                        type="link"
+                                                        icon={<EditOutlined />}
+                                                        onClick={() => !field.inherited && onEdit(field, block.block_id)}
+                                                        disabled={field.inherited}
+                                                    />
+                                                )}
 
-                            {/* Eliminar campo */}
-                            {canDeleteField && (
-                                <Button
-                                    type="link"
-                                    danger
-                                    icon={<DeleteOutlined />}
-                                    onClick={() => !field.inherited && field.type !== 'relation' && onDeleteField(field.field_id)}
-                                    disabled={field.inherited || field.type === 'relation'}
-                                />
-                            )}
-                        </Space>
-                    </Col>
-                ))}
-            </Row>
+                                                {canDeleteField && (
+                                                    <Button
+                                                        type="link"
+                                                        danger
+                                                        icon={<DeleteOutlined />}
+                                                        onClick={() => !field.inherited && field.type !== 'relation' && onDeleteField(field.field_id)}
+                                                        disabled={field.inherited || field.type === 'relation'}
+                                                    />
+                                                )}
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
+                            </Draggable>
+                        ))}
+                        {provided.placeholder}
+                    </div>
+                )}
+            </Droppable>
         </Card>
     );
 };
@@ -113,9 +140,6 @@ const CustomFields = () => {
     const { t } = useTranslation();
     const { request } = useFetch();
 
-    // -----------------------------------------------------------
-    // Traer permisos del AuthContext
-    // -----------------------------------------------------------
     const { hasPermission } = useContext(AuthContext);
 
     const canCreateBlock = hasPermission("blocks:create");
@@ -173,17 +197,58 @@ const CustomFields = () => {
         fetchFields();
     }, [request, changeModule, t, message]);
 
+    // -----------------------------------------------------------
+    // Drag & Drop: reorder fields within the same block
+    // -----------------------------------------------------------
+    const onDragEnd = useCallback(async (result) => {
+        const { source, destination, draggableId } = result;
+
+        if (!destination) return;
+
+        if (source.droppableId === destination.droppableId && source.index === destination.index) return;
+
+        const sourceBlockId = source.droppableId.replace("block-", "");
+        const destBlockId = destination.droppableId.replace("block-", "");
+
+        if (sourceBlockId !== destBlockId) return;
+
+        const blockIndex = blocks.findIndex(b => String(b.block_id) === String(sourceBlockId));
+        if (blockIndex === -1) return;
+
+        const updatedBlocks = [...blocks];
+        const block = { ...updatedBlocks[blockIndex] };
+        const fields = [...block.fields];
+
+        const [movedField] = fields.splice(source.index, 1);
+        fields.splice(destination.index, 0, movedField);
+
+        block.fields = fields;
+        updatedBlocks[blockIndex] = block;
+        setBlocks(updatedBlocks);
+
+        try {
+            const orderedIds = fields.map(f => f.field_id);
+            const response = await request(`fields/${sourceBlockId}/order`, "PUT", { field_ids: orderedIds });
+            if (response.success) {
+                message.success(t('settings.blockReordered'));
+            }
+            else {
+                message.error(t('settings.reorderFieldError'));
+            }
+        } catch (err) {
+            message.error(t('settings.reorderFieldError'));
+            changeModule(selectedModule);
+        }
+    }, [blocks, request, message, t, selectedModule, changeModule]);
+
     // Edit field
     const showModal = (field, blockId) => {
         let formattedField = { ...field };
-        // Ensure options are an array for the Select tags mode
         if (field.type === 'select' && field.options && typeof field.options === 'string') {
             try {
-                // Try parsing if it looks like JSON array
                 if (field.options.startsWith('[')) {
                     formattedField.options = JSON.parse(field.options);
                 } else {
-                    // Otherwise split by comma
                     formattedField.options = field.options.split(',').map(op => op.trim());
                 }
             } catch (e) {
@@ -199,7 +264,6 @@ const CustomFields = () => {
 
     const handleSubmit = async (values) => {
         try {
-            // Options are already an array from Select mode="tags"
             const payload = { ...values, id: editField.field_id, block_id: currentBlockId };
             await request(`fields/${editField.field_id}`, "PUT", payload);
             message.success(t('settings.fieldUpdated'));
@@ -259,7 +323,7 @@ const CustomFields = () => {
             setIsBlockModalOpen(false);
             changeModule(selectedModule);
         } catch (err) {
-            message.error(t('settings.createBlockError'));
+            message.error(err.message || t('settings.createBlockError'));
         }
     };
 
@@ -310,7 +374,7 @@ const CustomFields = () => {
             await request(`fields/${fieldId}`, "DELETE");
             changeModule(selectedModule);
         } catch (err) {
-            message.error(t('settings.deleteFieldError'));
+            message.error(err.message || t('settings.deleteFieldError'));
         }
     };
 
@@ -360,7 +424,6 @@ const CustomFields = () => {
                             ))}
                         </Select>
 
-                        {/* Crear bloque */}
                         {canCreateBlock && (
                             <Button
                                 type="primary"
@@ -377,21 +440,22 @@ const CustomFields = () => {
             <Divider />
 
             {blocks.length > 0 ? (
-                blocks.map(block => (
-                    <FieldCard
-                        key={block.block_id}
-                        block={block}
-                        onEdit={showModal}
-                        onAddField={handleAddField}
-                        onDeleteField={handleConfirmDeleteField}
-                        onDeleteBlock={handleConfirmDeleteBlock}
-                    />
-                ))
+                <DragDropContext onDragEnd={onDragEnd}>
+                    {blocks.map(block => (
+                        <FieldCard
+                            key={block.block_id}
+                            block={block}
+                            onEdit={showModal}
+                            onAddField={handleAddField}
+                            onDeleteField={handleConfirmDeleteField}
+                            onDeleteBlock={handleConfirmDeleteBlock}
+                        />
+                    ))}
+                </DragDropContext>
             ) : (
                 !loading && <Empty description={t('global.noData')} />
             )}
 
-            {/* MODALS — sin cambios excepto permisos ya aplicados arriba */}
             {/* Edit field */}
             <Modal
                 title={editField?.name || ""}
