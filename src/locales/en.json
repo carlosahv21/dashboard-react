@@ -115,6 +115,40 @@
         "type_subscription": "Subscription",
         "monthly_billed": "Monthly billed"
     },
+    "studentTabs": {
+        "profile": "Profile",
+        "stats": "Stats",
+        "achievements": "Achievements",
+        "challenges": "Challenges"
+    },
+    "studentStats": {
+        "level": "Level",
+        "points": "points",
+        "currentStreak": "Current streak",
+        "longestStreak": "Longest streak",
+        "days": "days",
+        "totalClassesAttended": "Classes attended",
+        "lessonsCompleted": "lessons completed",
+        "readingMinutes": "Reading minutes",
+        "reviewsMade": "Reviews made",
+        "avgRating": "Average rating",
+        "challengesJoined": "Challenges joined",
+        "completed": "completed",
+        "achievementsCount": "Achievements earned"
+    },
+    "studentAchievements": {
+        "title": "Achievements"
+    },
+    "studentChallenges": {
+        "statusActive": "Active",
+        "statusCompleted": "Completed",
+        "statusAbandoned": "Abandoned",
+        "leave": "Leave challenge",
+        "joinSuccess": "You joined the challenge",
+        "joinError": "Error joining challenge",
+        "leaveSuccess": "You left the challenge",
+        "leaveError": "Error leaving challenge"
+    },
     "students": {
         "name_plural": "Students",
         "name_singular": "Student",
@@ -175,6 +209,12 @@
         "nextCutoff": "Next Cutoff",
         "weeklyClasses": "Weekly Classes",
         "classes": "Classes"
+    },
+    "teacherReviews": {
+        "title": "Reviews",
+        "outOf": "of",
+        "reviews": "reviews",
+        "anonymous": "Anonymous"
     },
     "registrations": {
         "name_plural": "Registrations",
@@ -380,6 +420,9 @@
         "userManagement": "User Management",
         "customization": "Customization",
         "finance": "Finance",
+        "gamification": "Gamification",
+        "achievements": "Achievements",
+        "challenges": "Challenges",
         "activeModules": "Active Modules",
         "activeModulesSubtitle": "Manage the modules currently active in your application.",
         "fetchModulesError": "Error loading modules.",
@@ -392,9 +435,53 @@
         "contactSupport": "Contact support",
         "addBlock": "Add Block"
     },
+    "achievements": {
+        "name_plural": "Achievements",
+        "name_singular": "Achievement",
+        "category": "Category",
+        "pointsReward": "Points"
+    },
+    "challenges": {
+        "name_plural": "Challenges",
+        "name_singular": "Challenge",
+        "challengeType": "Type",
+        "goalValue": "Goal",
+        "startDate": "Start Date",
+        "endDate": "End Date",
+        "pointsReward": "Points",
+        "isActive": "Active"
+    },
+    "connections": {
+        "name_plural": "Connections",
+        "name_singular": "Connection",
+        "myConnections": "My Connections",
+        "pendingRequests": "Pending Requests",
+        "noConnections": "No connections yet",
+        "noPendingRequests": "No pending requests",
+        "sendRequest": "Send Request",
+        "sendRequestDescription": "Enter the user ID you want to connect with",
+        "userIdPlaceholder": "User ID",
+        "send": "Send",
+        "requestSent": "Request sent successfully",
+        "requestError": "Error sending request",
+        "accept": "Accept",
+        "reject": "Reject",
+        "remove": "Remove",
+        "accepted": "Connection accepted",
+        "rejected": "Request rejected",
+        "removed": "Connection removed",
+        "acceptError": "Error accepting",
+        "rejectError": "Error rejecting",
+        "removeError": "Error removing",
+        "rejectConfirm": "Reject this request?",
+        "removeConfirm": "Remove this connection?"
+    },
     "menu": {
         "dashboard": "Dashboard",
         "plans": "Plans",
+        "achievements": "Achievements",
+        "challenges": "Challenges",
+        "connections": "Connections",
         "classes": "Classes",
         "students": "Students",
         "teachers": "Teachers",

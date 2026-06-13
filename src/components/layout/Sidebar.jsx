@@ -28,7 +28,7 @@ const Sidebar = forwardRef((props, ref) => {
 	 * - `module`: must match a key in the backend `modules` array to be shown.
 	 * - `permissionRequired`: "module:action" permission string for role-based filtering.
 	 */
-	const staticMenuDefinition = [
+		const staticMenuDefinition = [
 		{
 			label: t("menu.dashboard"),
 			icon: "Dashboard",
@@ -42,6 +42,13 @@ const Sidebar = forwardRef((props, ref) => {
 			path: "/plans",
 			module: "plans",
 			permissionRequired: "plans:view",
+		},
+		{
+			label: t("menu.connections"),
+			icon: "TeamOutlined",
+			path: "/connections",
+			module: "connections",
+			permissionRequired: "connections:view",
 		},
 		{
 			label: t("menu.classes"),

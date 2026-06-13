@@ -8,6 +8,7 @@ import {
   DollarOutlined,
   AppstoreAddOutlined,
   DeleteOutlined,
+  TrophyOutlined,
 } from "@ant-design/icons";
 import { useTranslation } from "react-i18next";
 
@@ -19,6 +20,8 @@ import SettingsUsers from "../sections/Users";
 import SettingsCustomFields from "../sections/CustomFields";
 import SettingsPayments from "../sections/Payments";
 import SettingsRecycleBin from "../sections/RecycleBin";
+import SettingsAchievements from "../../achievements/pages/AchievementsPage";
+import SettingsChallenges from "../../challenges/pages/ChallengesPage";
 
 const componentsMap = {
   "settings.general": SettingsGeneral,
@@ -29,6 +32,8 @@ const componentsMap = {
   "settings.customFields": SettingsCustomFields,
   "settings.payments": SettingsPayments,
   "settings.recycle_bin": SettingsRecycleBin,
+  "settings.achievements": SettingsAchievements,
+  "settings.challenges": SettingsChallenges,
 };
 
 const iconMap = {
@@ -36,6 +41,7 @@ const iconMap = {
   userManagement: <UserOutlined />,
   customization: <AppstoreAddOutlined />,
   finance: <DollarOutlined />,
+  gamification: <TrophyOutlined />,
   recycle_bin: <DeleteOutlined />,
 };
 
@@ -96,6 +102,20 @@ const SettingsPage = () => {
         group: "recycle_bin",
         permission: "recycle_bin:view",
       },
+      {
+        path: "achievements",
+        label: t("settings.achievements"),
+        name: "settings.achievements",
+        permission: "achievements:view",
+        group: "gamification",
+      },
+      {
+        path: "challenges",
+        label: t("settings.challenges"),
+        name: "settings.challenges",
+        permission: "challenges:view",
+        group: "gamification",
+      },
     ],
     [t]
   );
@@ -106,6 +126,7 @@ const SettingsPage = () => {
       { key: "userManagement", label: t("settings.userManagement") },
       { key: "customization", label: t("settings.customization") },
       { key: "finance", label: t("settings.finance") },
+      { key: "gamification", label: t("settings.gamification") },
       { key: "recycle_bin", label: t("settings.recycle_bin"), isLeaf: true },
     ],
     [t]

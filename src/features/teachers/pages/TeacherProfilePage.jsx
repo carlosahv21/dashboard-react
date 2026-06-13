@@ -8,7 +8,8 @@ import {
     StarOutlined,
     CalendarOutlined,
     DollarOutlined,
-    BarChartOutlined
+    BarChartOutlined,
+    CommentOutlined
 } from "@ant-design/icons";
 import { useTranslation } from "react-i18next";
 import teacherService from "../services/teacherService";
@@ -19,6 +20,7 @@ import ProfileHeaderCard from "../../profile/components/ProfileHeaderCard";
 import ProfileDetailsCard from "../../profile/components/ProfileDetailsCard";
 import PageHeaderActions from "../../../components/Common/PageHeaderActions";
 import DetailCard from "../../../components/Common/DetailCard";
+import TeacherReviews from "../components/TeacherReviews";
 
 const { Title, Text } = Typography;
 
@@ -129,6 +131,10 @@ const TeacherProfilePage = () => {
                         handleProfileUpdate={handleProfileUpdate}
                         t={t}
                     />
+
+                    <DetailCard title={t("teacherReviews.title")} icon={<CommentOutlined />}>
+                        <TeacherReviews teacherId={id} />
+                    </DetailCard>
                 </Col>
 
                 <Col xs={24} lg={8}>

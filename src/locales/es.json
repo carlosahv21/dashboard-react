@@ -115,6 +115,40 @@
         "type_subscription": "Suscripción",
         "monthly_billed": "Facturado mensual"
     },
+    "studentTabs": {
+        "profile": "Perfil",
+        "stats": "Estadísticas",
+        "achievements": "Logros",
+        "challenges": "Retos"
+    },
+    "studentStats": {
+        "level": "Nivel",
+        "points": "puntos",
+        "currentStreak": "Racha actual",
+        "longestStreak": "Racha más larga",
+        "days": "días",
+        "totalClassesAttended": "Clases asistidas",
+        "lessonsCompleted": "lecciones completadas",
+        "readingMinutes": "Minutos de lectura",
+        "reviewsMade": "Reseñas realizadas",
+        "avgRating": "Calificación promedio",
+        "challengesJoined": "Retos unidos",
+        "completed": "completados",
+        "achievementsCount": "Logros obtenidos"
+    },
+    "studentAchievements": {
+        "title": "Logros"
+    },
+    "studentChallenges": {
+        "statusActive": "Activo",
+        "statusCompleted": "Completado",
+        "statusAbandoned": "Abandonado",
+        "leave": "Abandonar reto",
+        "joinSuccess": "Te has unido al reto",
+        "joinError": "Error al unirse al reto",
+        "leaveSuccess": "Has abandonado el reto",
+        "leaveError": "Error al abandonar el reto"
+    },
     "students": {
         "name_plural": "Estudiantes",
         "name_singular": "Estudiante",
@@ -175,6 +209,12 @@
         "nextCutoff": "Próximo Corte",
         "weeklyClasses": "Clases Semanales",
         "classes": "Clases"
+    },
+    "teacherReviews": {
+        "title": "Reseñas",
+        "outOf": "de",
+        "reviews": "reseñas",
+        "anonymous": "Anónimo"
     },
     "registrations": {
         "name_plural": "Inscripciones",
@@ -380,6 +420,9 @@
         "userManagement": "Gestión de Usuarios",
         "customization": "Personalización",
         "finance": "Finanzas",
+        "gamification": "Gamificación",
+        "achievements": "Logros",
+        "challenges": "Retos",
         "activeModules": "Módulos Activos",
         "activeModulesSubtitle": "Gestiona los módulos que están actualmente activos en tu aplicación.",
         "fetchModulesError": "Error al cargar módulos.",
@@ -392,9 +435,53 @@
         "contactSupport": "Contactar soporte",
         "addBlock": "Agregar Bloque"
     },
+    "achievements": {
+        "name_plural": "Logros",
+        "name_singular": "Logro",
+        "category": "Categoría",
+        "pointsReward": "Puntos"
+    },
+    "challenges": {
+        "name_plural": "Retos",
+        "name_singular": "Reto",
+        "challengeType": "Tipo",
+        "goalValue": "Meta",
+        "startDate": "Inicio",
+        "endDate": "Fin",
+        "pointsReward": "Puntos",
+        "isActive": "Activo"
+    },
+    "connections": {
+        "name_plural": "Conexiones",
+        "name_singular": "Conexión",
+        "myConnections": "Mis Conexiones",
+        "pendingRequests": "Solicitudes Pendientes",
+        "noConnections": "No tienes conexiones aún",
+        "noPendingRequests": "No hay solicitudes pendientes",
+        "sendRequest": "Enviar Solicitud",
+        "sendRequestDescription": "Ingresa el ID del usuario al que deseas conectar",
+        "userIdPlaceholder": "ID del usuario",
+        "send": "Enviar",
+        "requestSent": "Solicitud enviada correctamente",
+        "requestError": "Error al enviar solicitud",
+        "accept": "Aceptar",
+        "reject": "Rechazar",
+        "remove": "Eliminar",
+        "accepted": "Conexión aceptada",
+        "rejected": "Solicitud rechazada",
+        "removed": "Conexión eliminada",
+        "acceptError": "Error al aceptar",
+        "rejectError": "Error al rechazar",
+        "removeError": "Error al eliminar",
+        "rejectConfirm": "¿Rechazar esta solicitud?",
+        "removeConfirm": "¿Eliminar esta conexión?"
+    },
     "menu": {
         "dashboard": "Dashboard",
         "plans": "Planes",
+        "achievements": "Logros",
+        "challenges": "Retos",
+        "connections": "Conexiones",
         "classes": "Clases",
         "students": "Estudiantes",
         "teachers": "Profesores",

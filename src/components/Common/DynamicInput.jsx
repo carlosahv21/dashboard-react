@@ -74,10 +74,28 @@ const parseValidationRules = (required, type, t) => {
                 break;
             case "date":
                 rules.push({
-                    validator: (_, value) =>
-                        value
+                    validator: (_, value) => {
+                        if (!value) return Promise.resolve();
+
+                        // Para campos dinámicos, el valor puede ser string o objeto
+                        let isValid = false;
+
+                        if (value instanceof Date) {
+                            isValid = !isNaN(value.getTime());
+                        } else if (typeof value === 'string') {
+                            const date = new Date(value);
+                            isValid = !isNaN(date.getTime());
+                        } else if (typeof value === 'object' && value !== null) {
+                            // Formato { value: '...' } o similar
+                            const val = value.value || value.date || value;
+                            const date = new Date(val);
+                            isValid = !isNaN(date.getTime());
+                        }
+
+                        return isValid
                             ? Promise.resolve()
-                            : Promise.reject(new Error(t("forms.invalidDate"))),
+                            : Promise.reject(new Error(t("forms.invalidDate")));
+                    },
                 });
                 break;
             case "time":

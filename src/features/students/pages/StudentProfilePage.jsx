@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import {
     Row, Col, Typography, Spin, message, Form, Button, Statistic, List, Tag, Divider, Space, theme,
-    Input, Modal
+    Input, Modal, Tabs
 } from "antd";
 import {
     ClockCircleOutlined,
@@ -10,7 +10,10 @@ import {
     HistoryOutlined,
     PauseCircleOutlined,
     SafetyCertificateOutlined,
-    ExclamationCircleOutlined
+    ExclamationCircleOutlined,
+    BarChartOutlined,
+    TrophyOutlined,
+    ThunderboltOutlined
 } from "@ant-design/icons";
 import { useTranslation } from "react-i18next";
 import studentService from "../services/studentService";
@@ -26,6 +29,9 @@ import FormFooter from "../../../components/Common/FormFooter";
 import FormSection from "../../../components/Common/FormSection";
 import PageHeaderActions from "../../../components/Common/PageHeaderActions";
 import DetailCard from "../../../components/Common/DetailCard";
+import StudentStats from "../components/StudentStats";
+import StudentAchievements from "../components/StudentAchievements";
+import StudentChallenges from "../components/StudentChallenges";
 
 const { Title, Text } = Typography;
 
@@ -44,6 +50,7 @@ const StudentProfilePage = () => {
     const [uploading, setUploading] = useState(false);
     const [isPauseModalOpen, setIsPauseModalOpen] = useState(false);
     const [pauseReason, setPauseReason] = useState("");
+    const [activeTab, setActiveTab] = useState("profile");
 
     const { modalVisible, moduleData, openModal, closeModal, handleSubmit } = useFormModal(
         "payments", "payments", t('students.payment'), { user_id: id }, paymentForm
@@ -146,6 +153,45 @@ const StudentProfilePage = () => {
 
     const { student, activePlan, payments } = studentData;
 
+    const tabHeaders = [
+        {
+            key: "profile",
+            label: (
+                <span>
+                    <SafetyCertificateOutlined style={{ marginRight: 6 }} />
+                    {t("studentTabs.profile")}
+                </span>
+            ),
+        },
+        {
+            key: "stats",
+            label: (
+                <span>
+                    <BarChartOutlined style={{ marginRight: 6 }} />
+                    {t("studentTabs.stats")}
+                </span>
+            ),
+        },
+        {
+            key: "achievements",
+            label: (
+                <span>
+                    <TrophyOutlined style={{ marginRight: 6 }} />
+                    {t("studentTabs.achievements")}
+                </span>
+            ),
+        },
+        {
+            key: "challenges",
+            label: (
+                <span>
+                    <ThunderboltOutlined style={{ marginRight: 6 }} />
+                    {t("studentTabs.challenges")}
+                </span>
+            ),
+        },
+    ];
+
     return (
         <div style={{ minHeight: "100vh" }}>
             <PageHeaderActions
@@ -159,6 +205,8 @@ const StudentProfilePage = () => {
                     </Button>
                 }
             />
+
+            <Tabs activeKey={activeTab} onChange={setActiveTab} items={tabHeaders} style={{ marginBottom: 24 }} />
 
             <Row gutter={[24, 24]}>
                 <Col xs={24} lg={16}>
@@ -182,82 +230,88 @@ const StudentProfilePage = () => {
                 </Col>
 
                 <Col xs={24} lg={8}>
-                    <Space direction="vertical" size="large" style={{ width: '100%' }}>
-                        {/* Plan Activo */}
-                        <DetailCard
-                            title={t('students.currentPlan')}
-                            icon={<SafetyCertificateOutlined />}
-                            extra={<Tag color={activePlan?.status === "active" ? "green" : "red"}>{activePlan?.status || t('students.inactive')}</Tag>}
-                            actions={[
-                                activePlan?.status === "active" ? (
-                                    <Button danger icon={<PauseCircleOutlined />} onClick={() => setIsPauseModalOpen(true)}>
-                                        {t('students.pausePlan')}
-                                    </Button>
+                    {activeTab === "profile" && (
+                        <Space direction="vertical" size="large" style={{ width: '100%' }}>
+                            {/* Plan Activo */}
+                            <DetailCard
+                                title={t('students.currentPlan')}
+                                icon={<SafetyCertificateOutlined />}
+                                extra={<Tag color={activePlan?.status === "active" ? "green" : "red"}>{activePlan?.status || t('students.inactive')}</Tag>}
+                                actions={[
+                                    activePlan?.status === "active" ? (
+                                        <Button danger icon={<PauseCircleOutlined />} onClick={() => setIsPauseModalOpen(true)}>
+                                            {t('students.pausePlan')}
+                                        </Button>
+                                    ) : (
+                                        <Button type="primary" icon={<CreditCardOutlined />} onClick={() => openModal()}>
+                                            {activePlan ? t('students.renewPlan') : t('students.assignPlan', { defaultValue: 'Asignar Plan' })}
+                                        </Button>
+                                    )
+                                ]}
+                            >
+                                {activePlan ? (
+                                    <div style={{ textAlign: "center" }}>
+                                        <Title level={4} style={{ marginBottom: 4 }}>{activePlan.name}</Title>
+                                        <Text type="secondary">{t('students.expires')}: {formatDateShort(activePlan.end_date)}</Text>
+
+                                        <Divider style={{ margin: '16px 0' }} />
+
+                                        <Row gutter={16}>
+                                            <Col span={12}>
+                                                <Statistic
+                                                    title={t('students.classesRemaining')}
+                                                    value={activePlan.max_classes === 0 ? "∞" : activePlan.classes_remaining}
+                                                    prefix={<ClockCircleOutlined />}
+                                                />
+                                            </Col>
+                                            <Col span={12}>
+                                                <Statistic
+                                                    title={t('students.nextPayment')}
+                                                    value={formatCurrency(activePlan.price || 0)}
+                                                    prefix={<CreditCardOutlined />}
+                                                />
+                                            </Col>
+                                        </Row>
+                                    </div>
                                 ) : (
-                                    <Button type="primary" icon={<CreditCardOutlined />} onClick={() => openModal()}>
-                                        {activePlan ? t('students.renewPlan') : t('students.assignPlan', { defaultValue: 'Asignar Plan' })}
-                                    </Button>
-                                )
-                            ]}
-                        >
-                            {activePlan ? (
-                                <div style={{ textAlign: "center" }}>
-                                    <Title level={4} style={{ marginBottom: 4 }}>{activePlan.name}</Title>
-                                    <Text type="secondary">{t('students.expires')}: {formatDateShort(activePlan.end_date)}</Text>
-
-                                    <Divider style={{ margin: '16px 0' }} />
-
-                                    <Row gutter={16}>
-                                        <Col span={12}>
-                                            <Statistic
-                                                title={t('students.classesRemaining')}
-                                                value={activePlan.max_classes === 0 ? "∞" : activePlan.classes_remaining}
-                                                prefix={<ClockCircleOutlined />}
-                                            />
-                                        </Col>
-                                        <Col span={12}>
-                                            <Statistic
-                                                title={t('students.nextPayment')}
-                                                value={formatCurrency(activePlan.price || 0)}
-                                                prefix={<CreditCardOutlined />}
-                                            />
-                                        </Col>
-                                    </Row>
-                                </div>
-                            ) : (
-                                <div style={{ textAlign: "center", padding: "20px 0" }}>
-                                    <Text type="secondary">{t('students.noActivePlan')}</Text>
-                                </div>
-                            )}
-                        </DetailCard>
-
-                        {/* Últimos Pagos */}
-                        <DetailCard
-                            title={t('students.recentPayments', { defaultValue: "Últimos Pagos" })}
-                            icon={<HistoryOutlined />}
-                            bodyStyle={{ padding: '0 12px' }}
-                        >
-                            <List
-                                dataSource={payments.slice(0, 5)}
-                                renderItem={(item) => (
-                                    <List.Item>
-                                        <List.Item.Meta
-                                            title={<Text strong>{formatCurrency(item.amount)}</Text>}
-                                            description={formatDateShort(item.payment_date)}
-                                        />
-                                        <Tag color={item.status === 'completed' ? 'green' : 'orange'}>
-                                            {item.status}
-                                        </Tag>
-                                    </List.Item>
+                                    <div style={{ textAlign: "center", padding: "20px 0" }}>
+                                        <Text type="secondary">{t('students.noActivePlan')}</Text>
+                                    </div>
                                 )}
-                            />
-                            {payments.length > 5 && (
-                                <Button type="link" block onClick={() => navigate(`/students/${id}/history`)}>
-                                    {t('global.viewAll')}
-                                </Button>
-                            )}
-                        </DetailCard>
-                    </Space>
+                            </DetailCard>
+
+                            {/* Últimos Pagos */}
+                            <DetailCard
+                                title={t('students.recentPayments', { defaultValue: "Últimos Pagos" })}
+                                icon={<HistoryOutlined />}
+                                bodyStyle={{ padding: '0 12px' }}
+                            >
+                                <List
+                                    dataSource={payments.slice(0, 5)}
+                                    renderItem={(item) => (
+                                        <List.Item>
+                                            <List.Item.Meta
+                                                title={<Text strong>{formatCurrency(item.amount)}</Text>}
+                                                description={formatDateShort(item.payment_date)}
+                                            />
+                                            <Tag color={item.status === 'completed' ? 'green' : 'orange'}>
+                                                {item.status}
+                                            </Tag>
+                                        </List.Item>
+                                    )}
+                                />
+                                {payments.length > 5 && (
+                                    <Button type="link" block onClick={() => navigate(`/students/${id}/history`)}>
+                                        {t('global.viewAll')}
+                                    </Button>
+                                )}
+                            </DetailCard>
+                        </Space>
+                    )}
+
+                    {activeTab === "stats" && <StudentStats studentId={id} />}
+                    {activeTab === "achievements" && <StudentAchievements studentId={id} />}
+                    {activeTab === "challenges" && <StudentChallenges studentId={id} />}
                 </Col>
             </Row>
 

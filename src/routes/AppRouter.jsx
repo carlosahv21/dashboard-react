@@ -38,6 +38,9 @@ const Profile = lazy(() => import("../features/profile/pages/ProfilePage"));
 // Configuración
 const Settings = lazy(() => import("../features/settings/pages/SettingsPage"));
 
+// Conexiones
+const Connections = lazy(() => import("../features/connections/pages/ConnectionsPage"));
+
 const AppRouter = () => {
     const { user, loading, hasPermission } = useContext(AuthContext);
 
@@ -63,6 +66,11 @@ const AppRouter = () => {
                                 <Route path="plans" element={<Plans />} />
                                 <Route path="plans/:id/details" element={<PlanDetails />} />
                             </>
+                        )}
+
+                        {/* Conexiones */}
+                        {hasPermission("connections:view") && (
+                            <Route path="connections" element={<Connections />} />
                         )}
 
                         {/* Gestión de Clases  */}
