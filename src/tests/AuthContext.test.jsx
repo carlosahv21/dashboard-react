@@ -1,6 +1,6 @@
 import React, { useContext } from "react";
 import { renderHook, act } from "@testing-library/react";
-import { AuthContext, AuthProvider } from "./AuthContext";
+import { AuthContext, AuthProvider } from "../context/AuthContext";
 
 // --- Mocks ---------------------------------------------------------------
 jest.mock("../features/auth/services/authService.jsx", () => ({
@@ -24,10 +24,10 @@ beforeEach(() => {
 });
 
 describe("AuthContext", () => {
-    test("hasPermission reflects the stored permission map", () => {
+    test("hasPermission reflects the stored permission map (action→scope object)", () => {
         localStorage.setItem(
             "permissions",
-            JSON.stringify({ students: { actions: ["view", "create"] } })
+            JSON.stringify({ students: { actions: { view: "own", create: "own" } } })
         );
 
         const { result } = renderAuth();
@@ -37,6 +37,20 @@ describe("AuthContext", () => {
         expect(result.current.hasPermission("teachers:view")).toBe(false);
     });
 
+    test("getScope returns the scope of a granted action, or null when absent", () => {
+        localStorage.setItem(
+            "permissions",
+            JSON.stringify({ classes: { actions: { view: "all", edit: "own" } } })
+        );
+
+        const { result } = renderAuth();
+
+        expect(result.current.getScope("classes", "view")).toBe("all");
+        expect(result.current.getScope("classes", "edit")).toBe("own");
+        expect(result.current.getScope("classes", "delete")).toBeNull();
+        expect(result.current.getScope("teachers", "view")).toBeNull();
+    });
+
     test("login persists token and updates permissions in state", () => {
         const { result } = renderAuth();
 
@@ -44,13 +58,14 @@ describe("AuthContext", () => {
             result.current.login({
                 token: "jwt-123",
                 user: { id: 1, name: "Carlos" },
-                permissions: { teachers: { actions: ["view"] } },
+                permissions: { teachers: { actions: { view: "all" } } },
             })
         );
 
         expect(localStorage.getItem("token")).toBe("jwt-123");
         expect(result.current.user).toEqual({ id: 1, name: "Carlos" });
         expect(result.current.hasPermission("teachers:view")).toBe(true);
+        expect(result.current.getScope("teachers", "view")).toBe("all");
     });
 
     test("logout clears the session", () => {

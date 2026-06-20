@@ -1,10 +1,10 @@
 import { renderHook, act } from "@testing-library/react";
-import { useCrud } from "./useCrud";
+import { useCrud } from "../hooks/useCrud";
 
 // --- Mocks ---------------------------------------------------------------
 const mockRequest = jest.fn();
 
-jest.mock("./useFetch", () => ({
+jest.mock("../hooks/useFetch", () => ({
     __esModule: true,
     default: () => ({ request: mockRequest, loading: false, error: null }),
 }));

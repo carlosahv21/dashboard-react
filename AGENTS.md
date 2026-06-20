@@ -40,6 +40,7 @@ attendances — auth — classes — dashboard — notifications — onboarding 
 - **API calls**: `useFetch()` hook → axios instance → `REACT_APP_BACKEND_URL`. No direct axios imports in features.
 - **List pages**: `useCrud(endpoint, title)` hook returns pagination, search, sort, selection, bulk-delete state.
 - **RBAC**: `hasPermission("module:action")` (router) / `usePermission(module, action)` (components). Permission map stored in localStorage.
+  - **Shape**: `permissions[module].actions` is an object `{ [action]: scope }` (not an array). A granted action is a key present in that object; its value is the scope `"all" | "own" | "assigned"`. Read the scope with `getScope(module, action)` (from `AuthContext`) or the `useScope(module, action)` hook — both return `null` when the action isn't granted. Scope is for UI/feedback; the backend enforces it on its queries.
   - ⚠️ **Client-side gating is UX only.** The permission map lives in `localStorage` and is trivially editable from DevTools, so route guards and `usePermission()` only hide/disable UI. **Every action must be authorized server-side** — never treat the frontend check as a security boundary.
 - **Routes**: lazy-loaded with `React.lazy` + `<Suspense fallback={<LoadingScreen />}>`. Authenticated routes nested under `<DashboardLayout />`.
 - **Forms**: `BaseFormModal` and `useFormModal` for CRUD modals.

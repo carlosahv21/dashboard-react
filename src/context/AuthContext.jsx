@@ -28,7 +28,9 @@ const safeParseItem = (key, fallback) => {
  *  - user:        { id, email, name, role, theme, language, ... }
  *  - academy:     { id, name, logo_url, plan, currency, date_format, address }
  *  - modules:     string[]  — list of enabled module keys for this academy
- *  - permissions: { [module]: { actions: string[], scope: string } }
+ *  - permissions: { [module]: { actions: Record<string, "all"|"own"|"assigned"> } }
+ *                 — `actions` maps each granted action to its scope; an action
+ *                 absent from the map means the user lacks that permission.
  */
 export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(() => safeParseItem("user", null));
@@ -157,8 +159,16 @@ export const AuthProvider = ({ children }) => {
         if (!permString) return true;
         const [module, action] = permString.split(":");
         if (!permissions || !permissions[module]) return false;
-        if (action) return permissions[module].actions?.includes(action) ?? false;
+        if (action) return permissions[module].actions?.[action] != null;
         return true;
+    }, [permissions]);
+
+    /**
+     * Returns the scope of a granted action ("all" | "own" | "assigned"),
+     * or null if the user doesn't have that action.
+     */
+    const getScope = useCallback((module, action) => {
+        return permissions?.[module]?.actions?.[action] ?? null;
     }, [permissions]);
 
     /**
@@ -202,7 +212,7 @@ export const AuthProvider = ({ children }) => {
     return (
         <AuthContext.Provider value={{
             user, academy, settings, permissions, modules, loading,
-            login, logout, hasPermission, hasModule, toggleTheme, updateUser,
+            login, logout, hasPermission, getScope, hasModule, toggleTheme, updateUser,
         }}>
             {children}
         </AuthContext.Provider>

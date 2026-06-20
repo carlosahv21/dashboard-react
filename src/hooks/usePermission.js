@@ -20,7 +20,18 @@ const usePermission = (module, action) => {
     if (!permissions || !permissions[module]) return false;
     if (!action) return true; // Module exists, no specific action required → allowed
 
-    return permissions[module].actions?.includes(action) ?? false;
+    // `actions` is an object { [action]: scope }; presence of the key grants it.
+    return permissions[module].actions?.[action] != null;
 };
+
+/**
+ * Returns the scope of a granted action ("all" | "own" | "assigned"), or null if
+ * the user doesn't have that action. Useful for scope-aware UI/feedback.
+ *
+ * @example
+ * const editScope = useScope("classes", "edit"); // "own" | "all" | "assigned" | null
+ */
+export const useScope = (module, action) =>
+    useContext(AuthContext).permissions?.[module]?.actions?.[action] ?? null;
 
 export default usePermission;
