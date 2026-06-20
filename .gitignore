@@ -10,8 +10,9 @@ node_modules
 *.log
 Thumbs.db
 
-# Dependencias (asegurar)
-package-lock.json
+# Dependencias: este proyecto usa npm. Bloquear lockfiles de otros gestores.
+pnpm-lock.yaml
+yarn.lock
 
 estructura.txt
 gem-script.js

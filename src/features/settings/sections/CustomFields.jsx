@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useContext, useCallback, useMemo } from "react";
 import { Divider, Form, Select, Card, Row, Col, Button, Modal, Checkbox, Input, Skeleton, Empty, Space, Tooltip, theme, App } from "antd";
 import { EditOutlined, PlusOutlined, DeleteOutlined, InfoCircleOutlined, HolderOutlined } from "@ant-design/icons";
-import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
+import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 import useFetch from "../../../hooks/useFetch";
 import FormHeader from "../../../components/Common/FormHeader";
 import FormFooter from "../../../components/Common/FormFooter";

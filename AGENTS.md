@@ -3,17 +3,19 @@
 ## Quick start
 
 ```bash
-pnpm install
-pnpm run dev      # → http://localhost:3000
-pnpm run build    # → /build
-pnpm test         # react-scripts test (Jest + @testing-library)
+npm install
+npm run dev      # → http://localhost:3000
+npm run build    # → /build
+npm test         # react-scripts test (Jest + @testing-library)
 ```
+
+**Package manager: npm only.** A `preinstall` guard (`only-allow npm`) blocks pnpm/yarn, and their lockfiles are git-ignored. `package-lock.json` is the committed lockfile.
 
 No separate lint, typecheck, prettier, or commit-hook scripts exist.
 
 ## Architecture
 
-**Single app, pure JS** (no TypeScript, no monorepo). `pnpm-workspace.yaml` only exists to allow `core-js` builds.
+**Single app, pure JS** (no TypeScript, no monorepo). All transitive deps are pinned to the root React version via the top-level `overrides` in `package.json`.
 
 | Layer | Location | Notes |
 |---|---|---|
