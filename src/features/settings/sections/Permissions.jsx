@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback } from "react";
-import { message, Checkbox, Select, Button } from "antd";
+import { message, Checkbox, Select, Button, Space } from "antd";
 import useFetch from "../../../hooks/useFetch";
 import FormHeader from "../../../components/Common/FormHeader";
 import DataTable from "../../../components/Common/DataTable";
@@ -7,6 +7,8 @@ import { useTranslation } from "react-i18next";
 
 const { Option } = Select;
 const ACTIONS = ["view", "create", "edit", "delete"];
+const SCOPES = ["all", "own", "assigned"];
+const DEFAULT_SCOPE = "own";
 
 const RolePermissions = () => {
     const { t } = useTranslation();
@@ -15,8 +17,8 @@ const RolePermissions = () => {
     const [rolePermissions, setRolePermissions] = useState([]);
     const [selectedRole, setSelectedRole] = useState(null);
 
-    // Nuevo: permisos seleccionados localmente
-    const [localRolePermissions, setLocalRolePermissions] = useState([]);
+    // Permisos concedidos localmente, mapeados a su scope: { [permission_id]: scope }
+    const [localScopes, setLocalScopes] = useState({});
 
     const [loading, setLoading] = useState(false);
 
@@ -39,7 +41,8 @@ const RolePermissions = () => {
                     if (p.id != null)
                         allRolePermissions.push({
                             role_id: role.role_id,
-                            permission_id: p.id
+                            permission_id: p.id,
+                            scope: p.scope ?? DEFAULT_SCOPE
                         });
                 });
             });
@@ -64,31 +67,44 @@ const RolePermissions = () => {
         fetchRolePermissions();
     }, [fetchRolePermissions]);
 
-    // Cargar permisos locales cuando cambia el rol
+    // Cargar permisos locales (id → scope) cuando cambia el rol
     useEffect(() => {
         if (!selectedRole) return;
 
         const current = rolePermissions
             .filter(rp => rp.role_id === selectedRole)
-            .map(rp => rp.permission_id);
+            .reduce((acc, rp) => {
+                acc[rp.permission_id] = rp.scope ?? DEFAULT_SCOPE;
+                return acc;
+            }, {});
 
-        setLocalRolePermissions(current);
+        setLocalScopes(current);
     }, [selectedRole, rolePermissions]);
 
-    // Cambiar en local, sin backend
+    // Conceder/revocar en local, sin backend. Al conceder usa el scope por defecto.
     const toggleLocalPermission = (permissionId) => {
-        setLocalRolePermissions(prev =>
-            prev.includes(permissionId)
-                ? prev.filter(id => id !== permissionId)
-                : [...prev, permissionId]
-        );
+        setLocalScopes(prev => {
+            if (permissionId in prev) {
+                const { [permissionId]: _removed, ...rest } = prev;
+                return rest;
+            }
+            return { ...prev, [permissionId]: DEFAULT_SCOPE };
+        });
+    };
+
+    // Cambiar el scope de un permiso ya concedido
+    const setLocalScope = (permissionId, scope) => {
+        setLocalScopes(prev => ({ ...prev, [permissionId]: scope }));
     };
 
     // Enviar al backend
     const savePermissions = async () => {
         try {
             await request(`rolePermissions/${selectedRole}`, "POST", {
-                permission_ids: localRolePermissions
+                role_id: selectedRole,
+                permission_ids: permissions
+                    .filter(p => p.id in localScopes)
+                    .map(p => ({ permission_id: p.id, scope: localScopes[p.id] }))
             });
 
             message.success(t('settings.permissionsSaveSuccess'));
@@ -133,15 +149,32 @@ const RolePermissions = () => {
                 const perm = record[action];
                 if (!perm) return <Checkbox disabled />;
 
-                const checked = localRolePermissions.includes(perm.id);
+                const granted = perm.id in localScopes;
                 const isAdmin = roles.find(r => r.id === selectedRole)?.name.toLowerCase() === "admin";
 
                 return (
-                    <Checkbox
-                        checked={checked}
-                        disabled={isAdmin}
-                        onChange={() => toggleLocalPermission(perm.id)}
-                    />
+                    <Space size={8}>
+                        <Checkbox
+                            checked={granted}
+                            disabled={isAdmin}
+                            onChange={() => toggleLocalPermission(perm.id)}
+                        />
+                        {granted && (
+                            <Select
+                                size="small"
+                                style={{ width: 120 }}
+                                value={localScopes[perm.id]}
+                                disabled={isAdmin}
+                                onChange={(scope) => setLocalScope(perm.id, scope)}
+                            >
+                                {SCOPES.map(scope => (
+                                    <Option key={scope} value={scope}>
+                                        {t(`settings.scope_${scope}`)}
+                                    </Option>
+                                ))}
+                            </Select>
+                        )}
+                    </Space>
                 );
             }
         }))
