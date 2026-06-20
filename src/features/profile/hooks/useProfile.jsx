@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { message } from "antd";
+import { useTranslation } from "react-i18next";
 import dayjs from "dayjs";
 import profileService from "../services/profileService";
 
@@ -7,6 +8,7 @@ import profileService from "../services/profileService";
  * Hook to manage profile data and operations.
  */
 export const useProfile = (user, profileForm) => {
+  const { t } = useTranslation();
   const [profileData, setProfileData] = useState(null);
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
@@ -29,7 +31,7 @@ export const useProfile = (user, profileForm) => {
           }
         } catch (error) {
           console.error("Error fetching profile:", error);
-          message.error("Error al cargar el perfil");
+          message.error(t("profile.loadError"));
         } finally {
           setLoading(false);
         }
@@ -37,7 +39,7 @@ export const useProfile = (user, profileForm) => {
     };
 
     fetchProfile();
-  }, [user?.id, profileForm]);
+  }, [user?.id, profileForm, t]);
 
   const updateProfile = async (values) => {
     try {
@@ -51,11 +53,11 @@ export const useProfile = (user, profileForm) => {
       await profileService.updateProfile(user.id, formattedValues);
       setProfileData((prev) => ({ ...prev, ...formattedValues }));
       setIsEditing(false);
-      message.success("Perfil actualizado con éxito");
+      message.success(t("profile.updateSuccess"));
       return true;
     } catch (error) {
       console.error("Error updating profile:", error);
-      message.error("Error al actualizar el perfil");
+      message.error(t("profile.updateError"));
       return false;
     }
   };
@@ -67,11 +69,11 @@ export const useProfile = (user, profileForm) => {
         new_password: values.newPassword,
         email: email,
       });
-      message.success("Contraseña actualizada con éxito");
+      message.success(t("profile.passwordUpdateSuccess"));
       return true;
     } catch (error) {
       console.error("Error updating password:", error);
-      message.error("Error al actualizar la contraseña");
+      message.error(t("profile.passwordUpdateError"));
       return false;
     }
   };
@@ -93,11 +95,11 @@ export const useProfile = (user, profileForm) => {
         setUser((prev) => ({ ...prev, photo: imageUrl }));
       }
 
-      message.success("Foto actualizada con éxito");
+      message.success(t("profile.photoUpdateSuccess"));
       return imageUrl;
     } catch (error) {
       console.error("Upload error:", error);
-      message.error("Error al subir la imagen");
+      message.error(t("profile.photoUploadError"));
       throw error;
     } finally {
       setUploading(false);

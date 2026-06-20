@@ -67,7 +67,9 @@
         "stats": "Estadísticas",
         "welcome": "Bienvenido",
         "subtitle": "a la administración de {{academyName}}",
-        "period": "Periodo"
+        "period": "Periodo",
+        "loadKpisError": "Error al cargar los KPIs",
+        "loadParticipationError": "Error al cargar participación de maestros"
     },
     "stats": {
         "userDistributionByPlan": "Distribución de Usuarios por Plan",
@@ -224,7 +226,25 @@
         "date": "Fecha de Registro",
         "level": "Nivel",
         "genre": "Género",
-        "enroll_classes": "Inscribir Clases"
+        "enroll_classes": "Inscribir Clases",
+        "loadAvailableClassesError": "Error al cargar clases disponibles",
+        "loadStudentsError": "Error al cargar estudiantes",
+        "loadClassesError": "Error al cargar clases",
+        "loadEnrollmentsError": "Error al cargar inscripciones",
+        "selectStudentFirst": "Por favor seleccione un estudiante primero",
+        "enrollSuccess": "Inscrito correctamente en {{name}}",
+        "enrollError": "Error al inscribir",
+        "unenrollSuccess": "Clase dada de baja correctamente",
+        "unenrollError": "Error al dar de baja"
+    },
+    "profile": {
+        "loadError": "Error al cargar el perfil",
+        "updateSuccess": "Perfil actualizado con éxito",
+        "updateError": "Error al actualizar el perfil",
+        "passwordUpdateSuccess": "Contraseña actualizada con éxito",
+        "passwordUpdateError": "Error al actualizar la contraseña",
+        "photoUpdateSuccess": "Foto actualizada con éxito",
+        "photoUploadError": "Error al subir la imagen"
     },
     "attendances": {
         "name_plural": "Asistencias",

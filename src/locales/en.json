@@ -67,7 +67,9 @@
         "stats": "Statistics",
         "welcome": "Welcome",
         "subtitle": "to the administration of {{academyName}}",
-        "period": "Period"
+        "period": "Period",
+        "loadKpisError": "Error loading KPIs",
+        "loadParticipationError": "Error loading teacher participation"
     },
     "stats": {
         "userDistributionByPlan": "User Distribution by Plan",
@@ -224,7 +226,25 @@
         "date": "Registration Date",
         "level": "Level",
         "genre": "Genre",
-        "enroll_classes": "Enroll Classes"
+        "enroll_classes": "Enroll Classes",
+        "loadAvailableClassesError": "Error loading available classes",
+        "loadStudentsError": "Error loading students",
+        "loadClassesError": "Error loading classes",
+        "loadEnrollmentsError": "Error loading enrollments",
+        "selectStudentFirst": "Please select a student first",
+        "enrollSuccess": "Successfully enrolled in {{name}}",
+        "enrollError": "Error enrolling",
+        "unenrollSuccess": "Class successfully dropped",
+        "unenrollError": "Error dropping class"
+    },
+    "profile": {
+        "loadError": "Error loading profile",
+        "updateSuccess": "Profile updated successfully",
+        "updateError": "Error updating profile",
+        "passwordUpdateSuccess": "Password updated successfully",
+        "passwordUpdateError": "Error updating password",
+        "photoUpdateSuccess": "Photo updated successfully",
+        "photoUploadError": "Error uploading image"
     },
     "attendances": {
         "name_plural": "Attendances",

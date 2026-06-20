@@ -1,8 +1,10 @@
 import { useState, useEffect, useCallback, useMemo } from "react";
 import { message } from "antd";
+import { useTranslation } from "react-i18next";
 import registrationService from "../services/registrationService";
 
 export const useRegistrations = (user, isAdmin) => {
+  const { t } = useTranslation();
   const [students, setStudents] = useState([]);
   const [selectedStudentId, setSelectedStudentId] = useState(null);
   const [availableClasses, setAvailableClasses] = useState([]);
@@ -16,11 +18,11 @@ export const useRegistrations = (user, isAdmin) => {
       const res = await registrationService.getFavoriteClasses();
       setAvailableClasses(res.data?.data || res.data || []);
     } catch (error) {
-      message.error("Error al cargar clases disponibles");
+      message.error(t("registrations.loadAvailableClassesError"));
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [t]);
 
   const fetchStudents = useCallback(async (searchTerm) => {
     if (!searchTerm || searchTerm.length < 3) {
@@ -32,11 +34,11 @@ export const useRegistrations = (user, isAdmin) => {
       const res = await registrationService.getStudents(searchTerm);
       setStudents(res.data?.data || res.data || []);
     } catch (error) {
-      message.error("Error al cargar estudiantes");
+      message.error(t("registrations.loadStudentsError"));
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [t]);
 
   const fetchClasses = useCallback(async (searchTerm) => {
     if (!searchTerm || searchTerm.length === 0) {
@@ -52,11 +54,11 @@ export const useRegistrations = (user, isAdmin) => {
       const res = await registrationService.getClasses(searchTerm);
       setAvailableClasses(res.data?.data || res.data || []);
     } catch (error) {
-      message.error("Error al cargar clases");
+      message.error(t("registrations.loadClassesError"));
     } finally {
       setLoading(false);
     }
-  }, [fetchInitialClasses]);
+  }, [fetchInitialClasses, t]);
 
   const fetchEnrollments = useCallback(async (studentId) => {
     try {
@@ -64,33 +66,33 @@ export const useRegistrations = (user, isAdmin) => {
       const res = await registrationService.getEnrollments(studentId);
       setEnrolledClasses(res.data?.data || res.data || []);
     } catch (error) {
-      message.error("Error al cargar inscripciones");
+      message.error(t("registrations.loadEnrollmentsError"));
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [t]);
 
   const enroll = async (classItem) => {
     if (!selectedStudentId) {
-      message.warning("Por favor seleccione un estudiante primero");
+      message.warning(t("registrations.selectStudentFirst"));
       return;
     }
     try {
       await registrationService.enroll(selectedStudentId, classItem.id);
-      message.success(`Inscrito correctamente en ${classItem.name}`);
+      message.success(t("registrations.enrollSuccess", { name: classItem.name }));
       fetchEnrollments(selectedStudentId);
     } catch (error) {
-      message.error(error.response?.data?.message || "Error al inscribir");
+      message.error(error.response?.data?.message || t("registrations.enrollError"));
     }
   };
 
   const unenroll = async (classItem) => {
     try {
       await registrationService.unenroll(classItem.id);
-      message.success("Clase dada de baja correctamente");
+      message.success(t("registrations.unenrollSuccess"));
       fetchEnrollments(selectedStudentId);
     } catch (error) {
-      message.error("Error al dar de baja");
+      message.error(t("registrations.unenrollError"));
     }
   };
 

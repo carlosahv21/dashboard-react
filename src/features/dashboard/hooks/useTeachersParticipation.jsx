@@ -29,14 +29,14 @@ const useTeachersParticipation = (filters) => {
         }
       } catch (error) {
         console.error("Error al cargar participación de maestros:", error);
-        message.error("Error al cargar participación de maestros");
+        message.error(t("dashboard.loadParticipationError"));
         setTeacherData([]);
       } finally {
         setLoading(false);
       }
     };
     fetchData();
-  }, [filters]);
+  }, [filters, t]);
 
   const calculateRating = (totalMinutes, classesCount) => {
     const minutes =

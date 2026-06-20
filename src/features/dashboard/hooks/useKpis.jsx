@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { message } from "antd";
+import { useTranslation } from "react-i18next";
 import dashboardService from "../services/dashboardService";
 
 const initialKpiData = {
@@ -13,6 +14,7 @@ const initialKpiData = {
  * Hook to manage KPI data.
  */
 const useKpis = (filters) => {
+  const { t } = useTranslation();
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState(initialKpiData);
 
@@ -24,19 +26,19 @@ const useKpis = (filters) => {
         const result = response.data;
         
         if (!result?.success) {
-          message.error("Error al cargar los KPIs");
+          message.error(t("dashboard.loadKpisError"));
         }
         setData(result?.success ? result.data : initialKpiData);
       } catch (error) {
         console.error("Error KPI:", error);
-        message.error("Error al cargar los KPIs");
+        message.error(t("dashboard.loadKpisError"));
         setData(initialKpiData);
       } finally {
         setLoading(false);
       }
     };
     fetchKpiData();
-  }, [filters]);
+  }, [filters, t]);
 
   return {
     kpiLoading: loading,
