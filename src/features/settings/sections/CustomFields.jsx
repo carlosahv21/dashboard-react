@@ -201,7 +201,7 @@ const CustomFields = () => {
     // Drag & Drop: reorder fields within the same block
     // -----------------------------------------------------------
     const onDragEnd = useCallback(async (result) => {
-        const { source, destination, draggableId } = result;
+        const { source, destination } = result;
 
         if (!destination) return;
 

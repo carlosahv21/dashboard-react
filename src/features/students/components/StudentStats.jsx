@@ -3,7 +3,6 @@ import { Row, Col, Statistic, Spin, Typography, Tag, theme } from "antd";
 import {
     TrophyOutlined,
     FireOutlined,
-    BookOutlined,
     ClockCircleOutlined,
     StarOutlined,
     ThunderboltOutlined,

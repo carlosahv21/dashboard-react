@@ -94,6 +94,7 @@ export const useAttendance = () => {
       }
     };
     fetchClasses();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pagination.current, pagination.pageSize, selectedClass]);
 
   // Fetch Students and Attendance
@@ -164,6 +165,7 @@ export const useAttendance = () => {
       }
     };
     fetchData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     selectedClass,
     studentPagination.current,

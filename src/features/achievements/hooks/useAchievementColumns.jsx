@@ -1,6 +1,5 @@
 import { useTranslation } from "react-i18next";
 import { Tag } from "antd";
-import { TrophyOutlined } from "@ant-design/icons";
 
 export const useAchievementColumns = () => {
     const { t } = useTranslation();

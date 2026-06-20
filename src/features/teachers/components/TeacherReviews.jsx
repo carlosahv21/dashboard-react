@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { List, Typography, Rate, Tag, Empty, Spin, Space, theme } from "antd";
-import { CommentOutlined, UserOutlined } from "@ant-design/icons";
+import { UserOutlined } from "@ant-design/icons";
 import { useTranslation } from "react-i18next";
 import useFetch from "../../../hooks/useFetch";
 

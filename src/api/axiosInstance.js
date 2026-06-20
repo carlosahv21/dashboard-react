@@ -1,5 +1,6 @@
 import axios from "axios";
 import { Modal } from "antd";
+import i18n from "i18next";
 
 const api = axios.create({
     baseURL: process.env.REACT_APP_BACKEND_URL || "http://localhost:3000/api",
@@ -26,9 +27,9 @@ api.interceptors.response.use(
         if (error.response?.status === 401 && !isAuthRequest && !isSessionExpiredShown) {
             isSessionExpiredShown = true;
             Modal.warning({
-                title: 'Sesion Expirada',
-                content: 'Tu sesión ha expirado o el token es inválido. Por favor, inicia sesión nuevamente.',
-                okText: 'Entendido',
+                title: i18n.t('global.sessionExpiredTitle'),
+                content: i18n.t('global.sessionExpiredContent'),
+                okText: i18n.t('global.understood'),
                 onOk: () => {
                     isSessionExpiredShown = false;
                     localStorage.clear();

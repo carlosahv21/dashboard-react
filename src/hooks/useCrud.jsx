@@ -1,6 +1,7 @@
 // hooks/useCrud.js
 import { useState, useEffect, useCallback } from "react";
 import { message } from "antd";
+import { useTranslation } from "react-i18next";
 import useFetch from "./useFetch";
 
 export const useCrud = (
@@ -11,6 +12,7 @@ export const useCrud = (
     initialPageSize = 10
 ) => {
     const { request } = useFetch();
+    const { t } = useTranslation();
     const [items, setItems] = useState([]);
     const [loading, setLoading] = useState(false);
     
@@ -74,10 +76,11 @@ export const useCrud = (
             setPagination((prev) => ({ ...prev, total, current: Number(current), pageSize: Number(limit) }));
         } catch (error) {
             console.error(error);
-            message.error(`Error al cargar ${titlePlural}`);
+            message.error(t('global.loadError', { entity: titlePlural }));
         } finally {
             setLoading(false);
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [endpoint, titlePlural, filtersString, search, sort, pagination.current, pagination.pageSize, request]);
 
     // Dispara búsqueda (y carga inicial) restableciendo a la página 1 cuando cambia el input de búsqueda.
@@ -123,7 +126,7 @@ export const useCrud = (
             const params = {
                 page: 1,
                 limit: 10000,
-                search: search.length >= 3 ? search : undefined,
+                search: search.length >= 2 ? search : undefined,
                 order_by: sort.field,
                 order_direction:
                     sort.order === "ascend"
@@ -143,7 +146,7 @@ export const useCrud = (
             return response.data || [];
         } catch (error) {
             console.error(error);
-            message.error(`Error al exportar ${titlePlural}`);
+            message.error(t('global.exportError', { entity: titlePlural }));
             return [];
         }
     };
@@ -204,7 +207,7 @@ export const useCrud = (
                     for (let i = 0; i < idsToDelete.length; i += 5) {
                         const chunk = idsToDelete.slice(i, i + 5);
                         await Promise.all(
-                            chunk.map((id) => request(`${endpoint}/${id}`, "DELETE"))
+                            chunk.map((id) => request(`${endpoint}/${id}/bin`, "PATCH"))
                         );
                     }
 

@@ -29,16 +29,6 @@ const StudentChallenges = ({ studentId }) => {
         if (studentId) fetchChallenges();
     }, [studentId, fetchChallenges]);
 
-    const handleJoin = async (challengeId) => {
-        try {
-            await request("user-challenges/join", "POST", { challenge_id: challengeId });
-            message.success(t("studentChallenges.joinSuccess"));
-            fetchChallenges();
-        } catch (err) {
-            message.error(err.message || t("studentChallenges.joinError"));
-        }
-    };
-
     const handleLeave = async (challengeId) => {
         try {
             await request(`user-challenges/leave/${challengeId}`, "DELETE");

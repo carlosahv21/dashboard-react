@@ -1,9 +1,11 @@
 import { useState } from 'react';
 import { message } from 'antd';
+import { useTranslation } from 'react-i18next';
 import useFetch from './useFetch';
 
 export const useDrawerDetail = (endpoint, titleSingular) => {
     const { request } = useFetch();
+    const { t } = useTranslation();
     const [drawerVisible, setDrawerVisible] = useState(false);
     const [selectedRecordId, setSelectedRecordId] = useState(null);
     const [drawerData, setDrawerData] = useState(null);
@@ -21,7 +23,7 @@ export const useDrawerDetail = (endpoint, titleSingular) => {
             setDrawerData(response.data);
         } catch (error) {
             console.error("Error fetching detail:", error);
-            message.error(`Error al cargar los detalles de ${titleSingular}`);
+            message.error(t('global.detailLoadError', { entity: titleSingular }));
             setDrawerVisible(false);
         } finally {
             setDrawerLoading(false);
